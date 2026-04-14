@@ -32,13 +32,13 @@
         <img src="assets/logo.png" alt="Linkon" class="nav__logo-img">
       </a>
 
-      <nav class="nav__links" aria-label="주요 메뉴">
+      <nav class="nav__links" aria-label="주요 메뉴" data-i18n-aria-label="nav.aria.primary">
         <a href="#services" class="nav__link" data-i18n="nav.services">서비스</a>
         <a href="#about" class="nav__link" data-i18n="nav.about">회사 소개</a>
         <a href="#contact" class="nav__link" data-i18n="nav.contact">문의하기</a>
       </nav>
 
-      <div class="lang-toggle" role="group" aria-label="언어 선택">
+      <div class="lang-toggle" role="group" aria-label="언어 선택" data-i18n-aria-label="lang.toggle">
         <button class="lang-btn is-active" data-lang="ko">KO</button>
         <span class="lang-divider" aria-hidden="true">|</span>
         <button class="lang-btn" data-lang="en">EN</button>
@@ -121,19 +121,7 @@
             <div class="card-glow-top card-glow-top--vion"></div>
             <div class="card-header">
               <div class="service-logo-wrap service-logo-wrap--vion">
-                <!-- Vion SVG: 하트 + 포옹 미소 (실제 로고 반영) -->
-                <svg viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Vion 로고" role="img">
-                  <!-- 하트 본체 -->
-                  <path d="M40 62 C40 62 14 46 14 28 C14 18 21 11 30 11 C35 11 39 14 40 16 C41 14 45 11 50 11 C59 11 66 18 66 28 C66 46 40 62 40 62 Z" fill="#00C9B1"/>
-                  <!-- 하트 하이라이트 (입체감) -->
-                  <path d="M26 20 C22 23 20 28 20 32" stroke="white" stroke-width="2.5" stroke-linecap="round" opacity="0.45" fill="none"/>
-                  <!-- 포옹/미소 아크 -->
-                  <path d="M22 70 Q40 80 58 70" stroke="#00C9B1" stroke-width="3.5" fill="none" stroke-linecap="round"/>
-                  <!-- 포옹 왼쪽 팔 -->
-                  <path d="M22 70 C18 66 16 60 20 55" stroke="#00C9B1" stroke-width="3" fill="none" stroke-linecap="round"/>
-                  <!-- 포옹 오른쪽 팔 -->
-                  <path d="M58 70 C62 66 64 60 60 55" stroke="#00C9B1" stroke-width="3" fill="none" stroke-linecap="round"/>
-                </svg>
+                <img src="assets/vion-logo.png" alt="Vion 로고" class="service-logo-img">
               </div>
               <span class="status-badge status-badge--live" data-i18n="badge.live">서비스 중</span>
             </div>
@@ -159,32 +147,7 @@
             <div class="card-glow-top card-glow-top--rion"></div>
             <div class="card-header">
               <div class="service-logo-wrap service-logo-wrap--rion">
-                <!-- Rion SVG: 방패 + 사자 (실제 로고 반영) -->
-                <svg viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Rion 로고" role="img">
-                  <!-- 방패 -->
-                  <path d="M40 8 L64 18 L64 44 C64 57 53 67 40 72 C27 67 16 57 16 44 L16 18 Z" fill="#0056A0"/>
-                  <!-- 방패 내부 라인 -->
-                  <path d="M40 14 L58 22 L58 44 C58 53 50 61 40 65 C30 61 22 53 22 44 L22 22 Z" fill="none" stroke="rgba(255,255,255,0.18)" stroke-width="1.5"/>
-                  <!-- 사자 갈기 (원) -->
-                  <circle cx="40" cy="42" r="15" fill="#1A7ACC"/>
-                  <!-- 귀 -->
-                  <path d="M29 31 L26 24 L33 29 Z" fill="#0056A0"/>
-                  <path d="M51 31 L54 24 L47 29 Z" fill="#0056A0"/>
-                  <!-- 눈 -->
-                  <ellipse cx="35.5" cy="39" rx="2.5" ry="2" fill="white"/>
-                  <ellipse cx="44.5" cy="39" rx="2.5" ry="2" fill="white"/>
-                  <circle cx="36" cy="39.5" r="1" fill="#003D73"/>
-                  <circle cx="45" cy="39.5" r="1" fill="#003D73"/>
-                  <!-- 코 -->
-                  <path d="M38 44 L40 47 L42 44 Z" fill="white" opacity="0.85"/>
-                  <!-- 입 -->
-                  <path d="M35 49 Q40 54 45 49" stroke="white" stroke-width="1.5" fill="none" stroke-linecap="round"/>
-                  <!-- 수염 -->
-                  <path d="M27 44 L36 45.5" stroke="white" stroke-width="1" opacity="0.55" stroke-linecap="round"/>
-                  <path d="M27 47 L36 47" stroke="white" stroke-width="1" opacity="0.55" stroke-linecap="round"/>
-                  <path d="M44 45.5 L53 44" stroke="white" stroke-width="1" opacity="0.55" stroke-linecap="round"/>
-                  <path d="M44 47 L53 47" stroke="white" stroke-width="1" opacity="0.55" stroke-linecap="round"/>
-                </svg>
+                <img src="assets/rion-logo.png" alt="Rion 로고" class="service-logo-img">
               </div>
               <span class="status-badge status-badge--soon" data-i18n="badge.soon">출시 예정</span>
             </div>
@@ -210,20 +173,7 @@
             <div class="card-glow-top card-glow-top--taxon"></div>
             <div class="card-header">
               <div class="service-logo-wrap service-logo-wrap--taxon">
-                <!-- Taxon SVG: 상승 화살표 (실제 로고 반영) -->
-                <svg viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Taxon 로고" role="img">
-                  <!-- 배경 원 -->
-                  <circle cx="40" cy="40" r="34" fill="rgba(220,20,60,0.07)" stroke="#DC143C" stroke-width="1.5"/>
-                  <!-- 막대 차트 (오름차순) -->
-                  <rect x="16" y="58" width="9" height="10" rx="2" fill="#DC143C" opacity="0.2"/>
-                  <rect x="28" y="50" width="9" height="18" rx="2" fill="#DC143C" opacity="0.35"/>
-                  <rect x="40" y="40" width="9" height="28" rx="2" fill="#DC143C" opacity="0.5"/>
-                  <rect x="52" y="28" width="9" height="40" rx="2" fill="#DC143C" opacity="0.65"/>
-                  <!-- 상승 화살표 (메인) -->
-                  <path d="M18 62 L58 22" stroke="#DC143C" stroke-width="4" stroke-linecap="round"/>
-                  <!-- 화살표 머리 -->
-                  <path d="M46 18 L60 22 L56 36" stroke="#DC143C" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-                </svg>
+                <img src="assets/taxon-logo.png" alt="Taxon 로고" class="service-logo-img">
               </div>
               <span class="status-badge status-badge--soon" data-i18n="badge.soon">출시 예정</span>
             </div>
@@ -262,28 +212,72 @@
           </p>
           <div class="about-stats">
             <div class="stat-item" data-animate="scale-up" data-delay="100">
-              <span class="stat-number">3</span>
+              <span class="stat-number" data-countup="3">3</span>
               <span class="stat-label" data-i18n="about.stat1">전문 서비스</span>
             </div>
             <div class="stat-item" data-animate="scale-up" data-delay="200">
-              <span class="stat-number">100%</span>
+              <span class="stat-number" data-countup="100" data-suffix="%">100%</span>
               <span class="stat-label" data-i18n="about.stat2">AI 기반</span>
             </div>
             <div class="stat-item" data-animate="scale-up" data-delay="300">
-              <span class="stat-number">24/7</span>
+              <span class="stat-number" data-countup="24" data-suffix="/7">24/7</span>
               <span class="stat-label" data-i18n="about.stat3">언제 어디서나</span>
             </div>
           </div>
         </div>
 
-        <div class="about-visual" data-animate="fade-in" data-delay="200" aria-hidden="true">
-          <div class="orb-visual">
-            <div class="orb-visual__circle orb-visual__circle--teal"></div>
-            <div class="orb-visual__circle orb-visual__circle--blue"></div>
-            <div class="orb-visual__circle orb-visual__circle--red"></div>
-            <div class="orb-visual__label orb-visual__label--vion">Vion</div>
-            <div class="orb-visual__label orb-visual__label--rion">Rion</div>
-            <div class="orb-visual__label orb-visual__label--taxon">Taxon</div>
+        <div class="about-visual" data-animate="fade-in" data-delay="200">
+          <div class="service-diagram" data-active-service="vion">
+            <div class="service-diagram__ring service-diagram__ring--outer" aria-hidden="true"></div>
+            <div class="service-diagram__ring service-diagram__ring--inner" aria-hidden="true"></div>
+
+            <div class="service-diagram__core">
+              <span class="service-diagram__core-label" data-i18n="about.diagram.core.label">Linkon</span>
+              <p class="service-diagram__core-copy" data-i18n="about.diagram.core.copy">세 가지 전문 AI 서비스가 하나의 플랫폼에서 연결됩니다.</p>
+            </div>
+
+            <button class="service-diagram__node service-diagram__node--vion is-active" type="button"
+                    data-service-node="vion" aria-pressed="true" data-i18n-aria-label="about.diagram.vion.aria">
+              <span class="service-diagram__node-name">Vion</span>
+              <span class="service-diagram__node-tag" data-i18n="about.diagram.vion.tag">마음과 일상의 케어</span>
+            </button>
+
+            <button class="service-diagram__node service-diagram__node--rion" type="button"
+                    data-service-node="rion" aria-pressed="false" data-i18n-aria-label="about.diagram.rion.aria">
+              <span class="service-diagram__node-name">Rion</span>
+              <span class="service-diagram__node-tag" data-i18n="about.diagram.rion.tag">법률의 장벽을 낮추는 안내</span>
+            </button>
+
+            <button class="service-diagram__node service-diagram__node--taxon" type="button"
+                    data-service-node="taxon" aria-pressed="false" data-i18n-aria-label="about.diagram.taxon.aria">
+              <span class="service-diagram__node-name">Taxon</span>
+              <span class="service-diagram__node-tag" data-i18n="about.diagram.taxon.tag">숫자를 더 선명하게 보는 시선</span>
+            </button>
+
+            <div class="service-diagram__detail" id="about-diagram-detail" aria-live="polite">
+              <p class="service-diagram__detail-eyebrow" data-i18n="about.diagram.detail.eyebrow">Service Focus</p>
+
+              <div class="service-diagram__detail-panel is-active" data-service-panel="vion">
+                <h3 class="service-diagram__detail-title">Vion</h3>
+                <p class="service-diagram__detail-copy" data-i18n="about.diagram.vion.desc">
+                  감정 분석과 대화 기반 케어를 통해 언제든 기대어 쉴 수 있는 심리 AI입니다.
+                </p>
+              </div>
+
+              <div class="service-diagram__detail-panel" data-service-panel="rion" hidden>
+                <h3 class="service-diagram__detail-title">Rion</h3>
+                <p class="service-diagram__detail-copy" data-i18n="about.diagram.rion.desc">
+                  어려운 법률 문서와 절차를 일상 언어로 풀어내는 AI 법률 파트너입니다.
+                </p>
+              </div>
+
+              <div class="service-diagram__detail-panel" data-service-panel="taxon" hidden>
+                <h3 class="service-diagram__detail-title">Taxon</h3>
+                <p class="service-diagram__detail-copy" data-i18n="about.diagram.taxon.desc">
+                  자산 분석부터 절세 전략까지 재무 의사결정을 더 정확하게 돕는 AI입니다.
+                </p>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -298,13 +292,17 @@
         </div>
 
         <!-- 탭 버튼 -->
-        <div class="teaser-tabs" data-animate="fade-up" data-delay="100">
-          <button class="teaser-tab teaser-tab--rion active" data-tab="rion" aria-pressed="true">Rion</button>
-          <button class="teaser-tab teaser-tab--taxon" data-tab="taxon" aria-pressed="false">Taxon</button>
+        <div class="teaser-tabs" data-animate="fade-up" data-delay="100" role="tablist"
+             aria-label="출시 예정 서비스" data-i18n-aria-label="teaser.tabs.aria">
+          <button class="teaser-tab teaser-tab--rion active" id="tab-rion" type="button"
+                  data-tab="rion" role="tab" aria-selected="true" aria-controls="panel-rion" tabindex="0">Rion</button>
+          <button class="teaser-tab teaser-tab--taxon" id="tab-taxon" type="button"
+                  data-tab="taxon" role="tab" aria-selected="false" aria-controls="panel-taxon" tabindex="-1">Taxon</button>
         </div>
 
         <!-- Rion 패널 -->
-        <div class="teaser-panel active" id="panel-rion" data-animate="fade-up" data-delay="200">
+        <div class="teaser-panel active" id="panel-rion" role="tabpanel" aria-labelledby="tab-rion"
+             data-animate="fade-up" data-delay="200" tabindex="0">
           <div class="teaser-logo teaser-logo--rion">
             <svg viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
               <circle cx="40" cy="20" r="14" fill="#0056A0"/>
@@ -325,7 +323,8 @@
           </p>
           <form class="notify-form" data-service="rion" novalidate>
             <div class="notify-form__row">
-              <input type="email" class="notify-form__input" placeholder="이메일 주소를 입력해 주세요" aria-label="이메일 주소" data-i18n-placeholder="notify.placeholder">
+              <input type="email" class="notify-form__input" placeholder="이메일 주소를 입력해 주세요" aria-label="이메일 주소"
+                     data-i18n-placeholder="notify.placeholder" data-i18n-aria-label="notify.aria.email">
               <button type="submit" class="btn btn--rion" data-i18n="notify.btn">출시 알림 받기</button>
             </div>
             <p class="notify-form__success" aria-live="polite"></p>
@@ -333,7 +332,7 @@
         </div>
 
         <!-- Taxon 패널 -->
-        <div class="teaser-panel" id="panel-taxon">
+        <div class="teaser-panel" id="panel-taxon" role="tabpanel" aria-labelledby="tab-taxon" tabindex="0" hidden>
           <div class="teaser-logo teaser-logo--taxon">
             <svg viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
               <circle cx="40" cy="20" r="14" fill="#DC143C"/>
@@ -350,7 +349,8 @@
           </p>
           <form class="notify-form" data-service="taxon" novalidate>
             <div class="notify-form__row">
-              <input type="email" class="notify-form__input" placeholder="이메일 주소를 입력해 주세요" aria-label="이메일 주소" data-i18n-placeholder="notify.placeholder">
+              <input type="email" class="notify-form__input" placeholder="이메일 주소를 입력해 주세요" aria-label="이메일 주소"
+                     data-i18n-placeholder="notify.placeholder" data-i18n-aria-label="notify.aria.email">
               <button type="submit" class="btn btn--taxon" data-i18n="notify.btn">출시 알림 받기</button>
             </div>
             <p class="notify-form__success" aria-live="polite"></p>
@@ -376,9 +376,9 @@
       <div class="footer-links">
         <h4 class="footer-heading" data-i18n="footer.heading.services">서비스</h4>
         <ul class="footer-list">
-          <li><a href="https://voiceon-nine.vercel.app/" target="_blank" rel="noopener noreferrer" class="footer-link footer-link--active">Vion — 심리 및 실버 케어</a></li>
-          <li><span class="footer-link footer-link--muted">Rion — 법률 비서 <em>(출시 예정)</em></span></li>
-          <li><span class="footer-link footer-link--muted">Taxon — 재무 관리 <em>(출시 예정)</em></span></li>
+          <li><a href="https://voiceon-nine.vercel.app/" target="_blank" rel="noopener noreferrer" class="footer-link footer-link--active" data-i18n="footer.services.vion">Vion — 심리 및 실버 케어</a></li>
+          <li><span class="footer-link footer-link--muted" data-i18n-html="footer.services.rion">Rion — 법률 비서 <em>(출시 예정)</em></span></li>
+          <li><span class="footer-link footer-link--muted" data-i18n-html="footer.services.taxon">Taxon — 재무 관리 <em>(출시 예정)</em></span></li>
         </ul>
       </div>
 
