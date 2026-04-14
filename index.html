@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Linkon — 심리 케어, 법률, 재무를 아우르는 AI 서비스 플랫폼">
+  <meta property="og:title" content="Linkon">
+  <meta property="og:description" content="더 나은 삶을 위한 AI 서비스">
+  <meta property="og:type" content="website">
+  <meta name="theme-color" content="#F7F8FC">
+  <title>Linkon — AI 기반 전문 서비스</title>
+
+  <!-- Pretendard 폰트 (한국어 최적화) -->
+  <link rel="stylesheet" as="style" crossorigin
+    href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="css/reset.css">
+  <link rel="stylesheet" href="css/variables.css">
+  <link rel="stylesheet" href="css/typography.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/animations.css">
+  <link rel="stylesheet" href="css/responsive.css">
+</head>
+<body>
+
+  <!-- ===== NAVIGATION ===== -->
+  <header class="nav" id="nav">
+    <div class="nav__inner container">
+      <a href="#" class="nav__logo" aria-label="Linkon 홈">
+        <img src="assets/logo.png" alt="Linkon" class="nav__logo-img">
+      </a>
+
+      <nav class="nav__links" aria-label="주요 메뉴">
+        <a href="#services" class="nav__link" data-i18n="nav.services">서비스</a>
+        <a href="#about" class="nav__link" data-i18n="nav.about">회사 소개</a>
+        <a href="#contact" class="nav__link" data-i18n="nav.contact">문의하기</a>
+      </nav>
+
+      <div class="lang-toggle" role="group" aria-label="언어 선택">
+        <button class="lang-btn is-active" data-lang="ko">KO</button>
+        <span class="lang-divider" aria-hidden="true">|</span>
+        <button class="lang-btn" data-lang="en">EN</button>
+      </div>
+
+      <a href="https://voiceon-nine.vercel.app/" target="_blank" rel="noopener noreferrer"
+         class="btn btn--vion btn--sm nav__cta">
+        <span data-i18n="nav.cta">Vion 시작하기</span>
+        <svg class="btn__icon" width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+          <path d="M2.5 7h9M8 3.5L11.5 7 8 10.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </a>
+
+      <button class="nav__hamburger" id="hamburger" aria-label="메뉴 열기" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+
+    <!-- 모바일 드로어 -->
+    <div class="nav__drawer" id="drawer" aria-hidden="true">
+      <div class="nav__drawer-inner">
+        <a href="#services" class="nav__drawer-link" data-i18n="nav.services">서비스</a>
+        <a href="#about" class="nav__drawer-link" data-i18n="nav.about">회사 소개</a>
+        <a href="#contact" class="nav__drawer-link" data-i18n="nav.contact">문의하기</a>
+        <a href="https://voiceon-nine.vercel.app/" target="_blank" rel="noopener noreferrer"
+           class="btn btn--vion nav__drawer-cta" data-i18n="nav.cta">Vion 시작하기</a>
+      </div>
+    </div>
+    <div class="nav__overlay" id="nav-overlay" aria-hidden="true"></div>
+  </header>
+
+  <main>
+    <!-- ===== HERO ===== -->
+    <section class="hero" id="home">
+      <!-- 장식용 오브 -->
+      <div class="hero__orb hero__orb--teal" aria-hidden="true"></div>
+      <div class="hero__orb hero__orb--blue" aria-hidden="true"></div>
+      <div class="hero__orb hero__orb--red" aria-hidden="true"></div>
+
+      <div class="container hero__content">
+        <p class="hero__eyebrow" data-animate="fade-up" data-i18n="hero.eyebrow">AI 기반 전문 서비스 플랫폼</p>
+        <h1 class="hero__title" data-animate="fade-up" data-delay="100" data-i18n-html="hero.title">
+          더 나은 삶을 위한<br>
+          <span class="text-gradient">AI 서비스</span>
+        </h1>
+        <p class="hero__sub" data-animate="fade-up" data-delay="200" data-i18n-html="hero.sub">
+          심리 케어부터 법률, 재무까지 —<br class="hide-mobile"> 전문 AI가 함께합니다.
+        </p>
+        <div class="hero__actions" data-animate="fade-up" data-delay="300">
+          <a href="https://voiceon-nine.vercel.app/" target="_blank" rel="noopener noreferrer"
+             class="btn btn--vion btn--lg">
+            <span data-i18n="hero.cta.primary">Vion 체험하기</span>
+            <svg class="btn__icon" width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+              <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </a>
+          <a href="#services" class="btn btn--outline btn--lg" data-i18n="hero.cta.secondary">서비스 살펴보기</a>
+        </div>
+      </div>
+
+      <div class="hero__scroll-hint" aria-hidden="true">
+        <span class="hero__scroll-text" data-i18n="hero.scroll">스크롤</span>
+        <div class="hero__scroll-arrow"></div>
+      </div>
+    </section>
+
+    <!-- ===== SERVICES ===== -->
+    <section class="section" id="services">
+      <div class="container">
+        <div class="section-header" data-animate="fade-up">
+          <p class="section-label" data-i18n="services.label">서비스</p>
+          <h2 class="section-title" data-i18n-html="services.title">Linkon이 제공하는<br>전문 AI 서비스</h2>
+          <p class="section-desc" data-i18n="services.desc">각 분야 전문 AI가 당신의 삶을 더 풍요롭게 만들어 드립니다.</p>
+        </div>
+
+        <div class="services-grid">
+
+          <!-- VION -->
+          <article class="service-card service-card--live" data-service="vion" data-animate="fade-up" data-delay="100">
+            <div class="card-glow-top card-glow-top--vion"></div>
+            <div class="card-header">
+              <div class="service-logo-wrap service-logo-wrap--vion">
+                <!-- Vion SVG: 하트 + 포옹 미소 (실제 로고 반영) -->
+                <svg viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Vion 로고" role="img">
+                  <!-- 하트 본체 -->
+                  <path d="M40 62 C40 62 14 46 14 28 C14 18 21 11 30 11 C35 11 39 14 40 16 C41 14 45 11 50 11 C59 11 66 18 66 28 C66 46 40 62 40 62 Z" fill="#00C9B1"/>
+                  <!-- 하트 하이라이트 (입체감) -->
+                  <path d="M26 20 C22 23 20 28 20 32" stroke="white" stroke-width="2.5" stroke-linecap="round" opacity="0.45" fill="none"/>
+                  <!-- 포옹/미소 아크 -->
+                  <path d="M22 70 Q40 80 58 70" stroke="#00C9B1" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+                  <!-- 포옹 왼쪽 팔 -->
+                  <path d="M22 70 C18 66 16 60 20 55" stroke="#00C9B1" stroke-width="3" fill="none" stroke-linecap="round"/>
+                  <!-- 포옹 오른쪽 팔 -->
+                  <path d="M58 70 C62 66 64 60 60 55" stroke="#00C9B1" stroke-width="3" fill="none" stroke-linecap="round"/>
+                </svg>
+              </div>
+              <span class="status-badge status-badge--live" data-i18n="badge.live">서비스 중</span>
+            </div>
+            <div class="card-body">
+              <h3 class="service-name">Vion</h3>
+              <p class="service-tagline" data-i18n="vion.tagline">심리 및 실버 케어</p>
+              <p class="service-desc" data-i18n="vion.desc">
+                마음의 건강을 지키는 AI 심리 상담 서비스입니다. 일상의 스트레스부터 깊은 고민까지, 언제 어디서나 전문적인 심리 케어를 받아보세요.
+              </p>
+            </div>
+            <div class="card-footer">
+              <a href="vion.html" class="btn btn--vion btn--full">
+                <span data-i18n="vion.btn.detail">서비스 자세히 보기</span>
+                <svg class="btn__icon" width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                  <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </a>
+            </div>
+          </article>
+
+          <!-- RION -->
+          <article class="service-card service-card--soon" data-service="rion" data-animate="fade-up" data-delay="200">
+            <div class="card-glow-top card-glow-top--rion"></div>
+            <div class="card-header">
+              <div class="service-logo-wrap service-logo-wrap--rion">
+                <!-- Rion SVG: 방패 + 사자 (실제 로고 반영) -->
+                <svg viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Rion 로고" role="img">
+                  <!-- 방패 -->
+                  <path d="M40 8 L64 18 L64 44 C64 57 53 67 40 72 C27 67 16 57 16 44 L16 18 Z" fill="#0056A0"/>
+                  <!-- 방패 내부 라인 -->
+                  <path d="M40 14 L58 22 L58 44 C58 53 50 61 40 65 C30 61 22 53 22 44 L22 22 Z" fill="none" stroke="rgba(255,255,255,0.18)" stroke-width="1.5"/>
+                  <!-- 사자 갈기 (원) -->
+                  <circle cx="40" cy="42" r="15" fill="#1A7ACC"/>
+                  <!-- 귀 -->
+                  <path d="M29 31 L26 24 L33 29 Z" fill="#0056A0"/>
+                  <path d="M51 31 L54 24 L47 29 Z" fill="#0056A0"/>
+                  <!-- 눈 -->
+                  <ellipse cx="35.5" cy="39" rx="2.5" ry="2" fill="white"/>
+                  <ellipse cx="44.5" cy="39" rx="2.5" ry="2" fill="white"/>
+                  <circle cx="36" cy="39.5" r="1" fill="#003D73"/>
+                  <circle cx="45" cy="39.5" r="1" fill="#003D73"/>
+                  <!-- 코 -->
+                  <path d="M38 44 L40 47 L42 44 Z" fill="white" opacity="0.85"/>
+                  <!-- 입 -->
+                  <path d="M35 49 Q40 54 45 49" stroke="white" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+                  <!-- 수염 -->
+                  <path d="M27 44 L36 45.5" stroke="white" stroke-width="1" opacity="0.55" stroke-linecap="round"/>
+                  <path d="M27 47 L36 47" stroke="white" stroke-width="1" opacity="0.55" stroke-linecap="round"/>
+                  <path d="M44 45.5 L53 44" stroke="white" stroke-width="1" opacity="0.55" stroke-linecap="round"/>
+                  <path d="M44 47 L53 47" stroke="white" stroke-width="1" opacity="0.55" stroke-linecap="round"/>
+                </svg>
+              </div>
+              <span class="status-badge status-badge--soon" data-i18n="badge.soon">출시 예정</span>
+            </div>
+            <div class="card-body">
+              <h3 class="service-name">Rion</h3>
+              <p class="service-tagline" data-i18n="rion.tagline">법률 비서</p>
+              <p class="service-desc" data-i18n="rion.desc">
+                신뢰와 권위를 바탕으로 한 AI 법률 비서입니다. 복잡한 법률 문서 검토부터 기본 법률 상담까지 든든하게 지원합니다.
+              </p>
+            </div>
+            <div class="card-footer">
+              <a href="rion.html" class="btn btn--outline btn--full">
+                <span data-i18n="rion.btn.preview">서비스 미리보기</span>
+                <svg class="btn__icon" width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                  <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </a>
+            </div>
+          </article>
+
+          <!-- TAXON -->
+          <article class="service-card service-card--soon" data-service="taxon" data-animate="fade-up" data-delay="300">
+            <div class="card-glow-top card-glow-top--taxon"></div>
+            <div class="card-header">
+              <div class="service-logo-wrap service-logo-wrap--taxon">
+                <!-- Taxon SVG: 상승 화살표 (실제 로고 반영) -->
+                <svg viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Taxon 로고" role="img">
+                  <!-- 배경 원 -->
+                  <circle cx="40" cy="40" r="34" fill="rgba(220,20,60,0.07)" stroke="#DC143C" stroke-width="1.5"/>
+                  <!-- 막대 차트 (오름차순) -->
+                  <rect x="16" y="58" width="9" height="10" rx="2" fill="#DC143C" opacity="0.2"/>
+                  <rect x="28" y="50" width="9" height="18" rx="2" fill="#DC143C" opacity="0.35"/>
+                  <rect x="40" y="40" width="9" height="28" rx="2" fill="#DC143C" opacity="0.5"/>
+                  <rect x="52" y="28" width="9" height="40" rx="2" fill="#DC143C" opacity="0.65"/>
+                  <!-- 상승 화살표 (메인) -->
+                  <path d="M18 62 L58 22" stroke="#DC143C" stroke-width="4" stroke-linecap="round"/>
+                  <!-- 화살표 머리 -->
+                  <path d="M46 18 L60 22 L56 36" stroke="#DC143C" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+                </svg>
+              </div>
+              <span class="status-badge status-badge--soon" data-i18n="badge.soon">출시 예정</span>
+            </div>
+            <div class="card-body">
+              <h3 class="service-name">Taxon</h3>
+              <p class="service-tagline" data-i18n="taxon.tagline">재무 관리</p>
+              <p class="service-desc" data-i18n="taxon.desc">
+                열정과 정확성으로 당신의 재무를 관리하는 AI 서비스입니다. 자산 분석부터 절세 전략까지 스마트한 재무 파트너가 되어드립니다.
+              </p>
+            </div>
+            <div class="card-footer">
+              <a href="taxon.html" class="btn btn--outline btn--full">
+                <span data-i18n="taxon.btn.preview">서비스 미리보기</span>
+                <svg class="btn__icon" width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                  <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </a>
+            </div>
+          </article>
+
+        </div><!-- /services-grid -->
+      </div>
+    </section>
+
+    <!-- ===== ABOUT ===== -->
+    <section class="section section--alt" id="about">
+      <div class="container about-grid">
+        <div class="about-text" data-animate="fade-up">
+          <p class="section-label" data-i18n="about.label">회사 소개</p>
+          <h2 class="section-title" data-i18n-html="about.title">기술로 삶의 문제를<br>해결합니다</h2>
+          <p class="about-body" data-i18n="about.body1">
+            Linkon은 전문 지식의 장벽을 낮추고 누구나 고품질의 AI 서비스를 누릴 수 있도록 만들어진 플랫폼입니다.
+          </p>
+          <p class="about-body" data-i18n="about.body2">
+            심리 상담, 법률 자문, 재무 관리 — 삶의 중요한 순간마다 Linkon의 AI가 곁에서 돕습니다. 복잡한 문제를 단순하고 명확하게, 언제 어디서나.
+          </p>
+          <div class="about-stats">
+            <div class="stat-item" data-animate="scale-up" data-delay="100">
+              <span class="stat-number">3</span>
+              <span class="stat-label" data-i18n="about.stat1">전문 서비스</span>
+            </div>
+            <div class="stat-item" data-animate="scale-up" data-delay="200">
+              <span class="stat-number">100%</span>
+              <span class="stat-label" data-i18n="about.stat2">AI 기반</span>
+            </div>
+            <div class="stat-item" data-animate="scale-up" data-delay="300">
+              <span class="stat-number">24/7</span>
+              <span class="stat-label" data-i18n="about.stat3">언제 어디서나</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="about-visual" data-animate="fade-in" data-delay="200" aria-hidden="true">
+          <div class="orb-visual">
+            <div class="orb-visual__circle orb-visual__circle--teal"></div>
+            <div class="orb-visual__circle orb-visual__circle--blue"></div>
+            <div class="orb-visual__circle orb-visual__circle--red"></div>
+            <div class="orb-visual__label orb-visual__label--vion">Vion</div>
+            <div class="orb-visual__label orb-visual__label--rion">Rion</div>
+            <div class="orb-visual__label orb-visual__label--taxon">Taxon</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== COMING SOON 티저 ===== -->
+    <section class="section teaser-section" id="coming-soon">
+      <div class="container">
+        <div class="section-header" data-animate="fade-up">
+          <p class="section-label" data-i18n="teaser.label">곧 만나보세요</p>
+          <h2 class="section-title" data-i18n-html="teaser.title">더 많은 AI 서비스가<br>출시 예정입니다</h2>
+        </div>
+
+        <!-- 탭 버튼 -->
+        <div class="teaser-tabs" data-animate="fade-up" data-delay="100">
+          <button class="teaser-tab teaser-tab--rion active" data-tab="rion" aria-pressed="true">Rion</button>
+          <button class="teaser-tab teaser-tab--taxon" data-tab="taxon" aria-pressed="false">Taxon</button>
+        </div>
+
+        <!-- Rion 패널 -->
+        <div class="teaser-panel active" id="panel-rion" data-animate="fade-up" data-delay="200">
+          <div class="teaser-logo teaser-logo--rion">
+            <svg viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <circle cx="40" cy="20" r="14" fill="#0056A0"/>
+              <circle cx="40" cy="20" r="17" stroke="#0056A0" stroke-width="2.5" stroke-dasharray="4 3" fill="none" opacity="0.5"/>
+              <polygon points="33,10 30,16 36,16" fill="white" opacity="0.9"/>
+              <polygon points="47,10 44,16 50,16" fill="white" opacity="0.9"/>
+              <circle cx="36" cy="19" r="1.5" fill="white"/>
+              <circle cx="44" cy="19" r="1.5" fill="white"/>
+              <path d="M38.5 22 Q40 24 41.5 22" stroke="white" stroke-width="1.2" stroke-linecap="round" fill="none"/>
+              <path d="M32 22 L38 23" stroke="white" stroke-width="1" stroke-linecap="round" opacity="0.7"/>
+              <path d="M42 23 L48 22" stroke="white" stroke-width="1" stroke-linecap="round" opacity="0.7"/>
+              <rect x="34" y="40" width="12" height="32" rx="5" fill="#0056A0"/>
+            </svg>
+          </div>
+          <h3 class="teaser-name">Rion <span class="teaser-tagline" data-i18n="rion.teaser.tagline">— 법률 비서</span></h3>
+          <p class="teaser-desc" data-i18n="rion.teaser.desc">
+            복잡한 법률 문서도 Rion과 함께라면 쉽게 이해할 수 있습니다. AI 법률 비서가 당신의 권리를 지켜드립니다.
+          </p>
+          <form class="notify-form" data-service="rion" novalidate>
+            <div class="notify-form__row">
+              <input type="email" class="notify-form__input" placeholder="이메일 주소를 입력해 주세요" aria-label="이메일 주소" data-i18n-placeholder="notify.placeholder">
+              <button type="submit" class="btn btn--rion" data-i18n="notify.btn">출시 알림 받기</button>
+            </div>
+            <p class="notify-form__success" aria-live="polite"></p>
+          </form>
+        </div>
+
+        <!-- Taxon 패널 -->
+        <div class="teaser-panel" id="panel-taxon">
+          <div class="teaser-logo teaser-logo--taxon">
+            <svg viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <circle cx="40" cy="20" r="14" fill="#DC143C"/>
+              <rect x="29" y="25" width="5" height="8" rx="1" fill="white"/>
+              <rect x="37" y="21" width="5" height="12" rx="1" fill="white"/>
+              <rect x="45" y="16.5" width="5" height="16.5" rx="1" fill="white"/>
+              <polyline points="31,13 36,18 49,10" stroke="white" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+              <rect x="34" y="40" width="12" height="32" rx="5" fill="#DC143C"/>
+            </svg>
+          </div>
+          <h3 class="teaser-name">Taxon <span class="teaser-tagline" data-i18n="taxon.teaser.tagline">— 재무 관리</span></h3>
+          <p class="teaser-desc" data-i18n="taxon.teaser.desc">
+            AI가 분석하는 스마트한 재무 관리. 자산 현황 파악부터 절세 전략까지, Taxon이 당신의 재무 파트너가 되어드립니다.
+          </p>
+          <form class="notify-form" data-service="taxon" novalidate>
+            <div class="notify-form__row">
+              <input type="email" class="notify-form__input" placeholder="이메일 주소를 입력해 주세요" aria-label="이메일 주소" data-i18n-placeholder="notify.placeholder">
+              <button type="submit" class="btn btn--taxon" data-i18n="notify.btn">출시 알림 받기</button>
+            </div>
+            <p class="notify-form__success" aria-live="polite"></p>
+          </form>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ===== FOOTER ===== -->
+  <footer class="footer" id="contact">
+    <div class="container footer-grid">
+      <div class="footer-brand">
+        <img src="assets/logo.png" alt="Linkon" class="footer-logo">
+        <p class="footer-tagline" data-i18n="footer.tagline">더 나은 삶을 위한 AI 서비스 플랫폼</p>
+        <p class="footer-email">
+          <a href="mailto:linkon.ai2026@gmail.com">linkon.ai2026@gmail.com</a>
+        </p>
+      </div>
+
+      <div class="footer-links">
+        <h4 class="footer-heading" data-i18n="footer.heading.services">서비스</h4>
+        <ul class="footer-list">
+          <li><a href="https://voiceon-nine.vercel.app/" target="_blank" rel="noopener noreferrer" class="footer-link footer-link--active">Vion — 심리 및 실버 케어</a></li>
+          <li><span class="footer-link footer-link--muted">Rion — 법률 비서 <em>(출시 예정)</em></span></li>
+          <li><span class="footer-link footer-link--muted">Taxon — 재무 관리 <em>(출시 예정)</em></span></li>
+        </ul>
+      </div>
+
+      <div class="footer-contact">
+        <h4 class="footer-heading" data-i18n="footer.heading.contact">문의하기</h4>
+        <p class="footer-contact-desc" data-i18n="footer.contact.desc">
+          서비스 관련 문의 또는 제안이 있으시면 이메일로 연락해 주세요.
+        </p>
+        <a href="mailto:linkon.ai2026@gmail.com" class="btn btn--outline btn--sm" data-i18n="footer.contact.btn">이메일 문의</a>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <div class="container footer-bottom-inner">
+        <p class="footer-copy">&copy; 2025 Linkon. All rights reserved.</p>
+        <div class="footer-legal">
+          <a href="#" class="footer-legal-link" data-i18n="footer.legal.privacy">개인정보처리방침</a>
+          <a href="#" class="footer-legal-link" data-i18n="footer.legal.terms">이용약관</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- JS -->
+  <script src="js/animations.js"></script>
+  <script src="js/main.js"></script>
+  <script src="js/i18n.js"></script>
+</body>
+</html>

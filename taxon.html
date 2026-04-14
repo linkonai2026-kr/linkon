@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Taxon — AI 기반 재무 관리 서비스. 열정과 정확성으로 당신의 재무를 관리합니다.">
+  <title>Taxon — 재무 관리 | Linkon</title>
+
+  <link rel="stylesheet" as="style" crossorigin
+    href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+
+  <link rel="stylesheet" href="css/reset.css">
+  <link rel="stylesheet" href="css/variables.css">
+  <link rel="stylesheet" href="css/typography.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/animations.css">
+  <link rel="stylesheet" href="css/responsive.css">
+  <link rel="stylesheet" href="css/service-page.css">
+
+  <style>
+    :root {
+      --sp-accent-color: var(--taxon-primary);
+      --sp-icon-bg: var(--taxon-dim);
+      --sp-tint-color: var(--taxon-primary);
+      --sp-overlay-end: rgba(40, 0, 8, 0.90);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ===== NAVIGATION ===== -->
+  <header class="nav sp-nav" id="nav">
+    <div class="nav__inner container">
+      <a href="index.html" class="nav__logo" aria-label="Linkon 홈으로">
+        <img src="assets/logo.png" alt="Linkon" class="nav__logo-img">
+      </a>
+      <nav class="nav__links">
+        <a href="index.html#services" class="nav__link" data-i18n="nav.services">서비스</a>
+        <a href="index.html#about" class="nav__link" data-i18n="nav.about">회사 소개</a>
+        <a href="index.html#contact" class="nav__link" data-i18n="nav.contact">문의하기</a>
+      </nav>
+      <div class="lang-toggle" role="group" aria-label="언어 선택">
+        <button class="lang-btn is-active" data-lang="ko">KO</button>
+        <span class="lang-divider" aria-hidden="true">|</span>
+        <button class="lang-btn" data-lang="en">EN</button>
+      </div>
+      <a href="vion.html" class="btn btn--vion btn--sm nav__cta">
+        <span data-i18n="nav.cta">Vion 시작하기</span>
+        <svg class="btn__icon" width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+          <path d="M2.5 7h9M8 3.5L11.5 7 8 10.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </a>
+      <button class="nav__hamburger" id="hamburger" aria-label="메뉴 열기" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+    <div class="nav__drawer" id="drawer" aria-hidden="true">
+      <div class="nav__drawer-inner">
+        <a href="index.html#services" class="nav__drawer-link" data-i18n="nav.services">서비스</a>
+        <a href="index.html#about" class="nav__drawer-link" data-i18n="nav.about">회사 소개</a>
+        <a href="index.html#contact" class="nav__drawer-link" data-i18n="nav.contact">문의하기</a>
+        <a href="vion.html" class="btn btn--vion nav__drawer-cta" data-i18n="nav.cta">Vion 시작하기</a>
+      </div>
+    </div>
+    <div class="nav__overlay" id="nav-overlay" aria-hidden="true"></div>
+  </header>
+
+  <main>
+    <!-- ===== HERO ===== -->
+    <section class="sp-hero" id="home">
+      <div class="sp-hero__bg" id="hero-bg"
+           style="background-image: url('assets/taxon-mockup.png'), linear-gradient(135deg, #1a0005 0%, #4a0010 35%, #9e0f2b 65%, #dc143c 100%);"></div>
+      <div class="sp-hero__overlay"></div>
+      <div class="sp-hero__tint"></div>
+
+      <div class="sp-hero__content">
+        <div class="container">
+          <a href="index.html#services" class="sp-back" data-animate="fade-in" data-i18n="sp.back">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+              <path d="M10 3L5 8l5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            모든 서비스 보기
+          </a>
+
+          <div class="sp-hero__badge" data-animate="fade-up">
+            <span class="sp-hero__badge-dot" style="background: var(--taxon-light);"></span>
+            <span data-i18n="taxon.status">출시 예정</span>
+          </div>
+
+          <!-- 로고 -->
+          <div class="sp-hero__wordmark" data-animate="fade-up" data-delay="100">
+            <div class="sp-hero__logo-card" id="logo-card">
+              <img src="assets/taxon-logo.png" alt="Taxon"
+                   class="sp-hero__logo-img"
+                   onerror="this.closest('.sp-hero__logo-card').classList.add('fallback-mode'); this.style.display='none'; document.getElementById('taxon-logo-fallback').style.display='flex';">
+              <div class="sp-hero__logo-fallback" id="taxon-logo-fallback">
+                <svg class="sp-hero__logo-icon" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                  <circle cx="40" cy="40" r="34" fill="rgba(220,20,60,0.12)" stroke="#DC143C" stroke-width="1.5"/>
+                  <rect x="16" y="58" width="9" height="10" rx="2" fill="#DC143C" opacity="0.2"/>
+                  <rect x="28" y="50" width="9" height="18" rx="2" fill="#DC143C" opacity="0.35"/>
+                  <rect x="40" y="40" width="9" height="28" rx="2" fill="#DC143C" opacity="0.5"/>
+                  <rect x="52" y="28" width="9" height="40" rx="2" fill="#DC143C" opacity="0.65"/>
+                  <path d="M18 62 L58 22" stroke="#DC143C" stroke-width="4" stroke-linecap="round"/>
+                  <path d="M46 18 L60 22 L56 36" stroke="#DC143C" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+                </svg>
+                <h1 class="sp-hero__title">Taxon</h1>
+              </div>
+            </div>
+          </div>
+
+          <p class="sp-hero__tagline" data-animate="fade-up" data-delay="200">
+            Efficient Business Accounting &amp; Tax
+          </p>
+          <p class="sp-hero__desc" data-animate="fade-up" data-delay="300" data-i18n="taxon.hero.desc">
+            열정과 정확성으로 당신의 재무를 관리하는 AI 서비스입니다. 복잡한 세금 신고, 자산 분석, 절세 전략까지 — Taxon이 스마트한 재무 파트너가 되어드립니다.
+          </p>
+          <div class="sp-hero__actions" data-animate="fade-up" data-delay="400">
+            <a href="#notify" class="btn btn--lg"
+               style="background: var(--taxon-primary); border-color: var(--taxon-primary); color: white;">
+              <span data-i18n="taxon.hero.btn.primary">출시 알림 받기</span>
+              <svg class="btn__icon" width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                <path d="M8 2a6 6 0 0 1 6 6v1l1 2H1l1-2V8a6 6 0 0 1 6-6zM6 14h4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+              </svg>
+            </a>
+            <a href="#about-taxon" class="btn btn--outline btn--lg" style="border-color: rgba(255,255,255,0.4); color: white;" data-i18n="taxon.hero.btn.secondary">
+              서비스 소개 보기
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <div class="sp-hero__scroll" aria-hidden="true">
+        <span data-i18n="sp.scroll">스크롤</span>
+        <div class="sp-hero__scroll-line"></div>
+      </div>
+    </section>
+
+    <!-- ===== 서비스 소개 ===== -->
+    <section class="sp-intro section" id="about-taxon">
+      <div class="container sp-intro__grid">
+        <div class="sp-intro__text" data-animate="fade-up">
+          <p class="section-label" style="color: var(--taxon-primary);" data-i18n="taxon.intro.label">서비스 소개</p>
+          <h2 class="section-title" data-i18n-html="taxon.intro.title">숫자가 두렵지 않은<br>스마트 재무 관리</h2>
+          <p class="sp-intro__body" data-i18n="taxon.intro.body1">
+            Taxon은 복잡한 세무·회계 작업을 AI가 대신 처리해주는 재무 관리 서비스입니다. 소득 분석부터 절세 전략까지, 전문 세무사 수준의 서비스를 누구나 쉽게 이용할 수 있습니다.
+          </p>
+          <p class="sp-intro__body" data-i18n="taxon.intro.body2">
+            개인 사업자, 프리랜서, 직장인 모두를 위한 맞춤형 재무 솔루션을 제공합니다. 매년 반복되는 세금 신고 스트레스를 Taxon이 해결해 드립니다.
+          </p>
+          <a href="#notify" class="btn" style="background: var(--taxon-primary); border-color: var(--taxon-primary); color: white; margin-top: var(--space-6); display: inline-flex;" data-i18n="taxon.intro.btn">
+            출시 알림 신청
+          </a>
+        </div>
+
+        <div class="sp-intro__visual" data-animate="fade-in" data-delay="200">
+          <img src="assets/taxon-mockup.png" alt="Taxon 서비스 목업" loading="lazy"
+               onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+          <div class="sp-intro__visual-fallback" style="display:none; background: linear-gradient(135deg, #fae8eb 0%, #f0b3be 100%);">
+            <svg viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="40" cy="40" r="34" fill="rgba(220,20,60,0.1)" stroke="#DC143C" stroke-width="1.5" opacity="0.6"/>
+              <path d="M18 62 L58 22" stroke="#DC143C" stroke-width="4" stroke-linecap="round" opacity="0.6"/>
+              <path d="M46 18 L60 22 L56 36" stroke="#DC143C" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none" opacity="0.6"/>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== 핵심 기능 ===== -->
+    <section class="sp-features section">
+      <div class="container">
+        <div class="section-header" data-animate="fade-up">
+          <p class="section-label" style="color: var(--taxon-primary);" data-i18n="taxon.features.label">핵심 기능</p>
+          <h2 class="section-title" data-i18n-html="taxon.features.title">Taxon이 제공하는<br>재무 관리 솔루션</h2>
+        </div>
+
+        <div class="sp-features__grid">
+
+          <div class="sp-feature-card" data-animate="fade-up" data-delay="100">
+            <div class="sp-feature-icon" style="background: var(--taxon-dim);">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M22 12h-4l-3 9L9 3l-3 9H2" stroke="#DC143C" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <p class="sp-feature-title" data-i18n="taxon.f1.title">AI 자산 분석</p>
+            <p class="sp-feature-desc" data-i18n="taxon.f1.desc">소득, 지출, 자산 현황을 AI가 자동으로 분석해 재무 건강 지수와 개선 방향을 시각적으로 제공합니다.</p>
+          </div>
+
+          <div class="sp-feature-card" data-animate="fade-up" data-delay="150">
+            <div class="sp-feature-icon" style="background: var(--taxon-dim);">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <rect x="2" y="3" width="20" height="14" rx="2" stroke="#DC143C" stroke-width="1.8"/>
+                <path d="M16 21H8M12 17v4" stroke="#DC143C" stroke-width="1.8" stroke-linecap="round"/>
+                <path d="M7 8h10M7 11h5" stroke="#DC143C" stroke-width="1.5" stroke-linecap="round"/>
+              </svg>
+            </div>
+            <p class="sp-feature-title" data-i18n="taxon.f2.title">자동 세금 신고</p>
+            <p class="sp-feature-desc" data-i18n="taxon.f2.desc">종합소득세, 부가가치세, 법인세 신고를 AI가 자동으로 준비해 드립니다. 복잡한 서류 작업을 단 몇 분 만에 완료하세요.</p>
+          </div>
+
+          <div class="sp-feature-card" data-animate="fade-up" data-delay="200">
+            <div class="sp-feature-icon" style="background: var(--taxon-dim);">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <circle cx="12" cy="12" r="10" stroke="#DC143C" stroke-width="1.8"/>
+                <path d="M12 6v6l4 2" stroke="#DC143C" stroke-width="1.8" stroke-linecap="round"/>
+              </svg>
+            </div>
+            <p class="sp-feature-title" data-i18n="taxon.f3.title">실시간 절세 전략</p>
+            <p class="sp-feature-desc" data-i18n="taxon.f3.desc">납부 기한과 공제 항목을 실시간으로 분석해 합법적으로 세금을 최소화할 수 있는 맞춤 절세 전략을 제안합니다.</p>
+          </div>
+
+          <div class="sp-feature-card" data-animate="fade-up" data-delay="250">
+            <div class="sp-feature-icon" style="background: var(--taxon-dim);">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <line x1="18" y1="20" x2="18" y2="10" stroke="#DC143C" stroke-width="1.8" stroke-linecap="round"/>
+                <line x1="12" y1="20" x2="12" y2="4" stroke="#DC143C" stroke-width="1.8" stroke-linecap="round"/>
+                <line x1="6" y1="20" x2="6" y2="14" stroke="#DC143C" stroke-width="1.8" stroke-linecap="round"/>
+              </svg>
+            </div>
+            <p class="sp-feature-title" data-i18n="taxon.f4.title">수익 예측 모델</p>
+            <p class="sp-feature-desc" data-i18n="taxon.f4.desc">과거 재무 데이터를 기반으로 미래 수익과 지출을 예측해 선제적인 재무 계획을 수립할 수 있도록 지원합니다.</p>
+          </div>
+
+          <div class="sp-feature-card" data-animate="fade-up" data-delay="300">
+            <div class="sp-feature-icon" style="background: var(--taxon-dim);">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" stroke="#DC143C" stroke-width="1.8" stroke-linecap="round"/>
+                <polyline points="14 2 14 8 20 8" stroke="#DC143C" stroke-width="1.8" stroke-linecap="round"/>
+                <path d="M9 13h6M9 17h4" stroke="#DC143C" stroke-width="1.5" stroke-linecap="round"/>
+              </svg>
+            </div>
+            <p class="sp-feature-title" data-i18n="taxon.f5.title">영수증 자동 처리</p>
+            <p class="sp-feature-desc" data-i18n="taxon.f5.desc">영수증이나 세금계산서를 촬영하면 AI가 자동으로 항목을 분류하고 경비 처리 가능 여부를 판단해 장부에 기록합니다.</p>
+          </div>
+
+          <div class="sp-feature-card" data-animate="fade-up" data-delay="350">
+            <div class="sp-feature-icon" style="background: var(--taxon-dim);">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke="#DC143C" stroke-width="1.8" stroke-linecap="round"/>
+                <path d="M9 12l2 2 4-4" stroke="#DC143C" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <p class="sp-feature-title" data-i18n="taxon.f6.title">세무 전문가 연결</p>
+            <p class="sp-feature-desc" data-i18n="taxon.f6.desc">복잡한 세무 이슈가 발생할 경우 Taxon과 연동된 전문 세무사 · 공인회계사와 즉시 연결해 전문적인 조언을 받을 수 있습니다.</p>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== CTA (Coming Soon) ===== -->
+    <section class="sp-cta sp-cta--soon section" id="notify">
+      <div class="container">
+        <div class="sp-cta__inner" data-animate="fade-up">
+          <div class="sp-coming-badge">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+              <rect x="3" y="6" width="8" height="7" rx="1.5" stroke="currentColor" stroke-width="1.3"/>
+              <path d="M5 6V4.5a2 2 0 0 1 4 0V6" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+            </svg>
+            <span data-i18n="taxon.cta.badge">출시 예정</span>
+          </div>
+          <p class="section-label" style="color: var(--taxon-primary);" data-i18n="taxon.cta.label">출시 알림</p>
+          <h2 class="sp-cta__title" data-i18n="taxon.cta.title">Taxon, 곧 만나보실 수 있습니다</h2>
+          <p class="sp-cta__desc" data-i18n="taxon.cta.desc">
+            이메일을 등록하시면 Taxon 출시 소식을 가장 먼저 전해드립니다. 얼리 액세스 혜택도 함께 제공됩니다.
+          </p>
+          <div class="sp-notify-form">
+            <form class="notify-form" data-service="taxon" novalidate>
+              <div class="notify-form__row">
+                <input type="email" class="notify-form__input" placeholder="이메일 주소를 입력해 주세요" aria-label="이메일 주소" data-i18n-placeholder="sp.notify.placeholder">
+                <button type="submit" class="btn" style="background: var(--taxon-primary); border-color: var(--taxon-primary); color: white; border-radius: var(--radius-full); padding: 10px 20px; flex-shrink: 0;" data-i18n="sp.notify.btn">출시 알림 받기</button>
+              </div>
+              <p class="notify-form__success" aria-live="polite"></p>
+            </form>
+          </div>
+          <p style="margin-top: var(--space-5);">
+            <a href="index.html" class="btn btn--outline" data-i18n="sp.cta.other">다른 서비스 보기</a>
+          </p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ===== FOOTER ===== -->
+  <footer class="footer" id="contact">
+    <div class="container footer-grid">
+      <div class="footer-brand">
+        <img src="assets/logo.png" alt="Linkon" class="footer-logo">
+        <p class="footer-tagline" data-i18n="footer.tagline">더 나은 삶을 위한 AI 서비스 플랫폼</p>
+        <p class="footer-email"><a href="mailto:linkon.ai2026@gmail.com">linkon.ai2026@gmail.com</a></p>
+      </div>
+      <div class="footer-links">
+        <h4 class="footer-heading" data-i18n="footer.heading.services">서비스</h4>
+        <ul class="footer-list">
+          <li><a href="vion.html" class="footer-link footer-link--active">Vion — 심리 및 실버 케어</a></li>
+          <li><a href="rion.html" class="footer-link footer-link--muted">Rion — 법률 비서 <em>(출시 예정)</em></a></li>
+          <li><a href="taxon.html" class="footer-link">Taxon — 재무 관리 <em style="font-style:normal; font-size: var(--text-xs); color: var(--text-muted);">(출시 예정)</em></a></li>
+        </ul>
+      </div>
+      <div class="footer-contact">
+        <h4 class="footer-heading" data-i18n="footer.heading.contact">문의하기</h4>
+        <p class="footer-contact-desc" data-i18n="footer.contact.desc.short">서비스 관련 문의는 이메일로 연락해 주세요.</p>
+        <a href="mailto:linkon.ai2026@gmail.com" class="btn btn--outline btn--sm" data-i18n="footer.contact.btn">이메일 문의</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <div class="container footer-bottom-inner">
+        <p class="footer-copy">&copy; 2025 Linkon. All rights reserved.</p>
+        <div class="footer-legal">
+          <a href="#" class="footer-legal-link" data-i18n="footer.legal.privacy">개인정보처리방침</a>
+          <a href="#" class="footer-legal-link" data-i18n="footer.legal.terms">이용약관</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/animations.js"></script>
+  <script src="js/main.js"></script>
+  <script src="js/i18n.js"></script>
+  <script>
+    (function () {
+      var nav = document.getElementById('nav');
+      if (!nav) return;
+      function update() {
+        if (window.scrollY > 80) {
+          nav.classList.add('nav--scrolled', 'sp-nav--scrolled');
+        } else {
+          nav.classList.remove('nav--scrolled', 'sp-nav--scrolled');
+        }
+      }
+      window.addEventListener('scroll', update, { passive: true });
+      update();
+
+      var bg = document.getElementById('hero-bg');
+      if (bg) {
+        var img = new Image();
+        img.onload = function () { bg.classList.add('is-loaded'); };
+        img.src = 'assets/taxon-mockup.png';
+      }
+    })();
+  </script>
+</body>
+</html>

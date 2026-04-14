@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Rion — AI 기반 법률 비서 서비스. 신뢰와 권위로 당신의 권리를 지켜드립니다.">
+  <title>Rion — 법률 비서 | Linkon</title>
+
+  <link rel="stylesheet" as="style" crossorigin
+    href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+
+  <link rel="stylesheet" href="css/reset.css">
+  <link rel="stylesheet" href="css/variables.css">
+  <link rel="stylesheet" href="css/typography.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/animations.css">
+  <link rel="stylesheet" href="css/responsive.css">
+  <link rel="stylesheet" href="css/service-page.css">
+
+  <style>
+    :root {
+      --sp-accent-color: var(--rion-primary);
+      --sp-icon-bg: var(--rion-dim);
+      --sp-tint-color: var(--rion-primary);
+      --sp-overlay-end: rgba(0, 20, 50, 0.90);
+    }
+
+    .sp-notify-form .btn { background: var(--rion-primary); border-color: var(--rion-primary); color: white; }
+    .sp-notify-form .btn:hover { background: var(--rion-dark); border-color: var(--rion-dark); }
+  </style>
+</head>
+<body>
+
+  <!-- ===== NAVIGATION ===== -->
+  <header class="nav sp-nav" id="nav">
+    <div class="nav__inner container">
+      <a href="index.html" class="nav__logo" aria-label="Linkon 홈으로">
+        <img src="assets/logo.png" alt="Linkon" class="nav__logo-img">
+      </a>
+      <nav class="nav__links">
+        <a href="index.html#services" class="nav__link" data-i18n="nav.services">서비스</a>
+        <a href="index.html#about" class="nav__link" data-i18n="nav.about">회사 소개</a>
+        <a href="index.html#contact" class="nav__link" data-i18n="nav.contact">문의하기</a>
+      </nav>
+      <div class="lang-toggle" role="group" aria-label="언어 선택">
+        <button class="lang-btn is-active" data-lang="ko">KO</button>
+        <span class="lang-divider" aria-hidden="true">|</span>
+        <button class="lang-btn" data-lang="en">EN</button>
+      </div>
+      <a href="vion.html" class="btn btn--vion btn--sm nav__cta">
+        <span data-i18n="nav.cta">Vion 시작하기</span>
+        <svg class="btn__icon" width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+          <path d="M2.5 7h9M8 3.5L11.5 7 8 10.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </a>
+      <button class="nav__hamburger" id="hamburger" aria-label="메뉴 열기" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+    <div class="nav__drawer" id="drawer" aria-hidden="true">
+      <div class="nav__drawer-inner">
+        <a href="index.html#services" class="nav__drawer-link" data-i18n="nav.services">서비스</a>
+        <a href="index.html#about" class="nav__drawer-link" data-i18n="nav.about">회사 소개</a>
+        <a href="index.html#contact" class="nav__drawer-link" data-i18n="nav.contact">문의하기</a>
+        <a href="vion.html" class="btn btn--vion nav__drawer-cta" data-i18n="nav.cta">Vion 시작하기</a>
+      </div>
+    </div>
+    <div class="nav__overlay" id="nav-overlay" aria-hidden="true"></div>
+  </header>
+
+  <main>
+    <!-- ===== HERO ===== -->
+    <section class="sp-hero" id="home">
+      <div class="sp-hero__bg" id="hero-bg"
+           style="background-image: url('assets/rion-mockup.png'), linear-gradient(135deg, #00142e 0%, #002a5c 40%, #0056a0 75%, #1a7acc 100%);"></div>
+      <div class="sp-hero__overlay"></div>
+      <div class="sp-hero__tint"></div>
+
+      <div class="sp-hero__content">
+        <div class="container">
+          <a href="index.html#services" class="sp-back" data-animate="fade-in" data-i18n="sp.back">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+              <path d="M10 3L5 8l5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            모든 서비스 보기
+          </a>
+
+          <div class="sp-hero__badge" data-animate="fade-up">
+            <span class="sp-hero__badge-dot" style="background: var(--rion-light);"></span>
+            <span data-i18n="rion.status">출시 예정</span>
+          </div>
+
+          <!-- 로고 -->
+          <div class="sp-hero__wordmark" data-animate="fade-up" data-delay="100">
+            <div class="sp-hero__logo-card" id="logo-card">
+              <img src="assets/rion-logo.png" alt="Rion"
+                   class="sp-hero__logo-img"
+                   onerror="this.closest('.sp-hero__logo-card').classList.add('fallback-mode'); this.style.display='none'; document.getElementById('rion-logo-fallback').style.display='flex';">
+              <div class="sp-hero__logo-fallback" id="rion-logo-fallback">
+                <svg class="sp-hero__logo-icon" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                  <path d="M40 8 L64 18 L64 44 C64 57 53 67 40 72 C27 67 16 57 16 44 L16 18 Z" fill="#0056A0"/>
+                  <path d="M40 14 L58 22 L58 44 C58 53 50 61 40 65 C30 61 22 53 22 44 L22 22 Z" fill="none" stroke="rgba(255,255,255,0.18)" stroke-width="1.5"/>
+                  <circle cx="40" cy="42" r="15" fill="#1A7ACC"/>
+                  <path d="M29 31 L26 24 L33 29 Z" fill="#0056A0"/>
+                  <path d="M51 31 L54 24 L47 29 Z" fill="#0056A0"/>
+                  <ellipse cx="35.5" cy="39" rx="2.5" ry="2" fill="white"/>
+                  <ellipse cx="44.5" cy="39" rx="2.5" ry="2" fill="white"/>
+                  <circle cx="36" cy="39.5" r="1" fill="#003D73"/>
+                  <circle cx="45" cy="39.5" r="1" fill="#003D73"/>
+                  <path d="M38 44 L40 47 L42 44 Z" fill="white" opacity="0.85"/>
+                  <path d="M35 49 Q40 54 45 49" stroke="white" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+                  <path d="M27 44 L36 45.5" stroke="white" stroke-width="1" opacity="0.55" stroke-linecap="round"/>
+                  <path d="M27 47 L36 47" stroke="white" stroke-width="1" opacity="0.55" stroke-linecap="round"/>
+                  <path d="M44 45.5 L53 44" stroke="white" stroke-width="1" opacity="0.55" stroke-linecap="round"/>
+                  <path d="M44 47 L53 47" stroke="white" stroke-width="1" opacity="0.55" stroke-linecap="round"/>
+                </svg>
+                <h1 class="sp-hero__title">Rion</h1>
+              </div>
+            </div>
+          </div>
+
+          <p class="sp-hero__tagline" data-animate="fade-up" data-delay="200">
+            Your Protective Legal Partner
+          </p>
+          <p class="sp-hero__desc" data-animate="fade-up" data-delay="300" data-i18n="rion.hero.desc">
+            신뢰와 권위를 바탕으로 당신의 권리를 지키는 AI 법률 비서입니다. 복잡한 법률 문서도, 어려운 법적 절차도 Rion과 함께라면 쉽게 해결할 수 있습니다.
+          </p>
+          <div class="sp-hero__actions" data-animate="fade-up" data-delay="400">
+            <a href="#notify" class="btn btn--lg"
+               style="background: var(--rion-primary); border-color: var(--rion-primary); color: white;">
+              <span data-i18n="rion.hero.btn.primary">출시 알림 받기</span>
+              <svg class="btn__icon" width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                <path d="M8 2a6 6 0 0 1 6 6v1l1 2H1l1-2V8a6 6 0 0 1 6-6zM6 14h4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+              </svg>
+            </a>
+            <a href="#about-rion" class="btn btn--outline btn--lg" style="border-color: rgba(255,255,255,0.4); color: white;" data-i18n="rion.hero.btn.secondary">
+              서비스 소개 보기
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <div class="sp-hero__scroll" aria-hidden="true">
+        <span data-i18n="sp.scroll">스크롤</span>
+        <div class="sp-hero__scroll-line"></div>
+      </div>
+    </section>
+
+    <!-- ===== 서비스 소개 ===== -->
+    <section class="sp-intro section" id="about-rion">
+      <div class="container sp-intro__grid">
+        <div class="sp-intro__text" data-animate="fade-up">
+          <p class="section-label" style="color: var(--rion-primary);" data-i18n="rion.intro.label">서비스 소개</p>
+          <h2 class="section-title" data-i18n-html="rion.intro.title">법률의 장벽을 낮추는<br>AI 법률 파트너</h2>
+          <p class="sp-intro__body" data-i18n="rion.intro.body1">
+            Rion은 복잡하고 어렵게 느껴지는 법률 문제를 누구나 쉽게 이해하고 해결할 수 있도록 돕는 AI 법률 비서입니다. 계약서 검토, 법률 용어 해석, 분쟁 절차 안내 등 다양한 법률 서비스를 제공합니다.
+          </p>
+          <p class="sp-intro__body" data-i18n="rion.intro.body2">
+            전문 법률 지식을 AI가 쉬운 언어로 풀어드립니다. 더 이상 법률 문제 앞에서 혼자 막막해하지 않아도 됩니다. Rion이 든든한 보호자로서 함께합니다.
+          </p>
+          <a href="#notify" class="btn" style="background: var(--rion-primary); border-color: var(--rion-primary); color: white; margin-top: var(--space-6); display: inline-flex;" data-i18n="rion.intro.btn">
+            출시 알림 신청
+          </a>
+        </div>
+
+        <div class="sp-intro__visual" data-animate="fade-in" data-delay="200">
+          <img src="assets/rion-mockup.png" alt="Rion 서비스 목업" loading="lazy"
+               onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+          <div class="sp-intro__visual-fallback" style="display:none; background: linear-gradient(135deg, #e8f0fa 0%, #b3cbf0 100%);">
+            <svg viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M40 8 L64 18 L64 44 C64 57 53 67 40 72 C27 67 16 57 16 44 L16 18 Z" fill="#0056A0" opacity="0.5"/>
+              <circle cx="40" cy="42" r="15" fill="#1A7ACC" opacity="0.5"/>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== 핵심 기능 ===== -->
+    <section class="sp-features section">
+      <div class="container">
+        <div class="section-header" data-animate="fade-up">
+          <p class="section-label" style="color: var(--rion-primary);" data-i18n="rion.features.label">핵심 기능</p>
+          <h2 class="section-title" data-i18n-html="rion.features.title">Rion이 제공하는<br>법률 보호 서비스</h2>
+        </div>
+
+        <div class="sp-features__grid">
+
+          <div class="sp-feature-card" data-animate="fade-up" data-delay="100">
+            <div class="sp-feature-icon" style="background: var(--rion-dim);">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" stroke="#0056A0" stroke-width="1.8" stroke-linecap="round"/>
+                <polyline points="14 2 14 8 20 8" stroke="#0056A0" stroke-width="1.8" stroke-linecap="round"/>
+                <line x1="16" y1="13" x2="8" y2="13" stroke="#0056A0" stroke-width="1.8" stroke-linecap="round"/>
+                <line x1="16" y1="17" x2="8" y2="17" stroke="#0056A0" stroke-width="1.8" stroke-linecap="round"/>
+              </svg>
+            </div>
+            <p class="sp-feature-title" data-i18n="rion.f1.title">계약서 자동 검토</p>
+            <p class="sp-feature-desc" data-i18n="rion.f1.desc">계약서를 업로드하면 AI가 불리한 조항, 누락된 항목, 법적 위험 요소를 자동으로 분석해 알려드립니다.</p>
+          </div>
+
+          <div class="sp-feature-card" data-animate="fade-up" data-delay="150">
+            <div class="sp-feature-icon" style="background: var(--rion-dim);">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <circle cx="11" cy="11" r="8" stroke="#0056A0" stroke-width="1.8"/>
+                <path d="M21 21l-4.35-4.35" stroke="#0056A0" stroke-width="1.8" stroke-linecap="round"/>
+                <path d="M11 8v3l2 2" stroke="#0056A0" stroke-width="1.8" stroke-linecap="round"/>
+              </svg>
+            </div>
+            <p class="sp-feature-title" data-i18n="rion.f2.title">판례 검색 및 분석</p>
+            <p class="sp-feature-desc" data-i18n="rion.f2.desc">수십만 건의 판례 데이터베이스를 AI가 즉시 검색해 유사 사례와 법원 판단 동향을 쉽게 파악할 수 있습니다.</p>
+          </div>
+
+          <div class="sp-feature-card" data-animate="fade-up" data-delay="200">
+            <div class="sp-feature-icon" style="background: var(--rion-dim);">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" stroke="#0056A0" stroke-width="1.8" stroke-linecap="round"/>
+              </svg>
+            </div>
+            <p class="sp-feature-title" data-i18n="rion.f3.title">법률 용어 해설</p>
+            <p class="sp-feature-desc" data-i18n="rion.f3.desc">어렵고 복잡한 법률 용어를 일상 언어로 쉽게 설명해 드립니다. 법률 지식 없이도 내용을 정확히 이해할 수 있습니다.</p>
+          </div>
+
+          <div class="sp-feature-card" data-animate="fade-up" data-delay="250">
+            <div class="sp-feature-icon" style="background: var(--rion-dim);">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke="#0056A0" stroke-width="1.8" stroke-linecap="round"/>
+                <path d="M9 12l2 2 4-4" stroke="#0056A0" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <p class="sp-feature-title" data-i18n="rion.f4.title">권리 보호 가이드</p>
+            <p class="sp-feature-desc" data-i18n="rion.f4.desc">부당해고, 임금체불, 소비자 피해 등 다양한 상황에서 본인의 권리를 지키는 구체적인 방법과 절차를 안내합니다.</p>
+          </div>
+
+          <div class="sp-feature-card" data-animate="fade-up" data-delay="300">
+            <div class="sp-feature-icon" style="background: var(--rion-dim);">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <rect x="2" y="3" width="20" height="14" rx="2" stroke="#0056A0" stroke-width="1.8"/>
+                <path d="M8 21h8M12 17v4" stroke="#0056A0" stroke-width="1.8" stroke-linecap="round"/>
+              </svg>
+            </div>
+            <p class="sp-feature-title" data-i18n="rion.f5.title">법률 문서 자동 생성</p>
+            <p class="sp-feature-desc" data-i18n="rion.f5.desc">내용증명, 고소장, 계약서 초안 등 각종 법률 문서를 AI가 자동으로 작성해 시간과 비용을 대폭 절감합니다.</p>
+          </div>
+
+          <div class="sp-feature-card" data-animate="fade-up" data-delay="350">
+            <div class="sp-feature-icon" style="background: var(--rion-dim);">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" stroke="#0056A0" stroke-width="1.8" stroke-linecap="round"/>
+                <circle cx="9" cy="7" r="4" stroke="#0056A0" stroke-width="1.8"/>
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" stroke="#0056A0" stroke-width="1.8" stroke-linecap="round"/>
+              </svg>
+            </div>
+            <p class="sp-feature-title" data-i18n="rion.f6.title">전문 변호사 연결</p>
+            <p class="sp-feature-desc" data-i18n="rion.f6.desc">AI 상담 후 더 전문적인 도움이 필요할 경우, 분야별 전문 변호사와 연결해 드리는 원스톱 법률 서비스를 제공합니다.</p>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== CTA (Coming Soon) ===== -->
+    <section class="sp-cta sp-cta--soon section" id="notify">
+      <div class="container">
+        <div class="sp-cta__inner" data-animate="fade-up">
+          <div class="sp-coming-badge">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+              <rect x="3" y="6" width="8" height="7" rx="1.5" stroke="currentColor" stroke-width="1.3"/>
+              <path d="M5 6V4.5a2 2 0 0 1 4 0V6" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+            </svg>
+            <span data-i18n="rion.cta.badge">출시 예정</span>
+          </div>
+          <p class="section-label" style="color: var(--rion-primary);" data-i18n="rion.cta.label">출시 알림</p>
+          <h2 class="sp-cta__title" data-i18n="rion.cta.title">Rion, 곧 만나보실 수 있습니다</h2>
+          <p class="sp-cta__desc" data-i18n="rion.cta.desc">
+            이메일을 등록하시면 Rion 출시 소식을 가장 먼저 전해드립니다. 얼리 액세스 혜택도 함께 제공됩니다.
+          </p>
+          <div class="sp-notify-form">
+            <form class="notify-form" data-service="rion" novalidate>
+              <div class="notify-form__row">
+                <input type="email" class="notify-form__input" placeholder="이메일 주소를 입력해 주세요" aria-label="이메일 주소" data-i18n-placeholder="sp.notify.placeholder">
+                <button type="submit" class="btn" style="background: var(--rion-primary); border-color: var(--rion-primary); color: white; border-radius: var(--radius-full); padding: 10px 20px; flex-shrink: 0;" data-i18n="sp.notify.btn">출시 알림 받기</button>
+              </div>
+              <p class="notify-form__success" aria-live="polite"></p>
+            </form>
+          </div>
+          <p style="margin-top: var(--space-5);">
+            <a href="index.html" class="btn btn--outline" data-i18n="sp.cta.other">다른 서비스 보기</a>
+          </p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ===== FOOTER ===== -->
+  <footer class="footer" id="contact">
+    <div class="container footer-grid">
+      <div class="footer-brand">
+        <img src="assets/logo.png" alt="Linkon" class="footer-logo">
+        <p class="footer-tagline" data-i18n="footer.tagline">더 나은 삶을 위한 AI 서비스 플랫폼</p>
+        <p class="footer-email"><a href="mailto:linkon.ai2026@gmail.com">linkon.ai2026@gmail.com</a></p>
+      </div>
+      <div class="footer-links">
+        <h4 class="footer-heading" data-i18n="footer.heading.services">서비스</h4>
+        <ul class="footer-list">
+          <li><a href="vion.html" class="footer-link footer-link--active">Vion — 심리 및 실버 케어</a></li>
+          <li><a href="rion.html" class="footer-link">Rion — 법률 비서 <em style="font-style:normal; font-size: var(--text-xs); color: var(--text-muted);">(출시 예정)</em></a></li>
+          <li><a href="taxon.html" class="footer-link footer-link--muted">Taxon — 재무 관리 <em>(출시 예정)</em></a></li>
+        </ul>
+      </div>
+      <div class="footer-contact">
+        <h4 class="footer-heading" data-i18n="footer.heading.contact">문의하기</h4>
+        <p class="footer-contact-desc" data-i18n="footer.contact.desc.short">서비스 관련 문의는 이메일로 연락해 주세요.</p>
+        <a href="mailto:linkon.ai2026@gmail.com" class="btn btn--outline btn--sm" data-i18n="footer.contact.btn">이메일 문의</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <div class="container footer-bottom-inner">
+        <p class="footer-copy">&copy; 2025 Linkon. All rights reserved.</p>
+        <div class="footer-legal">
+          <a href="#" class="footer-legal-link" data-i18n="footer.legal.privacy">개인정보처리방침</a>
+          <a href="#" class="footer-legal-link" data-i18n="footer.legal.terms">이용약관</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/animations.js"></script>
+  <script src="js/main.js"></script>
+  <script src="js/i18n.js"></script>
+  <script>
+    (function () {
+      var nav = document.getElementById('nav');
+      if (!nav) return;
+      function update() {
+        if (window.scrollY > 80) {
+          nav.classList.add('nav--scrolled', 'sp-nav--scrolled');
+        } else {
+          nav.classList.remove('nav--scrolled', 'sp-nav--scrolled');
+        }
+      }
+      window.addEventListener('scroll', update, { passive: true });
+      update();
+
+      var bg = document.getElementById('hero-bg');
+      if (bg) {
+        var img = new Image();
+        img.onload = function () { bg.classList.add('is-loaded'); };
+        img.src = 'assets/rion-mockup.png';
+      }
+    })();
+  </script>
+</body>
+</html>

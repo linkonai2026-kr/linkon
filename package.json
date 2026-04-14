@@ -1,0 +1,9 @@
+{
+  "name": "linkon",
+  "version": "1.0.0",
+  "description": "Linkon 공식 홈페이지",
+  "scripts": {
+    "dev": "npx serve . --listen 3000 --no-clipboard",
+    "start": "npx serve . --listen 3000 --no-clipboard"
+  }
+}
