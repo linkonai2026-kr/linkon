@@ -505,12 +505,25 @@
   color: var(--text-muted);
 }
 
+.notify-form__input.is-error {
+  color: #DC143C;
+}
+
 .notify-form__success {
   margin-top: var(--space-3);
   font-size: var(--text-sm);
   color: var(--color-live);
   min-height: 1.4em;
   font-weight: 500;
+  transition: color 200ms ease;
+}
+
+.notify-form__success[data-type="error"] {
+  color: #DC143C;
+}
+
+.notify-form__success[data-type="success"] {
+  color: var(--color-live);
 }
 
 /* ===== FOOTER LINKS ===== */
@@ -577,6 +590,7 @@
 
 .lang-btn.is-active {
   color: var(--text-primary);
+  background: rgba(0, 0, 0, 0.06);
 }
 
 .lang-divider {

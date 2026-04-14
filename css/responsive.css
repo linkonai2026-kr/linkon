@@ -55,9 +55,19 @@
     bottom: -60px;
   }
 
-  .hero__orb--blue,
+  .hero__orb--blue {
+    width: 240px;
+    height: 240px;
+    top: 90px;
+    right: 110px;
+  }
+
   .hero__orb--red {
-    display: none;
+    width: 220px;
+    height: 220px;
+    top: auto;
+    left: -40px;
+    bottom: 160px;
   }
 
   /* 서비스 그리드: 2컬럼 */
@@ -75,12 +85,24 @@
     grid-template-columns: 1fr;
   }
 
-  .about-visual {
-    display: none;
-  }
-
   .about-text {
     max-width: 100%;
+  }
+
+  .service-diagram {
+    min-height: 480px;
+    margin-inline: auto;
+  }
+
+  .service-diagram__node--rion,
+  .service-diagram__node--taxon {
+    bottom: 180px;
+  }
+
+  .hero__content::before {
+    width: min(680px, calc(100% + 40px));
+    left: -20px;
+    height: 390px;
   }
 
   /* 섹션 간격 축소 */
@@ -90,6 +112,50 @@
 
   .section-title {
     font-size: var(--text-3xl);
+  }
+
+  /* 피드백 섹션 — 태블릿 */
+  .feedback-inner {
+    grid-template-columns: 1fr auto;
+    gap: var(--space-6);
+  }
+
+  .feedback-icon {
+    display: none;
+  }
+}
+
+/* ===== TABLET-SMALL (≤ 768px) — 다이어그램 스케일 조정 ===== */
+@media (max-width: 768px) {
+  .service-diagram {
+    transform: scale(0.88);
+    transform-origin: top center;
+    margin-bottom: -48px;
+  }
+
+  .service-diagram__ring--outer {
+    width: 290px;
+    height: 290px;
+  }
+
+  .service-diagram__ring--inner {
+    width: 210px;
+    height: 210px;
+  }
+
+  .service-diagram__node {
+    width: 148px;
+    padding: 14px 14px 12px;
+  }
+
+  .service-diagram__node--rion {
+    left: 12px;
+    bottom: 158px;
+  }
+
+  .service-diagram__node--taxon {
+    right: 12px;
+    bottom: 158px;
   }
 }
 
@@ -117,6 +183,14 @@
 
   .section-title {
     font-size: var(--text-2xl);
+  }
+
+  .hero__content::before {
+    inset: 50% auto auto 0;
+    width: 100%;
+    height: 380px;
+    border-radius: 28px;
+    transform: translateY(-50%);
   }
 
   /* 히어로 액션 세로 정렬 */
@@ -168,6 +242,50 @@
     height: 80px;
   }
 
+  .service-diagram {
+    min-height: auto;
+    padding: 24px;
+    display: grid;
+    gap: 18px;
+  }
+
+  .service-diagram__ring,
+  .service-diagram__node::after {
+    display: none;
+  }
+
+  .service-diagram__core,
+  .service-diagram__node,
+  .service-diagram__detail {
+    position: static;
+    width: 100%;
+    transform: none;
+  }
+
+  .service-diagram__core {
+    margin-bottom: 6px;
+  }
+
+  .service-diagram__node {
+    min-width: 0;
+  }
+
+  .service-diagram__node--vion.is-active,
+  .service-diagram__node--vion:hover,
+  .service-diagram__node--vion:focus-visible,
+  .service-diagram__node--rion.is-active,
+  .service-diagram__node--rion:hover,
+  .service-diagram__node--rion:focus-visible,
+  .service-diagram__node--taxon.is-active,
+  .service-diagram__node--taxon:hover,
+  .service-diagram__node--taxon:focus-visible {
+    transform: translateY(-4px);
+  }
+
+  .service-diagram__detail {
+    min-height: 0;
+  }
+
   .teaser-name {
     font-size: var(--text-xl);
   }
@@ -184,9 +302,38 @@
     gap: var(--space-3);
   }
 
+  .teaser-tab {
+    min-width: 0;
+    padding-inline: 18px;
+  }
+
   .notify-form__row .btn {
     border-radius: var(--radius-full);
     padding-block: 12px;
+  }
+
+  /* 피드백 섹션 */
+  .feedback-inner {
+    grid-template-columns: 1fr;
+    gap: var(--space-5);
+  }
+
+  .feedback-icon {
+    display: none;
+  }
+
+  .feedback-visual {
+    display: none;
+  }
+
+  .feedback-title {
+    font-size: var(--text-2xl);
+  }
+
+  .feedback-actions {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-3);
   }
 
   /* 푸터 */

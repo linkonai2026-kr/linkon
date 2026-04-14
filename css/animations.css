@@ -1,10 +1,9 @@
 /* ===== ANIMATIONS ===== */
 
-/* ===== 키프레임 ===== */
 @keyframes fadeUp {
   from {
     opacity: 0;
-    transform: translateY(28px);
+    transform: translateY(24px);
   }
   to {
     opacity: 1;
@@ -14,7 +13,7 @@
 
 @keyframes fadeIn {
   from { opacity: 0; }
-  to   { opacity: 1; }
+  to { opacity: 1; }
 }
 
 @keyframes scaleUp {
@@ -30,83 +29,70 @@
 
 @keyframes scrollBounce {
   0%, 100% { transform: scaleY(0.6); transform-origin: top; opacity: 0.4; }
-  50%       { transform: scaleY(1);   transform-origin: top; opacity: 1; }
+  50% { transform: scaleY(1); transform-origin: top; opacity: 1; }
 }
 
 @keyframes pulse {
   0%, 100% { opacity: 1; transform: scale(1); }
-  50%       { opacity: 0.5; transform: scale(0.8); }
+  50% { opacity: 0.5; transform: scale(0.8); }
 }
 
 @keyframes orbFloat {
-  0%, 100% { transform: translateY(0) translateX(0); }
-  33%       { transform: translateY(-16px) translateX(8px); }
-  66%       { transform: translateY(8px) translateX(-8px); }
+  0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+  25% { transform: translate3d(10px, -14px, 0) scale(1.02); }
+  50% { transform: translate3d(-8px, -24px, 0) scale(0.985); }
+  75% { transform: translate3d(-14px, 10px, 0) scale(1.015); }
 }
 
-/* ===== 스크롤 리빌 - 초기 상태 ===== */
+/* ===== Scroll Reveal Initial State ===== */
 [data-animate] {
   opacity: 0;
 }
 
-/* 애니메이션이 적용되기 전 상태 */
 [data-animate="fade-up"] {
-  transform: translateY(28px);
-  transition: opacity var(--dur-slow) var(--ease-out),
-              transform var(--dur-slow) var(--ease-out);
+  transform: translateY(24px);
+  transition: opacity 720ms cubic-bezier(0.16, 1, 0.3, 1),
+              transform 720ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 [data-animate="fade-in"] {
-  transition: opacity var(--dur-slow) var(--ease-out);
+  transition: opacity 700ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 [data-animate="scale-up"] {
   transform: scale(0.88);
-  transition: opacity var(--dur-slow) var(--ease-out),
-              transform var(--dur-slow) var(--ease-spring);
+  transition: opacity 680ms cubic-bezier(0.16, 1, 0.3, 1),
+              transform 680ms var(--ease-spring);
 }
 
-/* is-visible 추가 시 애니메이션 실행 */
 [data-animate].is-visible {
   opacity: 1;
   transform: none;
 }
 
-/* 딜레이 */
 [data-delay="100"].is-visible { transition-delay: 100ms; }
 [data-delay="200"].is-visible { transition-delay: 200ms; }
 [data-delay="300"].is-visible { transition-delay: 300ms; }
 [data-delay="400"].is-visible { transition-delay: 400ms; }
 
-/* 딜레이 초기 상태에도 적용 */
 [data-delay="100"] { transition-delay: 100ms; }
 [data-delay="200"] { transition-delay: 200ms; }
 [data-delay="300"] { transition-delay: 300ms; }
 [data-delay="400"] { transition-delay: 400ms; }
 
-/* ===== 오브 플로팅 ===== */
+/* ===== Floating Hero Orbs ===== */
 .hero__orb--teal {
-  animation: orbFloat 8s ease-in-out infinite;
+  animation: orbFloat 18s ease-in-out infinite;
 }
+
 .hero__orb--blue {
-  animation: orbFloat 10s ease-in-out infinite reverse;
+  animation: orbFloat 22s ease-in-out infinite reverse;
 }
+
 .hero__orb--red {
-  animation: orbFloat 7s ease-in-out infinite 2s;
+  animation: orbFloat 20s ease-in-out infinite 2.5s;
 }
 
-/* ===== About 시각 요소 ===== */
-.orb-visual__circle--teal {
-  animation: orbFloat 7s ease-in-out infinite;
-}
-.orb-visual__circle--blue {
-  animation: orbFloat 9s ease-in-out infinite 1s;
-}
-.orb-visual__circle--red {
-  animation: orbFloat 8s ease-in-out infinite 2.5s;
-}
-
-/* ===== 접근성: 모션 줄이기 ===== */
 @media (prefers-reduced-motion: reduce) {
   [data-animate],
   [data-animate="fade-up"],
@@ -118,9 +104,17 @@
   }
 
   .hero__orb,
-  .orb-visual__circle,
+  .hero__orb--teal,
+  .hero__orb--blue,
+  .hero__orb--red,
   .status-badge--live::before,
   .hero__scroll-arrow {
     animation: none;
+  }
+
+  * {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
   }
 }

@@ -4,13 +4,23 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="Linkon — 심리 케어, 법률, 재무를 아우르는 AI 서비스 플랫폼">
-  <meta property="og:title" content="Linkon">
-  <meta property="og:description" content="더 나은 삶을 위한 AI 서비스">
+  <meta property="og:title" content="Linkon — AI 기반 전문 서비스 플랫폼">
+  <meta property="og:description" content="심리 케어, 법률 자문, 재무 관리를 하나의 AI 플랫폼에서. Linkon이 삶의 중요한 순간마다 곁에 있습니다.">
   <meta property="og:type" content="website">
+  <meta property="og:url" content="https://linkon-official.github.io/linkon-website/">
+  <meta property="og:image" content="https://linkon-official.github.io/linkon-website/assets/og-thumbnail.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:locale" content="ko_KR">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Linkon — AI 기반 전문 서비스 플랫폼">
+  <meta name="twitter:description" content="심리 케어, 법률 자문, 재무 관리를 하나의 AI 플랫폼에서.">
+  <meta name="twitter:image" content="https://linkon-official.github.io/linkon-website/assets/og-thumbnail.png">
   <meta name="theme-color" content="#F7F8FC">
   <title>Linkon — AI 기반 전문 서비스</title>
 
   <!-- Pretendard 폰트 (한국어 최적화) -->
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
   <link rel="stylesheet" as="style" crossorigin
     href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
 
@@ -347,6 +357,48 @@
 
   </main>
 
+  <!-- ===== FEEDBACK ===== -->
+  <section class="section feedback-section" id="feedback" aria-labelledby="feedback-title">
+    <div class="container feedback-inner">
+      <div class="feedback-icon" aria-hidden="true">
+        <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect width="40" height="40" rx="12" fill="rgba(123,97,255,0.10)"/>
+          <path d="M10 12h20a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H14l-6 4V14a2 2 0 0 1 2-2z" stroke="#7B61FF" stroke-width="1.8" stroke-linejoin="round" fill="none"/>
+          <circle cx="15" cy="20" r="1.5" fill="#7B61FF"/>
+          <circle cx="20" cy="20" r="1.5" fill="#7B61FF"/>
+          <circle cx="25" cy="20" r="1.5" fill="#7B61FF"/>
+        </svg>
+      </div>
+      <div class="feedback-text" data-animate="fade-up">
+        <p class="section-label" data-i18n="feedback.label">함께 만들어가는 Linkon</p>
+        <h2 class="feedback-title" id="feedback-title" data-i18n="feedback.title">의견을 보내주세요</h2>
+        <p class="feedback-desc" data-i18n="feedback.desc">새로운 기능 아이디어, 불편한 점, 개선 제안이 있으시면 언제든지 이메일로 알려주세요. 여러분의 목소리가 Linkon을 더 좋은 서비스로 만드는 가장 직접적인 방법입니다.</p>
+        <div class="feedback-actions">
+          <a href="mailto:linkon.ai2026@gmail.com" class="btn btn--primary">
+            <span data-i18n="feedback.btn">의견 보내기</span>
+            <svg class="btn__icon" width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+              <path d="M2 8h12M9 3l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </a>
+          <p class="feedback-sub" data-i18n="feedback.sub">빠른 시일 내에 검토 후 서비스 개선에 반영하겠습니다.</p>
+        </div>
+      </div>
+      <div class="feedback-visual" aria-hidden="true">
+        <div class="feedback-card">
+          <div class="feedback-card__row">
+            <div class="feedback-card__avatar feedback-card__avatar--teal"></div>
+            <div class="feedback-card__lines">
+              <div class="feedback-card__line feedback-card__line--long"></div>
+              <div class="feedback-card__line feedback-card__line--short"></div>
+            </div>
+          </div>
+          <div class="feedback-card__bubble feedback-card__bubble--in">새로운 기능 제안 드려요!</div>
+          <div class="feedback-card__bubble feedback-card__bubble--out">소중한 의견 감사합니다 ✓</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <!-- ===== FOOTER ===== -->
   <footer class="footer" id="contact">
     <div class="container footer-grid">
@@ -380,8 +432,8 @@
       <div class="container footer-bottom-inner">
         <p class="footer-copy">&copy; 2025 Linkon. All rights reserved.</p>
         <div class="footer-legal">
-          <a href="#" class="footer-legal-link" data-i18n="footer.legal.privacy">개인정보처리방침</a>
-          <a href="#" class="footer-legal-link" data-i18n="footer.legal.terms">이용약관</a>
+          <a href="privacy.html" class="footer-legal-link" data-i18n="footer.legal.privacy">개인정보처리방침</a>
+          <a href="terms.html" class="footer-legal-link" data-i18n="footer.legal.terms">이용약관</a>
         </div>
       </div>
     </div>

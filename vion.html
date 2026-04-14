@@ -4,8 +4,18 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="Vion — AI 기반 심리 및 실버 케어 서비스. 마음의 건강을 지키는 전문 AI 상담 서비스입니다.">
+  <meta property="og:title" content="Vion — 심리 및 실버 케어 | Linkon">
+  <meta property="og:description" content="마음의 건강을 지키는 AI 심리 상담 서비스. 일상의 스트레스부터 깊은 고민까지, 언제 어디서나 전문적인 심리 케어를 받아보세요.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://linkon-official.github.io/linkon-website/vion.html">
+  <meta property="og:image" content="https://linkon-official.github.io/linkon-website/assets/og-thumbnail.png">
+  <meta property="og:locale" content="ko_KR">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Vion — 심리 및 실버 케어 | Linkon">
+  <meta name="twitter:image" content="https://linkon-official.github.io/linkon-website/assets/og-thumbnail.png">
   <title>Vion — 심리 및 실버 케어 | Linkon</title>
 
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
   <link rel="stylesheet" as="style" crossorigin
     href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
 
@@ -35,12 +45,12 @@
       <a href="index.html" class="nav__logo" aria-label="Linkon 홈으로">
         <img src="assets/logo.png" alt="Linkon" class="nav__logo-img">
       </a>
-      <nav class="nav__links">
+      <nav class="nav__links" aria-label="주요 메뉴" data-i18n-aria-label="nav.aria.primary">
         <a href="index.html#services" class="nav__link" data-i18n="nav.services">서비스</a>
         <a href="index.html#about" class="nav__link" data-i18n="nav.about">회사 소개</a>
         <a href="index.html#contact" class="nav__link" data-i18n="nav.contact">문의하기</a>
       </nav>
-      <div class="lang-toggle" role="group" aria-label="언어 선택">
+      <div class="lang-toggle" role="group" aria-label="언어 선택" data-i18n-aria-label="lang.toggle">
         <button class="lang-btn is-active" data-lang="ko">KO</button>
         <span class="lang-divider" aria-hidden="true">|</span>
         <button class="lang-btn" data-lang="en">EN</button>
@@ -287,9 +297,9 @@
       <div class="footer-links">
         <h4 class="footer-heading" data-i18n="footer.heading.services">서비스</h4>
         <ul class="footer-list">
-          <li><a href="vion.html" class="footer-link footer-link--active">Vion — 심리 및 실버 케어</a></li>
-          <li><a href="rion.html" class="footer-link footer-link--muted">Rion — 법률 비서 <em>(출시 예정)</em></a></li>
-          <li><a href="taxon.html" class="footer-link footer-link--muted">Taxon — 재무 관리 <em>(출시 예정)</em></a></li>
+          <li><a href="vion.html" class="footer-link footer-link--active" data-i18n="footer.services.vion">Vion — 심리 및 실버 케어</a></li>
+          <li><a href="rion.html" class="footer-link footer-link--muted" data-i18n-html="footer.services.rion">Rion — 법률 비서 <em>(출시 예정)</em></a></li>
+          <li><a href="taxon.html" class="footer-link footer-link--muted" data-i18n-html="footer.services.taxon">Taxon — 재무 관리 <em>(출시 예정)</em></a></li>
         </ul>
       </div>
       <div class="footer-contact">

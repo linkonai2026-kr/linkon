@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex">
+  <title>페이지를 찾을 수 없습니다 | Linkon</title>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <link rel="stylesheet" as="style" crossorigin
+    href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+  <link rel="stylesheet" href="css/reset.css">
+  <link rel="stylesheet" href="css/variables.css">
+  <link rel="stylesheet" href="css/typography.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/responsive.css">
+  <style>
+    body {
+      background: linear-gradient(160deg, #ffffff 0%, #f0f8ff 50%, #f7f3ff 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+    }
+    .err-wrap {
+      padding: var(--space-8) var(--space-5);
+      max-width: 480px;
+    }
+    .err-code {
+      font-size: 96px;
+      font-weight: 900;
+      line-height: 1;
+      background: linear-gradient(135deg, #7B61FF 0%, #00C9B1 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 16px;
+    }
+    .err-title {
+      font-size: var(--text-2xl);
+      font-weight: 800;
+      color: var(--text-primary);
+      margin-bottom: 12px;
+    }
+    .err-desc {
+      font-size: var(--text-base);
+      color: var(--text-secondary);
+      line-height: 1.7;
+      margin-bottom: 36px;
+    }
+    .err-logo {
+      width: 48px;
+      height: 48px;
+      margin: 0 auto 32px;
+    }
+  </style>
+</head>
+<body>
+  <div class="err-wrap">
+    <img src="assets/logo.png" alt="Linkon" class="err-logo">
+    <p class="err-code">404</p>
+    <h1 class="err-title">페이지를 찾을 수 없습니다</h1>
+    <p class="err-desc">
+      요청하신 페이지가 존재하지 않거나 이동된 것 같습니다.<br>
+      홈으로 돌아가서 원하시는 내용을 찾아보세요.
+    </p>
+    <a href="index.html" class="btn btn--primary">홈으로 돌아가기</a>
+  </div>
+</body>
+</html>
