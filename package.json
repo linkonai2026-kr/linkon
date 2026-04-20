@@ -1,9 +1,27 @@
 {
   "name": "linkon",
   "version": "1.0.0",
-  "description": "Linkon 공식 홈페이지",
+  "description": "Linkon 공식 홈페이지 & 통합 인증",
+  "private": true,
   "scripts": {
-    "dev": "npx serve . --listen 3000 --no-clipboard",
-    "start": "npx serve . --listen 3000 --no-clipboard"
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "next": "^16.2.3",
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4",
+    "@supabase/ssr": "^0.6.1",
+    "@supabase/supabase-js": "^2.49.4"
+  },
+  "devDependencies": {
+    "@types/node": "^22",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "typescript": "^5",
+    "eslint": "^9",
+    "eslint-config-next": "^16.2.3"
   }
 }

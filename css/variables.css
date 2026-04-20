@@ -1,6 +1,6 @@
 /* ===== CSS CUSTOM PROPERTIES ===== */
 :root {
-  /* --- 배경 & 표면 (라이트 모드) --- */
+  /* --- 배경 & 표면 (라이트 프리미엄 테마) --- */
   --bg-primary:    #FFFFFF;
   --bg-secondary:  #F7F8FC;
   --bg-elevated:   #EDEEF5;
@@ -14,6 +14,13 @@
   --text-inverse:   #F5F7FF;
   --text-inverse-soft: rgba(245, 247, 255, 0.78);
   --text-inverse-muted: rgba(245, 247, 255, 0.56);
+
+  /* --- 브랜드 & 프리미엄 골드 --- */
+  --gold-primary:   #D4AF37;
+  --gold-light:     #F3E5AB;
+  --gold-dark:      #AA8C2C;
+  --gold-dim:       rgba(212, 175, 55, 0.12);
+
 
   /* --- 브랜드 액센트 --- */
   --linkon-accent:     #7B61FF;
