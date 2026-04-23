@@ -1,107 +1,159 @@
 import { NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { verifyWebhookAuth } from "@/lib/auth/token";
-import {
-  createServiceUser,
-  recordServiceAccount,
-  type ServiceName,
-} from "@/lib/auth/sync";
+import { ensureCanonicalUserProfile } from "@/lib/linkon/users";
+import { syncServiceUserState } from "@/lib/linkon/service-sync";
+import { ServiceName } from "@/lib/linkon/types";
 
 export const dynamic = "force-dynamic";
 
 interface SyncBody {
-  event: "user.created";
+  event: "user.created" | "user.updated";
   service: ServiceName;
   email: string;
   name?: string;
-  serviceUid: string;
+  serviceUid?: string;
 }
 
-/**
- * POST /api/sync
- *
- * 개별 서비스(vion/rion/taxon)에서 직접 가입 시 호출하는 webhook
- * HMAC-SHA256 서명으로 인증 (LINKON_WEBHOOK_SECRET 공유)
- */
-export async function POST(req: Request) {
-  const rawBody = await req.text();
-
-  // HMAC 서명 검증
-  const authHeader = req.headers.get("Authorization");
-  if (!verifyWebhookAuth(rawBody, authHeader)) {
-    return NextResponse.json(
-      { error: "인증 실패" },
-      { status: 401 }
-    );
-  }
-
-  let body: SyncBody;
-  try {
-    body = JSON.parse(rawBody);
-  } catch {
-    return NextResponse.json(
-      { error: "요청 형식이 올바르지 않습니다." },
-      { status: 400 }
-    );
-  }
-
-  const { event, service, email, name, serviceUid } = body;
-
-  if (event !== "user.created") {
-    return NextResponse.json({ ok: true, message: "이벤트 무시" });
-  }
-
-  if (!email || !service || !serviceUid) {
-    return NextResponse.json(
-      { error: "필수 필드가 누락되었습니다." },
-      { status: 400 }
-    );
-  }
-
+async function findLinkonAuthUserByEmail(email: string) {
   const linkonAdmin = createAdminClient("linkon");
+  let page = 1;
 
-  // 1. linkon에 이미 계정이 있는지 확인
-  const { data: existingUsers } = await linkonAdmin.auth.admin.listUsers();
-  const existingUser = existingUsers?.users?.find((u) => u.email === email);
+  while (page <= 20) {
+    const { data, error } = await linkonAdmin.auth.admin.listUsers({
+      page,
+      perPage: 200,
+    });
 
-  let linkonUid: string;
+    if (error) {
+      throw new Error(error.message);
+    }
 
-  if (existingUser) {
-    // 기존 계정 — service_accounts만 추가
-    linkonUid = existingUser.id;
-  } else {
-    // linkon에 계정 없음 — 새로 생성 (비밀번호 없음: 랜덤 password로 생성)
-    // 사용자가 linkon에 처음 접근 시 "비밀번호 설정" 또는 magic link 로그인 안내
-    const tempPassword = Math.random().toString(36).slice(-12) + "Aa1!";
-    const { data: newUser, error: createError } =
-      await linkonAdmin.auth.admin.createUser({
-        email,
-        password: tempPassword,
-        email_confirm: true,
-        user_metadata: { full_name: name ?? "", needs_password_setup: true },
-      });
+    const match = data.users.find(
+      (candidate) => candidate.email?.toLowerCase() === email.toLowerCase()
+    );
 
-    if (createError) {
+    if (match) {
+      return match;
+    }
+
+    if (!data.nextPage) {
+      break;
+    }
+
+    page = data.nextPage;
+  }
+
+  return null;
+}
+
+export async function POST(req: Request) {
+  try {
+    const rawBody = await req.text();
+    const authHeader = req.headers.get("Authorization");
+
+    if (!verifyWebhookAuth(rawBody, authHeader)) {
+      return NextResponse.json({ error: "Authentication failed." }, { status: 401 });
+    }
+
+    let body: SyncBody;
+
+    try {
+      body = JSON.parse(rawBody);
+    } catch {
       return NextResponse.json(
-        { error: `linkon 계정 생성 실패: ${createError.message}` },
+        { error: "The request body is invalid." },
+        { status: 400 }
+      );
+    }
+
+    const { event, service, email, name, serviceUid } = body;
+
+    if (!email || !service) {
+      return NextResponse.json(
+        { error: "Required fields are missing." },
+        { status: 400 }
+      );
+    }
+
+    const linkonAdmin = createAdminClient("linkon");
+    const existingUser = await findLinkonAuthUserByEmail(email);
+
+    const linkonAuthUser =
+      existingUser ??
+      (
+        await linkonAdmin.auth.admin.createUser({
+          email,
+          password: `${Math.random().toString(36).slice(-10)}Aa1!`,
+          email_confirm: true,
+          user_metadata: {
+            full_name: name ?? "",
+            needs_password_setup: true,
+          },
+        })
+      ).data.user;
+
+    if (!linkonAuthUser) {
+      return NextResponse.json(
+        { error: "The Linkon account could not be created or found." },
         { status: 500 }
       );
     }
 
-    linkonUid = newUser.user!.id;
+    const profile = await ensureCanonicalUserProfile(linkonAuthUser);
+
+    if (serviceUid) {
+      const { error } = await linkonAdmin.from("service_accounts").upsert(
+        {
+          linkon_uid: profile.id,
+          service,
+          service_uid: serviceUid,
+          service_email: email,
+          sync_status: "succeeded",
+          sync_error: null,
+          last_synced_at: new Date().toISOString(),
+        },
+        { onConflict: "linkon_uid,service" }
+      );
+
+      if (error) {
+        throw new Error(error.message);
+      }
+    }
+
+    if (event === "user.updated") {
+      await syncServiceUserState(
+        service,
+        {
+          linkonUid: profile.id,
+          email,
+          name: name ?? profile.name,
+          role: profile.role,
+          accountStatus: profile.account_status,
+          plan: profile.plan,
+          billingState: profile.billing_state,
+          suspensionReason: profile.suspension_reason,
+          deletedAt: profile.deleted_at,
+        },
+        profile.id,
+        "upsert"
+      );
+    }
+
+    return NextResponse.json({
+      ok: true,
+      linkonUid: profile.id,
+      service,
+    });
+  } catch (error) {
+    return NextResponse.json(
+      {
+        error:
+          error instanceof Error
+            ? error.message
+            : "The sync request could not be completed.",
+      },
+      { status: 500 }
+    );
   }
-
-  // 2. 해당 서비스 service_account 기록
-  await recordServiceAccount(linkonUid, [
-    { service, uid: serviceUid, error: null },
-  ]);
-
-  // 3. 나머지 두 서비스에는 계정 생성을 하지 않음
-  //    (비밀번호를 모르므로 — 사용자가 linkon에서 직접 통합 가입할 때 동기화)
-
-  return NextResponse.json({
-    ok: true,
-    linkonUid,
-    message: `${service} 가입이 linkon에 동기화되었습니다.`,
-  });
 }

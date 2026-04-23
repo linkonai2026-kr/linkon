@@ -191,6 +191,18 @@
   width: 100%;
 }
 
+.btn--primary {
+  background: linear-gradient(135deg, var(--linkon-accent) 0%, #5f7cff 100%);
+  color: white;
+  border-color: transparent;
+  box-shadow: 0 10px 24px rgba(95, 124, 255, 0.22);
+}
+
+.btn--primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 14px 28px rgba(95, 124, 255, 0.28);
+}
+
 .btn__icon {
   flex-shrink: 0;
   transition: transform var(--dur-fast) var(--ease-out);
@@ -615,14 +627,17 @@
 }
 
 /* Service page nav — white text on dark background */
-.sp-nav:not(.sp-nav--scrolled) .lang-btn {
+.sp-nav:not(.sp-nav--scrolled) .lang-btn,
+.sp-nav:not(.nav--scrolled) .lang-btn {
   color: rgba(255,255,255,0.55);
 }
 
-.sp-nav:not(.sp-nav--scrolled) .lang-btn.is-active {
+.sp-nav:not(.sp-nav--scrolled) .lang-btn.is-active,
+.sp-nav:not(.nav--scrolled) .lang-btn.is-active {
   color: rgba(255,255,255,0.95);
 }
 
-.sp-nav:not(.sp-nav--scrolled) .lang-divider {
+.sp-nav:not(.sp-nav--scrolled) .lang-divider,
+.sp-nav:not(.nav--scrolled) .lang-divider {
   color: rgba(255,255,255,0.35);
 }

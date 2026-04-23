@@ -17,7 +17,7 @@ interface ServiceLaunchBtnProps {
 export default function ServiceLaunchBtn({
   service,
   label,
-  loadingLabel = "연결 중...",
+  loadingLabel = "Connecting...",
   className,
   style,
 }: ServiceLaunchBtnProps) {

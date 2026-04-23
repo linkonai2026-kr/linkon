@@ -41,7 +41,7 @@ export default function NotFound() {
           marginBottom: "var(--space-4)",
         }}
       >
-        페이지를 찾을 수 없어요
+        We could not find that page.
       </h1>
       <p
         style={{
@@ -52,12 +52,11 @@ export default function NotFound() {
           lineHeight: 1.7,
         }}
       >
-        요청하신 페이지가 없거나 이동되었습니다.
-        <br />
-        아래 버튼으로 홈페이지로 돌아가세요.
+        The page may have moved, been removed, or never existed in this
+        environment.
       </p>
       <Link href="/" className="btn btn--primary">
-        홈으로 돌아가기
+        Return home
       </Link>
     </div>
   );

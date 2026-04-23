@@ -1,11 +1,7 @@
 import { NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
-import {
-  createServiceUser,
-  recordServiceAccount,
-  recordPreferences,
-  type ServiceName,
-} from "@/lib/auth/sync";
+import { ensureCanonicalUserProfile } from "@/lib/linkon/users";
+import { syncAllServices, toServiceSyncPayload } from "@/lib/linkon/service-sync";
 
 export const dynamic = "force-dynamic";
 
@@ -19,125 +15,139 @@ interface RegisterBody {
 }
 
 export async function POST(req: Request) {
-  let body: RegisterBody;
-
   try {
-    body = await req.json();
-  } catch {
-    return NextResponse.json(
-      { error: "요청 형식이 올바르지 않습니다." },
-      { status: 400 }
-    );
-  }
+    let body: RegisterBody;
 
-  const {
-    email,
-    password,
-    name,
-    preferredService,
-    termsAgreed,
-    marketingAgreed = false,
-  } = body;
-
-  // 필수 항목 검증
-  if (!email || !password || !name || !termsAgreed) {
-    return NextResponse.json(
-      { error: "이름, 이메일, 비밀번호, 약관 동의는 필수입니다." },
-      { status: 400 }
-    );
-  }
-
-  if (password.length < 8) {
-    return NextResponse.json(
-      { error: "비밀번호는 8자 이상이어야 합니다." },
-      { status: 400 }
-    );
-  }
-
-  const linkonAdmin = createAdminClient("linkon");
-
-  // ── Step 1: linkon Supabase에 계정 생성 ──
-  const { data: linkonUser, error: linkonError } =
-    await linkonAdmin.auth.admin.createUser({
-      email,
-      password,
-      email_confirm: true,
-      user_metadata: { full_name: name },
-    });
-
-  if (linkonError) {
-    const isAlreadyRegistered =
-      linkonError.message.includes("already been registered") ||
-      linkonError.message.includes("already exists") ||
-      linkonError.message.includes("duplicate");
-
-    if (isAlreadyRegistered) {
+    try {
+      body = await req.json();
+    } catch {
       return NextResponse.json(
-        { error: "이미 가입된 이메일 주소입니다." },
-        { status: 409 }
+        { error: "The request body is invalid." },
+        { status: 400 }
       );
     }
 
-    return NextResponse.json(
-      { error: linkonError.message },
-      { status: 400 }
-    );
-  }
-
-  const linkonUid = linkonUser.user!.id;
-
-  // ── Step 2: 세 서비스에 동시 계정 생성 (일부 실패해도 계속) ──
-  const services: ServiceName[] = ["vion", "rion", "taxon"];
-  const serviceResults = await Promise.allSettled(
-    services.map((service) =>
-      createServiceUser(service, { email, password, name })
-    )
-  );
-
-  const results = serviceResults.map((result, i) => {
-    if (result.status === "fulfilled") return result.value;
-    return { service: services[i], uid: null, error: result.reason?.message ?? "알 수 없는 오류" };
-  });
-
-  // ── Step 3: service_accounts 테이블 기록 ──
-  await recordServiceAccount(linkonUid, results);
-
-  // ── Step 4: registration_preferences 기록 ──
-  await recordPreferences(linkonUid, {
-    preferredService,
-    termsAgreed,
-    marketingAgreed,
-  });
-
-  // ── Step 5: linkon 로그인 세션 생성 ──
-  const { data: sessionData, error: sessionError } =
-    await linkonAdmin.auth.admin.generateLink({
-      type: "magiclink",
+    const {
       email,
-      options: {
-        redirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/select-service`,
-      },
-    });
+      password,
+      name,
+      preferredService,
+      termsAgreed,
+      marketingAgreed = false,
+    } = body;
 
-  if (sessionError || !sessionData?.properties?.action_link) {
-    // 계정은 생성됐지만 자동 로그인 불가 → 로그인 페이지로 안내
+    if (!email || !password || !name || !termsAgreed) {
+      return NextResponse.json(
+        { error: "Name, email, password, and terms agreement are required." },
+        { status: 400 }
+      );
+    }
+
+    if (password.length < 8) {
+      return NextResponse.json(
+        { error: "Password must be at least 8 characters long." },
+        { status: 400 }
+      );
+    }
+
+    const linkonAdmin = createAdminClient("linkon");
+    const { data: createdUser, error: createError } =
+      await linkonAdmin.auth.admin.createUser({
+        email,
+        password,
+        email_confirm: true,
+        user_metadata: { full_name: name },
+      });
+
+    if (createError) {
+      const isAlreadyRegistered =
+        createError.message.includes("already been registered") ||
+        createError.message.includes("already exists") ||
+        createError.message.includes("duplicate");
+
+      return NextResponse.json(
+        {
+          error: isAlreadyRegistered
+            ? "This email is already registered."
+            : createError.message,
+        },
+        { status: isAlreadyRegistered ? 409 : 400 }
+      );
+    }
+
+    if (!createdUser.user) {
+      return NextResponse.json(
+        { error: "The account could not be created." },
+        { status: 500 }
+      );
+    }
+
+    const profile = await ensureCanonicalUserProfile(createdUser.user);
+    const syncResults = await syncAllServices(
+      toServiceSyncPayload(profile, createdUser.user, password),
+      createdUser.user.id
+    );
+
+    const { error: preferenceError } = await linkonAdmin
+      .from("registration_preferences")
+      .upsert(
+        {
+          linkon_uid: createdUser.user.id,
+          preferred_service: preferredService ?? null,
+          terms_agreed: termsAgreed,
+          terms_agreed_at: new Date().toISOString(),
+          marketing_agreed: marketingAgreed,
+        },
+        { onConflict: "linkon_uid" }
+      );
+
+    if (preferenceError) {
+      return NextResponse.json(
+        {
+          error: `The account was created, but preferences could not be saved: ${preferenceError.message}`,
+        },
+        { status: 500 }
+      );
+    }
+
+    const { data: sessionData, error: sessionError } =
+      await linkonAdmin.auth.admin.generateLink({
+        type: "magiclink",
+        email,
+        options: {
+          redirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/select-service`,
+        },
+      });
+
+    if (sessionError || !sessionData?.properties?.action_link) {
+      return NextResponse.json({
+        ok: true,
+        autoLogin: false,
+        syncResults: syncResults.map((result) => ({
+          service: result.service,
+          success: result.success,
+        })),
+      });
+    }
+
     return NextResponse.json({
       ok: true,
-      autoLogin: false,
-      syncResults: results.map((r) => ({
-        service: r.service,
-        success: r.error === null,
+      autoLogin: true,
+      magicLink: sessionData.properties.action_link,
+      syncResults: syncResults.map((result) => ({
+        service: result.service,
+        success: result.success,
       })),
     });
+  } catch (error) {
+    return NextResponse.json(
+      {
+        error:
+          error instanceof Error
+            ? error.message
+            : "Registration failed due to an unexpected error.",
+      },
+      { status: 500 }
+    );
   }
-
-  return NextResponse.json({
-    ok: true,
-    autoLogin: true,
-    magicLink: sessionData.properties.action_link,
-    syncResults: results.map((r) => ({
-      service: r.service,
-      success: r.error === null,
-    })),
-  });
 }

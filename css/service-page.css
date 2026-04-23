@@ -404,18 +404,21 @@
   color: white;
 }
 
-.sp-nav--scrolled {
+.sp-nav--scrolled,
+.sp-nav.nav--scrolled {
   background-color: rgba(255,255,255,0.97) !important;
   backdrop-filter: blur(16px) !important;
   border-bottom: 1px solid var(--border) !important;
   box-shadow: var(--shadow-sm) !important;
 }
 
-.sp-nav--scrolled .nav__link {
+.sp-nav--scrolled .nav__link,
+.sp-nav.nav--scrolled .nav__link {
   color: var(--text-secondary) !important;
 }
 
-.sp-nav--scrolled .nav__link:hover {
+.sp-nav--scrolled .nav__link:hover,
+.sp-nav.nav--scrolled .nav__link:hover {
   color: var(--text-primary) !important;
 }
 
@@ -423,17 +426,20 @@
   background: white;
 }
 
-.sp-nav--scrolled .nav__hamburger span {
+.sp-nav--scrolled .nav__hamburger span,
+.sp-nav.nav--scrolled .nav__hamburger span {
   background: var(--text-primary);
 }
 
 /* 스크롤 전 로고 숨김, 스크롤 후 표시 */
-.sp-nav:not(.sp-nav--scrolled) .nav__logo-img {
+.sp-nav:not(.sp-nav--scrolled) .nav__logo-img,
+.sp-nav:not(.nav--scrolled) .nav__logo-img {
   opacity: 0;
   pointer-events: none;
 }
 
-.sp-nav--scrolled .nav__logo-img {
+.sp-nav--scrolled .nav__logo-img,
+.sp-nav.nav--scrolled .nav__logo-img {
   opacity: 1;
   filter: none;
   transition: opacity 300ms ease;

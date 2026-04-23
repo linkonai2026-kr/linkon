@@ -1,81 +1,161 @@
 -- ==============================
--- linkon Supabase 프로젝트 스키마
--- Supabase SQL Editor에서 실행하세요
+-- Linkon launch schema
+-- Canonical identity + admin control plane + service sync outbox
 -- ==============================
 
--- 1. users 테이블 (auth.users를 미러링)
-CREATE TABLE IF NOT EXISTS public.users (
-  id         uuid PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
-  email      text UNIQUE NOT NULL,
-  name       text,
-  created_at timestamptz NOT NULL DEFAULT now(),
-  updated_at timestamptz NOT NULL DEFAULT now()
+create extension if not exists pgcrypto;
+
+create or replace function public.set_updated_at()
+returns trigger as $$
+begin
+  new.updated_at = now();
+  return new;
+end;
+$$ language plpgsql;
+
+create table if not exists public.users (
+  id uuid primary key references auth.users(id) on delete cascade,
+  email text unique not null,
+  name text,
+  role text not null default 'customer' check (role in ('customer', 'admin', 'super_admin')),
+  account_status text not null default 'active' check (account_status in ('active', 'suspended', 'deleted')),
+  plan text not null default 'free' check (plan in ('free', 'standard', 'premium', 'enterprise')),
+  billing_state text not null default 'manual' check (billing_state in ('manual', 'active', 'past_due', 'canceled')),
+  suspension_reason text,
+  deleted_at timestamptz,
+  last_synced_at timestamptz,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
 );
 
--- 2. service_accounts 테이블 (각 서비스의 Supabase uid 저장)
-CREATE TABLE IF NOT EXISTS public.service_accounts (
-  id          uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  linkon_uid  uuid NOT NULL REFERENCES public.users(id) ON DELETE CASCADE,
-  service     text NOT NULL CHECK (service IN ('vion', 'rion', 'taxon')),
-  service_uid uuid NOT NULL,
-  created_at  timestamptz NOT NULL DEFAULT now(),
-  UNIQUE (linkon_uid, service),
-  UNIQUE (service, service_uid)
+create table if not exists public.service_accounts (
+  id uuid primary key default gen_random_uuid(),
+  linkon_uid uuid not null references public.users(id) on delete cascade,
+  service text not null check (service in ('vion', 'rion', 'taxon')),
+  service_uid uuid,
+  service_email text,
+  sync_status text not null default 'pending' check (sync_status in ('pending', 'processing', 'succeeded', 'failed')),
+  sync_error text,
+  last_synced_at timestamptz,
+  deleted_at timestamptz,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now(),
+  unique (linkon_uid, service),
+  unique nulls not distinct (service, service_uid)
 );
 
--- 3. registration_preferences 테이블 (가입 시 선호도 조사)
-CREATE TABLE IF NOT EXISTS public.registration_preferences (
-  id                uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  linkon_uid        uuid NOT NULL REFERENCES public.users(id) ON DELETE CASCADE,
-  preferred_service text CHECK (preferred_service IN ('vion', 'rion', 'taxon')),
-  marketing_agreed  boolean NOT NULL DEFAULT false,
-  terms_agreed      boolean NOT NULL DEFAULT false,
-  terms_agreed_at   timestamptz,
-  created_at        timestamptz NOT NULL DEFAULT now(),
-  UNIQUE (linkon_uid)
+create table if not exists public.registration_preferences (
+  id uuid primary key default gen_random_uuid(),
+  linkon_uid uuid not null references public.users(id) on delete cascade,
+  preferred_service text check (preferred_service in ('vion', 'rion', 'taxon')),
+  marketing_agreed boolean not null default false,
+  terms_agreed boolean not null default false,
+  terms_agreed_at timestamptz,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now(),
+  unique (linkon_uid)
 );
 
--- ==============================
--- RLS (Row Level Security) 활성화
--- ==============================
-ALTER TABLE public.users ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.service_accounts ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.registration_preferences ENABLE ROW LEVEL SECURITY;
+create table if not exists public.admin_audit_logs (
+  id uuid primary key default gen_random_uuid(),
+  actor_uid uuid references public.users(id) on delete set null,
+  target_uid uuid not null references public.users(id) on delete cascade,
+  action text not null,
+  before_state jsonb,
+  after_state jsonb,
+  sync_result jsonb,
+  created_at timestamptz not null default now()
+);
 
--- users RLS: 자신의 레코드만 조회/수정
-CREATE POLICY "users_select_own" ON public.users
-  FOR SELECT USING (auth.uid() = id);
+create table if not exists public.service_sync_jobs (
+  id uuid primary key default gen_random_uuid(),
+  linkon_uid uuid not null references public.users(id) on delete cascade,
+  service text not null check (service in ('vion', 'rion', 'taxon')),
+  action text not null check (action in ('upsert', 'status', 'plan', 'role', 'delete', 'resync')),
+  status text not null default 'pending' check (status in ('pending', 'processing', 'succeeded', 'failed')),
+  payload jsonb not null default '{}'::jsonb,
+  actor_uid uuid references public.users(id) on delete set null,
+  attempts integer not null default 0,
+  last_error text,
+  synced_at timestamptz,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
 
-CREATE POLICY "users_update_own" ON public.users
-  FOR UPDATE USING (auth.uid() = id);
+create index if not exists idx_service_accounts_linkon_uid on public.service_accounts(linkon_uid);
+create index if not exists idx_service_accounts_status on public.service_accounts(sync_status);
+create index if not exists idx_audit_logs_target_uid on public.admin_audit_logs(target_uid, created_at desc);
+create index if not exists idx_sync_jobs_status on public.service_sync_jobs(status, created_at desc);
 
--- service_accounts RLS: 자신의 서비스 계정만 조회
-CREATE POLICY "service_accounts_select_own" ON public.service_accounts
-  FOR SELECT USING (auth.uid() = linkon_uid);
+drop trigger if exists users_set_updated_at on public.users;
+create trigger users_set_updated_at
+before update on public.users
+for each row
+execute function public.set_updated_at();
 
--- registration_preferences RLS: 자신의 선호도만 조회
-CREATE POLICY "preferences_select_own" ON public.registration_preferences
-  FOR SELECT USING (auth.uid() = linkon_uid);
+drop trigger if exists service_accounts_set_updated_at on public.service_accounts;
+create trigger service_accounts_set_updated_at
+before update on public.service_accounts
+for each row
+execute function public.set_updated_at();
 
--- ==============================
--- 트리거: auth.users 생성 시 public.users 자동 생성
--- ==============================
-CREATE OR REPLACE FUNCTION public.handle_new_user()
-RETURNS TRIGGER AS $$
-BEGIN
-  INSERT INTO public.users (id, email, name)
-  VALUES (
-    NEW.id,
-    NEW.email,
-    NEW.raw_user_meta_data ->> 'full_name'
+drop trigger if exists registration_preferences_set_updated_at on public.registration_preferences;
+create trigger registration_preferences_set_updated_at
+before update on public.registration_preferences
+for each row
+execute function public.set_updated_at();
+
+drop trigger if exists service_sync_jobs_set_updated_at on public.service_sync_jobs;
+create trigger service_sync_jobs_set_updated_at
+before update on public.service_sync_jobs
+for each row
+execute function public.set_updated_at();
+
+alter table public.users enable row level security;
+alter table public.service_accounts enable row level security;
+alter table public.registration_preferences enable row level security;
+alter table public.admin_audit_logs enable row level security;
+alter table public.service_sync_jobs enable row level security;
+
+drop policy if exists users_select_own on public.users;
+create policy users_select_own on public.users
+for select using (auth.uid() = id);
+
+drop policy if exists service_accounts_select_own on public.service_accounts;
+create policy service_accounts_select_own on public.service_accounts
+for select using (auth.uid() = linkon_uid);
+
+drop policy if exists registration_preferences_select_own on public.registration_preferences;
+create policy registration_preferences_select_own on public.registration_preferences
+for select using (auth.uid() = linkon_uid);
+
+drop policy if exists admin_audit_logs_select_none on public.admin_audit_logs;
+create policy admin_audit_logs_select_none on public.admin_audit_logs
+for select using (false);
+
+drop policy if exists service_sync_jobs_select_none on public.service_sync_jobs;
+create policy service_sync_jobs_select_none on public.service_sync_jobs
+for select using (false);
+
+create or replace function public.handle_new_user()
+returns trigger as $$
+begin
+  insert into public.users (id, email, name)
+  values (
+    new.id,
+    new.email,
+    new.raw_user_meta_data ->> 'full_name'
   )
-  ON CONFLICT (id) DO NOTHING;
-  RETURN NEW;
-END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
+  on conflict (id) do update
+    set email = excluded.email,
+        name = coalesce(excluded.name, public.users.name);
 
-DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
-CREATE TRIGGER on_auth_user_created
-  AFTER INSERT ON auth.users
-  FOR EACH ROW
-  EXECUTE FUNCTION public.handle_new_user();
+  return new;
+end;
+$$ language plpgsql security definer;
+
+drop trigger if exists on_auth_user_created on auth.users;
+create trigger on_auth_user_created
+after insert on auth.users
+for each row
+execute function public.handle_new_user();

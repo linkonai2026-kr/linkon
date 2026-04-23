@@ -3,13 +3,21 @@ import { Suspense } from "react";
 import LoginForm from "@/components/login-form";
 
 export const metadata: Metadata = {
-  title: "로그인",
-  description: "Linkon 계정으로 로그인하세요.",
+  title: "Sign In",
+  description: "Sign in with your Linkon account.",
 };
 
 export default function LoginPage() {
   return (
-    <Suspense fallback={<div className="auth-page"><div className="auth-card" style={{ textAlign: "center" }}>로딩 중...</div></div>}>
+    <Suspense
+      fallback={
+        <div className="auth-page">
+          <div className="auth-card" style={{ textAlign: "center" }}>
+            Loading...
+          </div>
+        </div>
+      }
+    >
       <LoginForm />
     </Suspense>
   );

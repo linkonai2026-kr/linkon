@@ -1,10 +1,11 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { createServerClient, type CookieOptions } from "@supabase/ssr";
+import { getBlockedReason, getCanonicalUserProfile } from "@/lib/linkon/users";
 
 // 인증이 필요한 라우트
-const PROTECTED_ROUTES = ["/select-service", "/api/auth/token"];
+const PROTECTED_ROUTES = ["/select-service", "/admin", "/api/auth/token", "/api/admin"];
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   const isProtected = PROTECTED_ROUTES.some((route) =>
@@ -51,12 +52,36 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(loginUrl);
   }
 
+  const profile = await getCanonicalUserProfile(user.id);
+
+  if (profile) {
+    const blockedReason = getBlockedReason(profile);
+
+    if (blockedReason) {
+      const loginUrl = request.nextUrl.clone();
+      loginUrl.pathname = "/login";
+      loginUrl.searchParams.set("error", blockedReason);
+      return NextResponse.redirect(loginUrl);
+    }
+
+    if (pathname.startsWith("/admin") || pathname.startsWith("/api/admin")) {
+      if (profile.role !== "super_admin") {
+        const loginUrl = request.nextUrl.clone();
+        loginUrl.pathname = "/login";
+        loginUrl.searchParams.set("error", "admin_required");
+        return NextResponse.redirect(loginUrl);
+      }
+    }
+  }
+
   return response;
 }
 
 export const config = {
   matcher: [
     "/select-service",
+    "/admin/:path*",
     "/api/auth/token/:path*",
+    "/api/admin/:path*",
   ],
 };

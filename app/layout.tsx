@@ -2,30 +2,39 @@ import type { Metadata, Viewport } from "next";
 import "@/styles/globals.css";
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://linkon.io"),
+  icons: {
+    icon: "/assets/linkon.png",
+    shortcut: "/assets/linkon.png",
+    apple: "/assets/linkon.png",
+  },
   title: {
-    default: "Linkon — AI 기반 전문 서비스",
+    default: "Linkon | AI Professional Service Platform",
     template: "%s | Linkon",
   },
-  description: "Linkon — 심리 케어, 법률, 재무를 아우르는 AI 서비스 플랫폼",
+  description:
+    "Linkon brings mental wellness, legal guidance, and tax operations into one AI-powered control plane.",
   openGraph: {
-    title: "Linkon — AI 기반 전문 서비스 플랫폼",
-    description: "심리 케어, 법률 자문, 재무 관리를 하나의 AI 플랫폼에서. Linkon이 삶의 중요한 순간마다 곁에 있습니다.",
+    title: "Linkon | AI Professional Service Platform",
+    description:
+      "A launch-ready AI platform for unified identity, service access, and operational control across Vion, Rion, and Taxon.",
     type: "website",
     url: "https://linkon.io",
     images: [
       {
-        url: "/assets/og-thumbnail.png",
+        url: "/assets/linkon.png",
         width: 1200,
         height: 630,
       },
     ],
-    locale: "ko_KR",
+    locale: "en_US",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Linkon — AI 기반 전문 서비스 플랫폼",
-    description: "심리 케어, 법률 자문, 재무 관리를 하나의 AI 플랫폼에서.",
-    images: ["/assets/og-thumbnail.png"],
+    title: "Linkon | AI Professional Service Platform",
+    description:
+      "Unified identity, service launch, and admin control for the Linkon ecosystem.",
+    images: ["/assets/linkon.png"],
   },
 };
 
@@ -35,11 +44,11 @@ export const viewport: Viewport = {
 
 export default function RootLayout({
   children,
-}: {
+}: Readonly<{
   children: React.ReactNode;
-}) {
+}>) {
   return (
-    <html lang="ko">
+    <html lang="en">
       <body>{children}</body>
     </html>
   );
