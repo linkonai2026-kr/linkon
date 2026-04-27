@@ -7,9 +7,22 @@ import SiteFooter from "@/components/site/site-footer";
 import SiteHeader from "@/components/site/site-header";
 
 export const metadata: Metadata = {
-  title: "Linkon | 하나의 계정으로 만나는 AI 서비스",
+  title: "LinkON | 일상에 필요한 AI 서비스를 연결하는 브랜드",
   description:
-    "Vion, Rion, Taxon을 하나의 Linkon 계정으로 시작하는 통합 AI 서비스 플랫폼입니다.",
+    "LinkON은 Vion, Rion, Taxon을 통해 일상 케어, 법률 이해, 세무 관리를 더 쉽게 시작할 수 있도록 돕는 AI 서비스 브랜드입니다.",
+  openGraph: {
+    title: "LinkON | 일상에 필요한 AI 서비스를 연결하는 브랜드",
+    description:
+      "Vion, Rion, Taxon으로 마음과 일상, 법률과 세무까지 더 편안하게 시작할 수 있도록 돕습니다.",
+    images: [{ url: "/assets/linkon.png", width: 1200, height: 630 }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "LinkON | 일상에 필요한 AI 서비스를 연결하는 브랜드",
+    description:
+      "일상 케어, 법률 이해, 세무 관리를 더 쉽게 시작할 수 있도록 돕는 LinkON의 AI 서비스 브랜드를 만나보세요.",
+    images: ["/assets/linkon.png"],
+  },
 };
 
 const services = [

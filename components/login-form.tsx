@@ -26,6 +26,18 @@ function getInitialErrorMessage(errorCode: string | null) {
     return "아직 연결 준비 중인 서비스입니다. 잠시 후 다시 시도해 주세요.";
   }
 
+  if (errorCode === "service_setup_required") {
+    return "서비스 자동 로그인을 준비 중입니다. 연결 설정이 완료되면 바로 이용할 수 있습니다.";
+  }
+
+  if (errorCode === "service_sync_failed") {
+    return "서비스 계정 연결에 실패했습니다. 다시 시도하거나 Linkon 운영팀에 문의해 주세요.";
+  }
+
+  if (errorCode === "service_signin_failed") {
+    return "서비스 자동 로그인을 완료하지 못했습니다. 다시 시도해 주세요.";
+  }
+
   if (errorCode === "service_disabled") {
     return "관리자에 의해 해당 서비스 접근 권한이 비활성화되었습니다.";
   }

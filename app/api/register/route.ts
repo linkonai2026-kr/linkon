@@ -3,6 +3,8 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { ensureCanonicalUserProfile } from "@/lib/linkon/users";
 import { syncServiceUserState, toServiceSyncPayload } from "@/lib/linkon/service-sync";
 import { ServiceName, SERVICE_NAMES } from "@/lib/linkon/types";
+import { getServiceUrl, isServiceDownstreamAuthReady } from "@/lib/linkon/service-config";
+import { getAppUrl } from "@/lib/supabase/config";
 
 export const dynamic = "force-dynamic";
 
@@ -20,18 +22,10 @@ function isServiceName(value: unknown): value is ServiceName {
   return typeof value === "string" && SERVICE_NAMES.includes(value as ServiceName);
 }
 
-function getAppUrl() {
-  return process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
-}
-
 function isAllowedReturnTo(returnTo: string | undefined, service: ServiceName | null) {
   if (!returnTo || !service) return false;
 
-  const allowedUrl = {
-    vion: process.env.NEXT_PUBLIC_VION_URL,
-    rion: process.env.NEXT_PUBLIC_RION_URL,
-    taxon: process.env.NEXT_PUBLIC_TAXON_URL,
-  }[service];
+  const allowedUrl = getServiceUrl(service);
 
   if (!allowedUrl) return false;
 
@@ -72,14 +66,14 @@ export async function POST(req: Request) {
     }
 
     const {
-      email,
       password,
-      name,
       preferredService,
       returnTo,
       termsAgreed,
       marketingAgreed = false,
     } = body;
+    const email = body.email?.trim().toLowerCase();
+    const name = body.name?.trim();
 
     if (!email || !password || !name || !termsAgreed) {
       return NextResponse.json(
@@ -127,16 +121,26 @@ export async function POST(req: Request) {
 
     const profile = await ensureCanonicalUserProfile(createdUser.user);
     const selectedService = isServiceName(preferredService) ? preferredService : null;
-    const syncResults = selectedService
-      ? [
-          await syncServiceUserState(
-            selectedService,
-            toServiceSyncPayload(profile, createdUser.user, password),
-            createdUser.user.id,
-            "upsert"
-          ),
-        ]
-      : [];
+    const syncResults =
+      selectedService && isServiceDownstreamAuthReady(selectedService)
+        ? [
+            await syncServiceUserState(
+              selectedService,
+              toServiceSyncPayload(profile, createdUser.user, password),
+              createdUser.user.id,
+              "upsert"
+            ),
+          ]
+        : selectedService
+          ? [
+              {
+                service: selectedService,
+                success: false,
+                serviceUid: null,
+                error: "service_setup_required",
+              },
+            ]
+          : [];
 
     const { error: preferenceError } = await linkonAdmin
       .from("registration_preferences")

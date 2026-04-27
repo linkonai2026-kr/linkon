@@ -45,8 +45,9 @@ export async function GET(request: NextRequest) {
     } = await supabase.auth.getUser();
 
     if (authError || !user?.email) {
+      const redirectPath = `/api/auth/token?${searchParams.toString()}`;
       return NextResponse.redirect(
-        `${getAppUrl()}/login?redirect=/api/auth/token?service=${service}`
+        `${getAppUrl()}/login?redirect=${encodeURIComponent(redirectPath)}`
       );
     }
 
