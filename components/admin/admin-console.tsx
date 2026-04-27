@@ -2,7 +2,14 @@
 
 import { startTransition, useEffect, useState } from "react";
 import { AdminUserDetail, AdminUserListItem } from "@/lib/linkon/admin";
-import { ACCOUNT_STATUSES, PLAN_TIERS, USER_ROLES } from "@/lib/linkon/types";
+import {
+  ACCOUNT_STATUSES,
+  PLAN_TIERS,
+  SERVICE_NAMES,
+  SERVICE_ROLES,
+  ServiceName,
+  USER_ROLES,
+} from "@/lib/linkon/types";
 
 interface AdminConsoleProps {
   initialUsers: AdminUserListItem[];
@@ -124,6 +131,8 @@ export default function AdminConsole({
   }
 
   const selectedUser = detail;
+  const getServiceAccount = (service: ServiceName) =>
+    selectedUser?.service_accounts.find((account) => account.service === service);
 
   return (
     <div className="admin-shell">
@@ -210,6 +219,10 @@ export default function AdminConsole({
                     {user.account_status}
                   </span>
                   <span className="admin-pill">{user.plan}</span>
+                  <span className="admin-pill">{user.role}</span>
+                  <span className="admin-pill">
+                    Last: {user.last_used_service ?? "-"}
+                  </span>
                 </div>
               </button>
             ))}
@@ -344,25 +357,83 @@ export default function AdminConsole({
               </div>
 
               <div className="admin-section">
-                <h3>Service sync status</h3>
+                <h3>Service usage summary</h3>
+                <div className="admin-detail-meta">
+                  <span className="admin-pill">
+                    Primary: {selectedUser.primary_service ?? "-"}
+                  </span>
+                  <span className="admin-pill">
+                    Most used: {selectedUser.most_used_service ?? "-"}
+                  </span>
+                  <span className="admin-pill">
+                    Last used: {selectedUser.last_used_service ?? "-"}
+                  </span>
+                  <span className="admin-pill">
+                    Last login: {selectedUser.last_login_at ?? "-"}
+                  </span>
+                </div>
+              </div>
+
+              <div className="admin-section">
+                <h3>Service access and roles</h3>
                 <div className="admin-service-grid">
-                  {selectedUser.service_accounts.map((service) => (
-                    <article
-                      key={`${service.service}-${service.service_uid ?? "empty"}`}
-                      className="admin-service-card"
-                    >
-                      <strong>{service.service.toUpperCase()}</strong>
-                      <span>ID: {service.service_uid ?? "Not linked"}</span>
-                      <span>Status: {service.sync_status ?? "unknown"}</span>
-                      <span>Last sync: {service.last_synced_at ?? "-"}</span>
-                      {service.sync_error && (
-                        <span className="admin-error-text">{service.sync_error}</span>
-                      )}
-                    </article>
-                  ))}
-                  {selectedUser.service_accounts.length === 0 && (
-                    <p className="admin-empty">No connected service records exist yet.</p>
-                  )}
+                  {SERVICE_NAMES.map((serviceName) => {
+                    const service = getServiceAccount(serviceName);
+                    const isEnabled = service?.is_enabled !== false;
+                    const serviceRole = service?.service_role ?? "user";
+
+                    return (
+                      <article
+                        key={serviceName}
+                        className="admin-service-card"
+                      >
+                        <strong>{serviceName.toUpperCase()}</strong>
+                        <span>ID: {service?.service_uid ?? "Not linked"}</span>
+                        <span>Access: {isEnabled ? "enabled" : "disabled"}</span>
+                        <span>Role: {serviceRole}</span>
+                        <span>Usage: {service?.usage_count ?? 0}</span>
+                        <span>Last access: {service?.last_accessed_at ?? "-"}</span>
+                        <span>Sync: {service?.sync_status ?? "not linked"}</span>
+                        <span>Last sync: {service?.last_synced_at ?? "-"}</span>
+                        {service?.sync_error && (
+                          <span className="admin-error-text">{service.sync_error}</span>
+                        )}
+
+                        <div className="admin-service-actions">
+                          <button
+                            type="button"
+                            className="btn btn--outline btn--sm"
+                            disabled={Boolean(busyAction)}
+                            onClick={() =>
+                              void submitAction(
+                                `/api/admin/users/${selectedUser.id}/services/${serviceName}`,
+                                { isEnabled: !isEnabled }
+                              )
+                            }
+                          >
+                            {isEnabled ? "Disable" : "Enable"}
+                          </button>
+                          <select
+                            className="admin-select"
+                            value={serviceRole}
+                            disabled={Boolean(busyAction)}
+                            onChange={(event) =>
+                              void submitAction(
+                                `/api/admin/users/${selectedUser.id}/services/${serviceName}`,
+                                { serviceRole: event.target.value }
+                              )
+                            }
+                          >
+                            {SERVICE_ROLES.map((role) => (
+                              <option key={role} value={role}>
+                                {role}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+                      </article>
+                    );
+                  })}
                 </div>
               </div>
 

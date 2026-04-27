@@ -3,9 +3,9 @@ import { Suspense } from "react";
 import SelectServiceClient from "@/components/select-service-client";
 
 export const metadata: Metadata = {
-  title: "Choose a Service",
+  title: "서비스 선택",
   description:
-    "Your Linkon account is ready. Choose the service you want to open.",
+    "Linkon 계정이 준비되었습니다. 이용할 서비스를 선택하세요.",
 };
 
 export default function SelectServicePage() {
@@ -14,7 +14,7 @@ export default function SelectServicePage() {
       fallback={
         <div className="auth-page">
           <div className="auth-card" style={{ textAlign: "center" }}>
-            Loading service access...
+            서비스 정보를 불러오는 중...
           </div>
         </div>
       }

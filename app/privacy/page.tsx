@@ -3,9 +3,9 @@ import LegalPage from "@/components/site/legal-page";
 import { legalContent } from "@/lib/site/content";
 
 export const metadata: Metadata = {
-  title: "Privacy Policy",
+  title: "개인정보처리방침",
   description:
-    "How Linkon handles identity, access, and operational records across connected services.",
+    "Linkon의 개인정보 수집, 이용, 보관, 서비스 연동 기준을 안내합니다.",
 };
 
 export default function PrivacyPage() {

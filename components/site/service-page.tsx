@@ -122,9 +122,9 @@ export default function ServicePage({ content }: { content: ServicePageContent }
       <SiteHeader
         theme="dark"
         navItems={[
-          { href: "#overview", label: "Overview" },
-          { href: "#features", label: "Features" },
-          { href: "#cta", label: isLive ? "Launch" : "Updates" },
+          { href: "#overview", label: "소개" },
+          { href: "#features", label: "기능" },
+          { href: "#cta", label: isLive ? "시작하기" : "출시 알림" },
         ]}
         ctaHref={content.heroPrimaryHref}
         ctaLabel={content.navLabel}
@@ -148,12 +148,12 @@ export default function ServicePage({ content }: { content: ServicePageContent }
                     strokeLinejoin="round"
                   />
                 </svg>
-                Back to Linkon
+                Linkon 홈으로
               </Link>
 
               <div className="sp-hero__badge" data-animate="fade-up">
                 <span className="sp-hero__badge-dot"></span>
-                <span>{isLive ? "Available now" : "Launching soon"}</span>
+                <span>{isLive ? "현재 이용 가능" : "출시 예정"}</span>
               </div>
 
               <div className="sp-hero__wordmark" data-animate="fade-up" data-delay="100">
@@ -233,8 +233,8 @@ export default function ServicePage({ content }: { content: ServicePageContent }
               <p className="section-label">{content.featuresLabel}</p>
               <h2 className="section-title font-serif">{content.featuresTitle}</h2>
               <p className="section-desc">
-                Every service ships under one identity model, one admin policy layer,
-                and one launch-ready operational standard.
+                모든 서비스는 Linkon 통합 계정, 관리자 권한 정책, 서비스 동기화
+                기준 위에서 안정적으로 연결됩니다.
               </p>
             </div>
 
@@ -260,7 +260,7 @@ export default function ServicePage({ content }: { content: ServicePageContent }
         <section className={`sp-cta ${isLive ? "" : "sp-cta--soon"}`} id="cta">
           <div className="container">
             <div className="sp-cta__inner" data-animate="fade-up">
-              {!isLive && <div className="sp-coming-badge">Launch prep in progress</div>}
+              {!isLive && <div className="sp-coming-badge">출시 준비 중</div>}
               <h2 className="sp-cta__title font-serif">{content.ctaTitle}</h2>
               <p className="sp-cta__desc">{content.ctaDescription}</p>
 
@@ -283,8 +283,8 @@ export default function ServicePage({ content }: { content: ServicePageContent }
                         className="notify-form__input"
                         type="email"
                         name="email"
-                        placeholder="Enter your email"
-                        aria-label="Email address"
+                        placeholder="이메일 주소를 입력해 주세요"
+                        aria-label="이메일 주소"
                       />
                       <button type="submit" className={`btn btn--${content.accentClass}`}>
                         {content.ctaPrimaryLabel}
@@ -292,7 +292,7 @@ export default function ServicePage({ content }: { content: ServicePageContent }
                     </div>
                   </form>
                   <p className="notify-form__note">
-                    You can also create a Linkon account now to be ready for service launch.
+                    Linkon 계정을 먼저 만들어두면 출시 후 더 빠르게 시작할 수 있습니다.
                   </p>
                   <Link href={content.ctaPrimaryHref} className="btn btn--outline btn--lg">
                     {content.ctaSecondaryLabel}

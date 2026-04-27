@@ -20,7 +20,7 @@ function randomPassword() {
   return `${Math.random().toString(36).slice(-10)}Aa1!`;
 }
 
-async function findServiceAccount(linkonUid: string, service: ServiceName) {
+export async function findServiceAccount(linkonUid: string, service: ServiceName) {
   const admin = getLinkonAdmin();
   const { data, error } = await admin
     .from("service_accounts")
@@ -41,6 +41,8 @@ async function saveServiceAccount(record: ServiceAccountRecord) {
   const { error } = await admin.from("service_accounts").upsert(
     {
       ...record,
+      is_enabled: record.is_enabled ?? true,
+      service_role: record.service_role ?? "user",
       last_synced_at: record.last_synced_at ?? new Date().toISOString(),
       sync_status: record.sync_status ?? "succeeded",
     },
@@ -143,6 +145,8 @@ async function upsertServiceUser(service: ServiceName, payload: ServiceSyncPaylo
       account_status: payload.accountStatus,
       plan: payload.plan,
       role: payload.role,
+      service_role: payload.serviceRole ?? "user",
+      service_enabled: payload.serviceEnabled ?? true,
       billing_state: payload.billingState,
       deleted_at: payload.deletedAt,
       suspension_reason: payload.suspensionReason,
@@ -204,25 +208,34 @@ export async function syncServiceUserState(
   actorUid: string | null,
   mode: "upsert" | "delete"
 ) {
+  const existingAccount = await findServiceAccount(payload.linkonUid, service);
+  const effectivePayload = {
+    ...payload,
+    serviceRole: payload.serviceRole ?? existingAccount?.service_role ?? "user",
+    serviceEnabled: payload.serviceEnabled ?? existingAccount?.is_enabled ?? true,
+  } satisfies ServiceSyncPayload;
+
   const job = await createSyncJob({
-    linkon_uid: payload.linkonUid,
+    linkon_uid: effectivePayload.linkonUid,
     service,
     action: mode === "delete" ? "delete" : "upsert",
     status: "processing",
-    payload: payload as unknown as Record<string, unknown>,
+    payload: effectivePayload as unknown as Record<string, unknown>,
     actor_uid: actorUid,
   });
 
   try {
     const serviceUid = mode === "delete"
-      ? await deleteServiceUser(service, payload)
-      : await upsertServiceUser(service, payload);
+      ? await deleteServiceUser(service, effectivePayload)
+      : await upsertServiceUser(service, effectivePayload);
 
     await saveServiceAccount({
-      linkon_uid: payload.linkonUid,
+      linkon_uid: effectivePayload.linkonUid,
       service,
       service_uid: serviceUid,
-      service_email: payload.email,
+      service_email: effectivePayload.email,
+      is_enabled: effectivePayload.serviceEnabled,
+      service_role: effectivePayload.serviceRole,
       sync_status: "succeeded",
       sync_error: null,
       last_synced_at: new Date().toISOString(),
@@ -246,10 +259,12 @@ export async function syncServiceUserState(
     const message = error instanceof Error ? error.message : "Unknown sync error";
 
     await saveServiceAccount({
-      linkon_uid: payload.linkonUid,
+      linkon_uid: effectivePayload.linkonUid,
       service,
-      service_uid: await resolveServiceUser(service, payload),
-      service_email: payload.email,
+      service_uid: existingAccount?.service_uid ?? null,
+      service_email: effectivePayload.email,
+      is_enabled: effectivePayload.serviceEnabled,
+      service_role: effectivePayload.serviceRole,
       sync_status: "failed",
       sync_error: message,
       last_synced_at: new Date().toISOString(),
@@ -275,13 +290,32 @@ export async function syncAllServices(
   actorUid: string | null,
   mode: "upsert" | "delete" = "upsert"
 ) {
+  const admin = getLinkonAdmin();
+  const { data: linkedAccounts, error: linkedAccountsError } = await admin
+    .from("service_accounts")
+    .select("service")
+    .eq("linkon_uid", payload.linkonUid);
+
+  if (linkedAccountsError) {
+    throw new Error(`Failed to load linked service accounts: ${linkedAccountsError.message}`);
+  }
+
+  const linkedServices = Array.from(
+    new Set(
+      (linkedAccounts ?? [])
+        .map((account) => account.service)
+        .filter((service): service is ServiceName =>
+          typeof service === "string" && (["vion", "rion", "taxon"] as string[]).includes(service)
+        )
+    )
+  );
+
   const outcomes = await Promise.all(
-    (["vion", "rion", "taxon"] as ServiceName[]).map((service) =>
+    linkedServices.map((service) =>
       syncServiceUserState(service, payload, actorUid, mode)
     )
   );
 
-  const admin = getLinkonAdmin();
   await admin
     .from("users")
     .update({
@@ -291,6 +325,72 @@ export async function syncAllServices(
     .eq("id", payload.linkonUid);
 
   return outcomes;
+}
+
+export async function recordServiceAccess(linkonUid: string, service: ServiceName) {
+  const admin = getLinkonAdmin();
+  const existingAccount = await findServiceAccount(linkonUid, service);
+  const now = new Date().toISOString();
+  const nextUsageCount = (existingAccount?.usage_count ?? 0) + 1;
+
+  const { error: accountError } = await admin.from("service_accounts").upsert(
+    {
+      linkon_uid: linkonUid,
+      service,
+      service_uid: existingAccount?.service_uid ?? null,
+      service_email: existingAccount?.service_email ?? null,
+      is_enabled: existingAccount?.is_enabled ?? true,
+      service_role: existingAccount?.service_role ?? "user",
+      sync_status: existingAccount?.sync_status ?? "succeeded",
+      sync_error: existingAccount?.sync_error ?? null,
+      last_synced_at: existingAccount?.last_synced_at ?? now,
+      last_accessed_at: now,
+      usage_count: nextUsageCount,
+      deleted_at: existingAccount?.deleted_at ?? null,
+    },
+    { onConflict: "linkon_uid,service" }
+  );
+
+  if (accountError) {
+    throw new Error(`Failed to record ${service} access: ${accountError.message}`);
+  }
+
+  const { data: serviceRows, error: serviceRowsError } = await admin
+    .from("service_accounts")
+    .select("service, usage_count")
+    .eq("linkon_uid", linkonUid)
+    .order("usage_count", { ascending: false })
+    .limit(1);
+
+  if (serviceRowsError) {
+    throw new Error(`Failed to calculate most used service: ${serviceRowsError.message}`);
+  }
+
+  const mostUsedService =
+    serviceRows?.[0] && typeof serviceRows[0].service === "string"
+      ? serviceRows[0].service
+      : service;
+
+  const { data: profile } = await admin
+    .from("users")
+    .select("primary_service")
+    .eq("id", linkonUid)
+    .maybeSingle();
+
+  const { error: userError } = await admin
+    .from("users")
+    .update({
+      last_login_at: now,
+      last_used_service: service,
+      most_used_service: mostUsedService,
+      primary_service: profile?.primary_service ?? service,
+      updated_at: now,
+    })
+    .eq("id", linkonUid);
+
+  if (userError) {
+    throw new Error(`Failed to update Linkon usage summary: ${userError.message}`);
+  }
 }
 
 export function toServiceSyncPayload(profile: CanonicalUserProfile, user: Pick<User, "email" | "user_metadata">, password?: string) {

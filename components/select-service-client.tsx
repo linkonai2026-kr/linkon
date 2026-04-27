@@ -13,19 +13,19 @@ interface SyncResult {
 const SERVICE_INFO = {
   vion: {
     name: "Vion",
-    desc: "Mental wellness and silver care",
+    desc: "심리 및 시니어 케어 AI",
     logo: "/assets/vion-no.png",
     color: "vion",
   },
   rion: {
     name: "Rion",
-    desc: "Legal co-pilot",
+    desc: "법률 비서 AI",
     logo: "/assets/rion-no.png",
     color: "rion",
   },
   taxon: {
     name: "Taxon",
-    desc: "Business finance operations",
+    desc: "세무 관리 AI",
     logo: "/assets/taxon-no.png",
     color: "taxon",
   },
@@ -55,17 +55,22 @@ export default function SelectServiceClient() {
     const error = searchParams.get("error");
 
     if (error === "service_unavailable") {
-      setErrorMessage("This service is not configured yet. Please try again shortly.");
+      setErrorMessage("아직 연결 준비 중인 서비스입니다. 잠시 후 다시 시도해 주세요.");
       return;
     }
 
     if (error === "service_sync_failed") {
-      setErrorMessage("Account sync failed for this service. Please retry or contact an administrator.");
+      setErrorMessage("이 서비스와 계정 동기화에 실패했습니다. 다시 시도하거나 관리자에게 문의해 주세요.");
+      return;
+    }
+
+    if (error === "service_disabled") {
+      setErrorMessage("관리자에 의해 이 서비스 접근 권한이 비활성화되었습니다.");
       return;
     }
 
     if (error === "service_signin_failed") {
-      setErrorMessage("Automatic sign-in could not be created for this service. Please try again.");
+      setErrorMessage("서비스 자동 로그인을 만들지 못했습니다. 다시 시도해 주세요.");
       return;
     }
 
@@ -109,11 +114,11 @@ export default function SelectServiceClient() {
               />
             </svg>
           </div>
-          <h1 className="auth-title">Account ready</h1>
+          <h1 className="auth-title">계정 준비가 완료되었습니다</h1>
           <p className="auth-subtitle">
-            Your Linkon account is active.
+            Linkon 통합 계정이 활성화되었습니다.
             <br />
-            Choose a service to continue.
+            계속 이용할 서비스를 선택해 주세요.
           </p>
         </div>
 
@@ -167,7 +172,7 @@ export default function SelectServiceClient() {
                         className={`service-select-card__sync service-select-card__sync--${syncOk ? "ok" : "fail"}`}
                         style={{ marginTop: "4px" }}
                       >
-                        {syncOk ? "Sync ready" : "Previous sync had issues"}
+                        {syncOk ? "동기화 완료" : "이전 동기화 확인 필요"}
                       </div>
                     )}
                   </div>
@@ -179,7 +184,7 @@ export default function SelectServiceClient() {
                         viewBox="0 0 20 20"
                         fill="none"
                         className="animate-spin"
-                        aria-label="Loading"
+                        aria-label="불러오는 중"
                       >
                         <circle
                           cx="10"
@@ -216,9 +221,9 @@ export default function SelectServiceClient() {
             marginTop: "var(--space-5)",
           }}
         >
-          Prefer to decide later?{" "}
+          나중에 선택하고 싶다면{" "}
           <Link href="/" style={{ color: "var(--linkon-accent)" }}>
-            Return to home
+            홈으로 돌아가기
           </Link>
         </p>
       </div>

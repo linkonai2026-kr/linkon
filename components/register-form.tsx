@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 
 type Step = 1 | 2 | 3;
@@ -11,19 +11,19 @@ type Step = 1 | 2 | 3;
 const SERVICE_INFO = {
   vion: {
     name: "Vion",
-    desc: "Mental wellness and silver care",
+    desc: "심리 및 시니어 케어 AI",
     logo: "/assets/vion-noback.png",
     color: "vion",
   },
   rion: {
     name: "Rion",
-    desc: "Legal co-pilot",
+    desc: "법률 비서 AI",
     logo: "/assets/rion-noback.png",
     color: "rion",
   },
   taxon: {
     name: "Taxon",
-    desc: "Business finance operations",
+    desc: "세무 관리 AI",
     logo: "/assets/taxon-noback.png",
     color: "taxon",
   },
@@ -31,15 +31,27 @@ const SERVICE_INFO = {
 
 type ServiceKey = keyof typeof SERVICE_INFO;
 
+function isServiceKey(value: string | null): value is ServiceKey {
+  return value === "vion" || value === "rion" || value === "taxon";
+}
+
 export default function RegisterForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const serviceFromQuery = searchParams.get("service");
+  const initialPreferredService = isServiceKey(serviceFromQuery)
+    ? serviceFromQuery
+    : "";
+  const returnTo = searchParams.get("returnTo") ?? undefined;
 
   const [step, setStep] = useState<Step>(1);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [passwordConfirm, setPasswordConfirm] = useState("");
-  const [preferredService, setPreferredService] = useState<ServiceKey | "">("");
+  const [preferredService, setPreferredService] = useState<ServiceKey | "">(
+    initialPreferredService
+  );
   const [termsAgreed, setTermsAgreed] = useState(false);
   const [privacyAgreed, setPrivacyAgreed] = useState(false);
   const [marketingAgreed, setMarketingAgreed] = useState(false);
@@ -48,18 +60,18 @@ export default function RegisterForm() {
   const [error, setError] = useState("");
 
   const validateStep1 = () => {
-    if (!name.trim()) return "Please enter your name.";
+    if (!name.trim()) return "이름을 입력해 주세요.";
     if (!email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      return "Please enter a valid email address.";
+      return "올바른 이메일 주소를 입력해 주세요.";
     }
-    if (password.length < 8) return "Password must be at least 8 characters long.";
-    if (password !== passwordConfirm) return "Passwords do not match.";
+    if (password.length < 8) return "비밀번호는 8자 이상이어야 합니다.";
+    if (password !== passwordConfirm) return "비밀번호가 서로 일치하지 않습니다.";
     return "";
   };
 
   const validateStep3 = () => {
-    if (!termsAgreed) return "You must agree to the Terms of Service.";
-    if (!privacyAgreed) return "You must agree to the Privacy Policy.";
+    if (!termsAgreed) return "이용약관에 동의해 주세요.";
+    if (!privacyAgreed) return "개인정보처리방침에 동의해 주세요.";
     return "";
   };
 
@@ -98,6 +110,7 @@ export default function RegisterForm() {
           password,
           name,
           preferredService: preferredService || undefined,
+          returnTo,
           termsAgreed,
           marketingAgreed,
         }),
@@ -106,7 +119,7 @@ export default function RegisterForm() {
       const data = await response.json();
 
       if (!response.ok) {
-        setError(data.error ?? "Registration failed.");
+        setError(data.error ?? "회원가입에 실패했습니다.");
         setLoading(false);
         return;
       }
@@ -124,15 +137,15 @@ export default function RegisterForm() {
       });
 
       if (signInError) {
-        setError("Registration completed, but automatic sign-in was unavailable. Please sign in manually.");
+        setError("회원가입은 완료되었지만 자동 로그인을 할 수 없습니다. 직접 로그인해 주세요.");
         router.push("/login");
         return;
       }
 
       sessionStorage.setItem("linkon_sync", JSON.stringify(data.syncResults));
-      router.push("/select-service");
+      router.push(data.nextPath ?? "/select-service");
     } catch {
-      setError("A network error occurred. Please try again.");
+      setError("네트워크 오류가 발생했습니다. 다시 시도해 주세요.");
     } finally {
       setLoading(false);
     }
@@ -173,22 +186,22 @@ export default function RegisterForm() {
               handleNextStep();
             }}
           >
-            <h1 className="auth-title">Create your Linkon account</h1>
+            <h1 className="auth-title">Linkon 통합 계정 만들기</h1>
             <p className="auth-subtitle">
-              One account gives you access to the full Linkon ecosystem.
+              하나의 계정으로 Vion, Rion, Taxon을 연결합니다.
             </p>
 
             {error && <div className="error-box" role="alert">{error}</div>}
 
             <div className="form-group">
               <label className="form-label" htmlFor="name">
-                Full name
+                이름
               </label>
               <input
                 id="name"
                 type="text"
                 className="form-input"
-                placeholder="Your name"
+                placeholder="이름을 입력해 주세요"
                 value={name}
                 onChange={(event) => setName(event.target.value)}
                 required
@@ -198,7 +211,7 @@ export default function RegisterForm() {
 
             <div className="form-group">
               <label className="form-label" htmlFor="email">
-                Email
+                이메일
               </label>
               <input
                 id="email"
@@ -214,13 +227,13 @@ export default function RegisterForm() {
 
             <div className="form-group">
               <label className="form-label" htmlFor="password">
-                Password
+                비밀번호
               </label>
               <input
                 id="password"
                 type="password"
                 className="form-input"
-                placeholder="At least 8 characters"
+                placeholder="8자 이상 입력해 주세요"
                 value={password}
                 onChange={(event) => setPassword(event.target.value)}
                 required
@@ -231,7 +244,7 @@ export default function RegisterForm() {
 
             <div className="form-group">
               <label className="form-label" htmlFor="password-confirm">
-                Confirm password
+                비밀번호 확인
               </label>
               <input
                 id="password-confirm"
@@ -239,14 +252,14 @@ export default function RegisterForm() {
                 className={`form-input ${
                   passwordConfirm && password !== passwordConfirm ? "is-error" : ""
                 }`}
-                placeholder="Re-enter your password"
+                placeholder="비밀번호를 다시 입력해 주세요"
                 value={passwordConfirm}
                 onChange={(event) => setPasswordConfirm(event.target.value)}
                 required
                 autoComplete="new-password"
               />
               {passwordConfirm && password !== passwordConfirm && (
-                <p className="form-error">Passwords do not match.</p>
+                <p className="form-error">비밀번호가 서로 일치하지 않습니다.</p>
               )}
             </div>
 
@@ -255,7 +268,7 @@ export default function RegisterForm() {
               className="btn btn--primary"
               style={{ width: "100%", marginTop: "var(--space-4)" }}
             >
-              Continue
+              다음
             </button>
 
             <p
@@ -266,12 +279,12 @@ export default function RegisterForm() {
                 marginTop: "var(--space-4)",
               }}
             >
-              Already have an account?{" "}
+              이미 계정이 있나요?{" "}
               <Link
                 href="/login"
                 style={{ color: "var(--linkon-accent)", fontWeight: 600 }}
               >
-                Sign in
+                로그인
               </Link>
             </p>
           </form>
@@ -279,9 +292,9 @@ export default function RegisterForm() {
 
         {step === 2 && (
           <div>
-            <h2 className="auth-title">Which service matters most right now?</h2>
+            <h2 className="auth-title">가장 관심 있는 서비스를 선택해 주세요</h2>
             <p className="auth-subtitle">
-              This is optional and only helps us improve the onboarding flow.
+              선택 사항이며, 첫 화면과 안내를 더 자연스럽게 맞추는 데 사용됩니다.
             </p>
 
             <div className="service-choice-grid">
@@ -314,7 +327,7 @@ export default function RegisterForm() {
                 onClick={() => setStep(1)}
                 style={{ flex: 1 }}
               >
-                Back
+                이전
               </button>
               <button
                 type="button"
@@ -322,7 +335,7 @@ export default function RegisterForm() {
                 onClick={handleNextStep}
                 style={{ flex: 1 }}
               >
-                Continue
+                다음
               </button>
             </div>
           </div>
@@ -330,9 +343,9 @@ export default function RegisterForm() {
 
         {step === 3 && (
           <form onSubmit={handleSubmit}>
-            <h2 className="auth-title">Review and agree</h2>
+            <h2 className="auth-title">약관 확인 및 동의</h2>
             <p className="auth-subtitle">
-              Please confirm the required policies before creating your account.
+              계정 생성을 위해 필수 약관을 확인해 주세요.
             </p>
 
             {error && <div className="error-box" role="alert">{error}</div>}
@@ -344,11 +357,11 @@ export default function RegisterForm() {
                 onChange={(event) => setTermsAgreed(event.target.checked)}
               />
               <span>
-                I agree to the{" "}
+                Linkon{" "}
                 <Link href="/terms" target="_blank">
-                  Terms of Service
+                  이용약관
                 </Link>
-                .
+                에 동의합니다.
               </span>
             </label>
 
@@ -359,11 +372,11 @@ export default function RegisterForm() {
                 onChange={(event) => setPrivacyAgreed(event.target.checked)}
               />
               <span>
-                I agree to the{" "}
+                Linkon{" "}
                 <Link href="/privacy" target="_blank">
-                  Privacy Policy
+                  개인정보처리방침
                 </Link>
-                .
+                에 동의합니다.
               </span>
             </label>
 
@@ -373,7 +386,7 @@ export default function RegisterForm() {
                 checked={marketingAgreed}
                 onChange={(event) => setMarketingAgreed(event.target.checked)}
               />
-              <span>I want to receive launch and product updates by email.</span>
+              <span>출시 소식과 제품 업데이트를 이메일로 받아보겠습니다.</span>
             </label>
 
             <div className="auth-actions" style={{ marginTop: "var(--space-5)" }}>
@@ -384,7 +397,7 @@ export default function RegisterForm() {
                 style={{ flex: 1 }}
                 disabled={loading}
               >
-                Back
+                이전
               </button>
               <button
                 type="submit"
@@ -392,7 +405,7 @@ export default function RegisterForm() {
                 style={{ flex: 1 }}
                 disabled={loading}
               >
-                {loading ? "Creating account..." : "Create account"}
+                {loading ? "계정 생성 중..." : "계정 만들기"}
               </button>
             </div>
           </form>

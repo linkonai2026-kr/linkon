@@ -3,9 +3,9 @@ import LegalPage from "@/components/site/legal-page";
 import { legalContent } from "@/lib/site/content";
 
 export const metadata: Metadata = {
-  title: "Terms of Service",
+  title: "이용약관",
   description:
-    "Terms governing Linkon, its connected services, and centralized admin controls.",
+    "Linkon 통합 계정과 연결 서비스 이용 조건을 안내합니다.",
 };
 
 export default function TermsPage() {

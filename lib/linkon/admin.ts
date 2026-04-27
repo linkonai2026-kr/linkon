@@ -4,6 +4,8 @@ import {
   AdminListFilters,
   CanonicalUserProfile,
   ServiceAccountRecord,
+  SERVICE_ROLES,
+  SYNC_JOB_STATUSES,
 } from "@/lib/linkon/types";
 import { normalizeCanonicalUserProfile } from "@/lib/linkon/users";
 
@@ -24,7 +26,21 @@ export interface AdminUserDetail extends AdminUserListItem {
 function normalizeAdminUser(row: UserRow): AdminUserListItem {
   return {
     ...normalizeCanonicalUserProfile(row),
-    service_accounts: Array.isArray(row.service_accounts) ? row.service_accounts : [],
+    service_accounts: Array.isArray(row.service_accounts)
+      ? row.service_accounts.map((account) => ({
+          ...account,
+          is_enabled: account.is_enabled !== false,
+          service_role: SERVICE_ROLES.includes(account.service_role ?? "user")
+            ? account.service_role
+            : "user",
+          sync_status:
+            account.sync_status && SYNC_JOB_STATUSES.includes(account.sync_status)
+              ? account.sync_status
+              : "pending",
+          usage_count: Number(account.usage_count ?? 0),
+          last_accessed_at: account.last_accessed_at ?? null,
+        }))
+      : [],
   };
 }
 

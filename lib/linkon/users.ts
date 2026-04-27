@@ -5,6 +5,7 @@ import {
   BILLING_STATES,
   CanonicalUserProfile,
   PLAN_TIERS,
+  SERVICE_NAMES,
   USER_ROLES,
 } from "@/lib/linkon/types";
 import { linkonEnv } from "@/lib/linkon/env";
@@ -17,6 +18,10 @@ const PROFILE_DEFAULTS = {
   suspension_reason: null,
   deleted_at: null,
   last_synced_at: null,
+  last_login_at: null,
+  primary_service: null,
+  most_used_service: null,
+  last_used_service: null,
 } as const;
 
 function isOneOf<T extends readonly string[]>(value: string | null | undefined, allowed: T): value is T[number] {
@@ -28,6 +33,9 @@ export function normalizeCanonicalUserProfile(row: Record<string, unknown>): Can
   const accountStatus = typeof row.account_status === "string" ? row.account_status : undefined;
   const plan = typeof row.plan === "string" ? row.plan : undefined;
   const billingState = typeof row.billing_state === "string" ? row.billing_state : undefined;
+  const primaryService = typeof row.primary_service === "string" ? row.primary_service : undefined;
+  const mostUsedService = typeof row.most_used_service === "string" ? row.most_used_service : undefined;
+  const lastUsedService = typeof row.last_used_service === "string" ? row.last_used_service : undefined;
 
   return {
     id: String(row.id),
@@ -48,6 +56,10 @@ export function normalizeCanonicalUserProfile(row: Record<string, unknown>): Can
     deleted_at: typeof row.deleted_at === "string" ? row.deleted_at : null,
     suspension_reason: typeof row.suspension_reason === "string" ? row.suspension_reason : null,
     last_synced_at: typeof row.last_synced_at === "string" ? row.last_synced_at : null,
+    last_login_at: typeof row.last_login_at === "string" ? row.last_login_at : null,
+    primary_service: isOneOf(primaryService, SERVICE_NAMES) ? primaryService : null,
+    most_used_service: isOneOf(mostUsedService, SERVICE_NAMES) ? mostUsedService : null,
+    last_used_service: isOneOf(lastUsedService, SERVICE_NAMES) ? lastUsedService : null,
     created_at: String(row.created_at ?? new Date().toISOString()),
     updated_at: String(row.updated_at ?? new Date().toISOString()),
   };
@@ -74,6 +86,10 @@ export async function ensureCanonicalUserProfile(user: User) {
     suspension_reason: existingProfile?.suspension_reason ?? PROFILE_DEFAULTS.suspension_reason,
     deleted_at: existingProfile?.deleted_at ?? PROFILE_DEFAULTS.deleted_at,
     last_synced_at: existingProfile?.last_synced_at ?? PROFILE_DEFAULTS.last_synced_at,
+    last_login_at: existingProfile?.last_login_at ?? PROFILE_DEFAULTS.last_login_at,
+    primary_service: existingProfile?.primary_service ?? PROFILE_DEFAULTS.primary_service,
+    most_used_service: existingProfile?.most_used_service ?? PROFILE_DEFAULTS.most_used_service,
+    last_used_service: existingProfile?.last_used_service ?? PROFILE_DEFAULTS.last_used_service,
   };
 
   const { data, error } = await linkonAdmin
@@ -128,6 +144,7 @@ export async function updateCanonicalUserProfile(
     Pick<
       CanonicalUserProfile,
       "role" | "account_status" | "plan" | "billing_state" | "suspension_reason" | "deleted_at" | "last_synced_at"
+      | "last_login_at" | "primary_service" | "most_used_service" | "last_used_service"
     >
   >
 ) {

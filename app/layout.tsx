@@ -9,15 +9,15 @@ export const metadata: Metadata = {
     apple: "/assets/linkon.png",
   },
   title: {
-    default: "Linkon | AI Professional Service Platform",
+    default: "Linkon | 통합 AI 서비스 플랫폼",
     template: "%s | Linkon",
   },
   description:
-    "Linkon brings mental wellness, legal guidance, and tax operations into one AI-powered control plane.",
+    "심리 케어, 법률 안내, 재무 관리를 하나의 통합 계정으로 연결하는 AI 서비스 플랫폼입니다.",
   openGraph: {
-    title: "Linkon | AI Professional Service Platform",
+    title: "Linkon | 통합 AI 서비스 플랫폼",
     description:
-      "A launch-ready AI platform for unified identity, service access, and operational control across Vion, Rion, and Taxon.",
+      "Vion, Rion, Taxon을 하나의 계정과 운영 기준으로 연결하는 Linkon 플랫폼입니다.",
     type: "website",
     url: "https://linkon.io",
     images: [
@@ -27,13 +27,13 @@ export const metadata: Metadata = {
         height: 630,
       },
     ],
-    locale: "en_US",
+    locale: "ko_KR",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Linkon | AI Professional Service Platform",
+    title: "Linkon | 통합 AI 서비스 플랫폼",
     description:
-      "Unified identity, service launch, and admin control for the Linkon ecosystem.",
+      "Linkon 생태계를 위한 통합 계정, 서비스 진입, 관리자 제어.",
     images: ["/assets/linkon.png"],
   },
 };
@@ -48,7 +48,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="ko">
       <body>{children}</body>
     </html>
   );

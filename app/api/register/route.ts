@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { ensureCanonicalUserProfile } from "@/lib/linkon/users";
-import { syncAllServices, toServiceSyncPayload } from "@/lib/linkon/service-sync";
+import { syncServiceUserState, toServiceSyncPayload } from "@/lib/linkon/service-sync";
+import { ServiceName, SERVICE_NAMES } from "@/lib/linkon/types";
 
 export const dynamic = "force-dynamic";
 
@@ -10,8 +11,51 @@ interface RegisterBody {
   password: string;
   name: string;
   preferredService?: string;
+  returnTo?: string;
   termsAgreed: boolean;
   marketingAgreed?: boolean;
+}
+
+function isServiceName(value: unknown): value is ServiceName {
+  return typeof value === "string" && SERVICE_NAMES.includes(value as ServiceName);
+}
+
+function getAppUrl() {
+  return process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
+}
+
+function isAllowedReturnTo(returnTo: string | undefined, service: ServiceName | null) {
+  if (!returnTo || !service) return false;
+
+  const allowedUrl = {
+    vion: process.env.NEXT_PUBLIC_VION_URL,
+    rion: process.env.NEXT_PUBLIC_RION_URL,
+    taxon: process.env.NEXT_PUBLIC_TAXON_URL,
+  }[service];
+
+  if (!allowedUrl) return false;
+
+  try {
+    return new URL(returnTo).origin === new URL(allowedUrl).origin;
+  } catch {
+    return false;
+  }
+}
+
+function getPostRegisterRedirect(service: ServiceName | null, returnTo: string | undefined) {
+  const appUrl = getAppUrl();
+
+  if (!service) {
+    return `${appUrl}/select-service`;
+  }
+
+  const params = new URLSearchParams({ service });
+
+  if (returnTo && isAllowedReturnTo(returnTo, service)) {
+    params.set("returnTo", returnTo);
+  }
+
+  return `${appUrl}/api/auth/token?${params.toString()}`;
 }
 
 export async function POST(req: Request) {
@@ -32,6 +76,7 @@ export async function POST(req: Request) {
       password,
       name,
       preferredService,
+      returnTo,
       termsAgreed,
       marketingAgreed = false,
     } = body;
@@ -83,17 +128,24 @@ export async function POST(req: Request) {
     }
 
     const profile = await ensureCanonicalUserProfile(createdUser.user);
-    const syncResults = await syncAllServices(
-      toServiceSyncPayload(profile, createdUser.user, password),
-      createdUser.user.id
-    );
+    const selectedService = isServiceName(preferredService) ? preferredService : null;
+    const syncResults = selectedService
+      ? [
+          await syncServiceUserState(
+            selectedService,
+            toServiceSyncPayload(profile, createdUser.user, password),
+            createdUser.user.id,
+            "upsert"
+          ),
+        ]
+      : [];
 
     const { error: preferenceError } = await linkonAdmin
       .from("registration_preferences")
       .upsert(
         {
           linkon_uid: createdUser.user.id,
-          preferred_service: preferredService ?? null,
+          preferred_service: selectedService,
           terms_agreed: termsAgreed,
           terms_agreed_at: new Date().toISOString(),
           marketing_agreed: marketingAgreed,
@@ -110,12 +162,37 @@ export async function POST(req: Request) {
       );
     }
 
+    const { error: contextError } = await linkonAdmin
+      .from("linkon_user_context")
+      .upsert(
+        {
+          linkon_uid: createdUser.user.id,
+          preferred_service: selectedService,
+          interest_tags: selectedService ? [selectedService] : [],
+          user_traits: {},
+          memo_summary: selectedService
+            ? `${selectedService} signup interest`
+            : "Linkon signup",
+          risk_flags: [],
+        },
+        { onConflict: "linkon_uid" }
+      );
+
+    if (contextError) {
+      return NextResponse.json(
+        {
+          error: `The account was created, but user context could not be saved: ${contextError.message}`,
+        },
+        { status: 500 }
+      );
+    }
+
     const { data: sessionData, error: sessionError } =
       await linkonAdmin.auth.admin.generateLink({
         type: "magiclink",
         email,
         options: {
-          redirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/select-service`,
+          redirectTo: getPostRegisterRedirect(selectedService, returnTo),
         },
       });
 
@@ -123,6 +200,9 @@ export async function POST(req: Request) {
       return NextResponse.json({
         ok: true,
         autoLogin: false,
+        nextPath: selectedService
+          ? `/api/auth/token?service=${selectedService}`
+          : "/select-service",
         syncResults: syncResults.map((result) => ({
           service: result.service,
           success: result.success,
@@ -134,6 +214,9 @@ export async function POST(req: Request) {
       ok: true,
       autoLogin: true,
       magicLink: sessionData.properties.action_link,
+      nextPath: selectedService
+        ? `/api/auth/token?service=${selectedService}`
+        : "/select-service",
       syncResults: syncResults.map((result) => ({
         service: result.service,
         success: result.success,

@@ -22,12 +22,12 @@ export default function LegalPage({
     <>
       <SiteHeader
         navItems={[
-          { href: "/", label: "Home" },
-          { href: "/privacy", label: "Privacy" },
-          { href: "/terms", label: "Terms" },
+          { href: "/", label: "홈" },
+          { href: "/privacy", label: "개인정보처리방침" },
+          { href: "/terms", label: "이용약관" },
         ]}
         ctaHref="/register"
-        ctaLabel="Create account"
+        ctaLabel="회원가입"
       />
       <main className="legal-page">
         <div className="legal-wrap">
@@ -41,12 +41,12 @@ export default function LegalPage({
                 strokeLinejoin="round"
               />
             </svg>
-            Back to Linkon
+            Linkon 홈으로
           </Link>
 
           <p className="section-label">Legal</p>
           <h1 className="legal-title font-serif">{title}</h1>
-          <p className="legal-date">Last updated: {updatedAt}</p>
+          <p className="legal-date">최종 업데이트: {updatedAt}</p>
           <p className="legal-lead">{description}</p>
 
           {sections.map((section) => (

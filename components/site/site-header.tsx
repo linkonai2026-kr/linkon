@@ -16,7 +16,7 @@ interface SiteHeaderProps {
 export default function SiteHeader({
   navItems,
   ctaHref = "/register",
-  ctaLabel = "Create account",
+  ctaLabel = "회원가입",
   theme = "light",
 }: SiteHeaderProps) {
   const navClassName = theme === "dark" ? "nav sp-nav" : "nav";
@@ -24,7 +24,7 @@ export default function SiteHeader({
   return (
     <header className={navClassName} id="nav">
       <div className="nav__inner container">
-        <Link href="/" className="nav__logo" aria-label="Linkon home">
+        <Link href="/" className="nav__logo" aria-label="Linkon 홈">
           <Image
             src="/assets/linkon-no.png"
             alt="Linkon"
@@ -35,7 +35,7 @@ export default function SiteHeader({
           />
         </Link>
 
-        <nav className="nav__links" aria-label="Primary navigation">
+        <nav className="nav__links" aria-label="주요 메뉴">
           {navItems.map((item) => (
             <Link key={item.href} href={item.href} className="nav__link">
               {item.label}
@@ -50,7 +50,7 @@ export default function SiteHeader({
         <button
           className="nav__hamburger"
           id="hamburger"
-          aria-label="Open menu"
+          aria-label="메뉴 열기"
           aria-expanded="false"
         >
           <span></span>

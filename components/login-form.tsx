@@ -8,19 +8,19 @@ import { createClient } from "@/lib/supabase/client";
 
 function getInitialErrorMessage(errorCode: string | null) {
   if (errorCode === "auth_callback_failed") {
-    return "Sign-in could not be completed. Please try again.";
+    return "로그인을 완료하지 못했습니다. 다시 시도해 주세요.";
   }
 
   if (errorCode === "account_suspended") {
-    return "This account is suspended. Please contact the Linkon team.";
+    return "이 계정은 이용이 정지되었습니다. Linkon 운영팀에 문의해 주세요.";
   }
 
   if (errorCode === "account_deleted") {
-    return "This account is no longer active. Please create a new account or contact support.";
+    return "이 계정은 더 이상 활성 상태가 아닙니다. 새 계정을 만들거나 운영팀에 문의해 주세요.";
   }
 
   if (errorCode === "admin_required") {
-    return "This area requires super admin access.";
+    return "이 영역은 최고 관리자 권한이 필요합니다.";
   }
 
   return "";
@@ -50,7 +50,7 @@ export default function LoginForm() {
     });
 
     if (signInError) {
-      setError("The email or password is incorrect.");
+      setError("이메일 또는 비밀번호가 올바르지 않습니다.");
       setLoading(false);
       return;
     }
@@ -72,8 +72,8 @@ export default function LoginForm() {
           />
         </div>
 
-        <h1 className="auth-title">Welcome back</h1>
-        <p className="auth-subtitle">Sign in with your Linkon account.</p>
+        <h1 className="auth-title">다시 만나서 반가워요</h1>
+        <p className="auth-subtitle">Linkon 통합 계정으로 로그인해 주세요.</p>
 
         {error && (
           <div className="error-box" role="alert">
@@ -84,7 +84,7 @@ export default function LoginForm() {
         <form onSubmit={handleLogin}>
           <div className="form-group">
             <label className="form-label" htmlFor="email">
-              Email
+              이메일
             </label>
             <input
               id="email"
@@ -100,13 +100,13 @@ export default function LoginForm() {
 
           <div className="form-group">
             <label className="form-label" htmlFor="password">
-              Password
+              비밀번호
             </label>
             <input
               id="password"
               type="password"
               className="form-input"
-              placeholder="Enter your password"
+              placeholder="비밀번호를 입력해 주세요"
               value={password}
               onChange={(event) => setPassword(event.target.value)}
               required
@@ -120,7 +120,7 @@ export default function LoginForm() {
             style={{ width: "100%", marginTop: "var(--space-4)" }}
             disabled={loading}
           >
-            {loading ? "Signing in..." : "Sign in"}
+            {loading ? "로그인 중..." : "로그인"}
           </button>
         </form>
 
@@ -132,12 +132,12 @@ export default function LoginForm() {
             marginTop: "var(--space-4)",
           }}
         >
-          Need a Linkon account?{" "}
+          아직 Linkon 계정이 없나요?{" "}
           <Link
             href="/register"
             style={{ color: "var(--linkon-accent)", fontWeight: 600 }}
           >
-            Create one
+            회원가입
           </Link>
         </p>
       </div>

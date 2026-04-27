@@ -1,8 +1,13 @@
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createAdminAuditLog, getAdminUserDetail } from "@/lib/linkon/admin";
-import { syncAllServices, toServiceSyncPayload } from "@/lib/linkon/service-sync";
+import {
+  findServiceAccount,
+  syncAllServices,
+  syncServiceUserState,
+  toServiceSyncPayload,
+} from "@/lib/linkon/service-sync";
 import { getCanonicalUserProfile, updateCanonicalUserProfile } from "@/lib/linkon/users";
-import { AccountStatus, PlanTier, UserRole } from "@/lib/linkon/types";
+import { AccountStatus, PlanTier, ServiceName, ServiceRole, UserRole } from "@/lib/linkon/types";
 
 const BLOCK_BAN_DURATION = "876000h";
 
@@ -263,4 +268,81 @@ export async function resyncUser(actorUid: string, targetUid: string) {
   const before = await getAdminUserDetail(targetUid);
   const mode = before.account_status === "deleted" || before.deleted_at ? "delete" : "upsert";
   return syncAndAudit(actorUid, targetUid, "user.resynced", mode, before);
+}
+
+export async function changeServiceAccess(
+  actorUid: string,
+  targetUid: string,
+  service: ServiceName,
+  patch: {
+    isEnabled?: boolean;
+    serviceRole?: ServiceRole;
+  }
+) {
+  await assertAdminActionAllowed(actorUid, targetUid);
+  const before = await getAdminUserDetail(targetUid);
+  const profile = await getCanonicalUserProfile(targetUid);
+
+  if (!profile) {
+    throw new Error("The target user account could not be found.");
+  }
+
+  const authUser = await getAuthUser(targetUid);
+  const existingAccount = await findServiceAccount(targetUid, service);
+  const nextIsEnabled = patch.isEnabled ?? existingAccount?.is_enabled ?? true;
+  const nextServiceRole = patch.serviceRole ?? existingAccount?.service_role ?? "user";
+  const now = new Date().toISOString();
+  const admin = createAdminClient("linkon");
+
+  const { error } = await admin.from("service_accounts").upsert(
+    {
+      linkon_uid: targetUid,
+      service,
+      service_uid: existingAccount?.service_uid ?? null,
+      service_email: existingAccount?.service_email ?? profile.email,
+      is_enabled: nextIsEnabled,
+      service_role: nextServiceRole,
+      sync_status: existingAccount?.sync_status ?? "pending",
+      sync_error: existingAccount?.sync_error ?? null,
+      last_synced_at: existingAccount?.last_synced_at ?? null,
+      last_accessed_at: existingAccount?.last_accessed_at ?? null,
+      usage_count: existingAccount?.usage_count ?? 0,
+      deleted_at: existingAccount?.deleted_at ?? null,
+      updated_at: now,
+    },
+    { onConflict: "linkon_uid,service" }
+  );
+
+  if (error) {
+    throw new Error(`Failed to update service access: ${error.message}`);
+  }
+
+  const result = await syncServiceUserState(
+    service,
+    {
+      ...toServiceSyncPayload(profile, authUser),
+      serviceEnabled: nextIsEnabled,
+      serviceRole: nextServiceRole,
+    },
+    actorUid,
+    profile.account_status === "deleted" || profile.deleted_at ? "delete" : "upsert"
+  );
+  const after = await getAdminUserDetail(targetUid);
+
+  await createAdminAuditLog({
+    actor_uid: actorUid,
+    target_uid: targetUid,
+    action: patch.serviceRole ? "service.role.updated" : "service.access.updated",
+    before_state: before,
+    after_state: after,
+    sync_result: {
+      service,
+      result,
+    },
+  });
+
+  return {
+    user: after,
+    syncResults: [result],
+  };
 }
