@@ -35,6 +35,11 @@ export function getServiceUrl(service: ServiceName) {
   return readEnv(SERVICE_ENV_NAMES[service]) || SERVICE_URL_FALLBACKS[service] || "";
 }
 
+export function isServiceDownstreamAuthReady(service: ServiceName) {
+  const supabaseEnv = SERVICE_SUPABASE_ENV_NAMES[service];
+  return Boolean(readEnv(supabaseEnv.url) && readEnv(supabaseEnv.key));
+}
+
 export function getServiceHealth() {
   return (["vion", "rion", "taxon"] as ServiceName[]).map((service) => {
     const configuredUrl = readEnv(SERVICE_ENV_NAMES[service]);
@@ -48,7 +53,7 @@ export function getServiceHealth() {
       urlConfigured: Boolean(configuredUrl),
       urlUsesFallback: !configuredUrl && Boolean(SERVICE_URL_FALLBACKS[service]),
       urlReady: isValidUrl(resolvedUrl),
-      downstreamAuthReady: hasServiceSupabaseUrl && hasServiceRoleKey,
+      downstreamAuthReady: isServiceDownstreamAuthReady(service),
     };
   });
 }

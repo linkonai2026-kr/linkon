@@ -45,16 +45,34 @@ export default function SiteHeader({
     let mounted = true;
     const supabase = createClient();
 
-    supabase.auth.getUser().then(({ data }) => {
-      if (mounted) {
-        setIsSignedIn(Boolean(data.user));
+    const refreshSession = async () => {
+      try {
+        const response = await fetch("/api/auth/session", {
+          cache: "no-store",
+          credentials: "same-origin",
+        });
+        const data = (await response.json()) as { authenticated?: boolean };
+
+        if (mounted) {
+          setIsSignedIn(Boolean(data.authenticated));
+        }
+      } catch {
+        if (mounted) {
+          setIsSignedIn(false);
+        }
       }
-    });
+    };
+
+    refreshSession();
 
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
-      setIsSignedIn(Boolean(session?.user));
+      if (session?.user) {
+        setIsSignedIn(true);
+      } else {
+        refreshSession();
+      }
     });
 
     return () => {

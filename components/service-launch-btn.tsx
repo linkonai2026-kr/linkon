@@ -2,7 +2,6 @@
 
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
-import { createClient } from "@/lib/supabase/client";
 
 type ServiceName = "vion" | "rion" | "taxon";
 
@@ -28,12 +27,13 @@ export default function ServiceLaunchBtn({
     setLoading(true);
 
     try {
-      const supabase = createClient();
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
+      const response = await fetch("/api/auth/session", {
+        cache: "no-store",
+        credentials: "same-origin",
+      });
+      const session = (await response.json()) as { authenticated?: boolean };
 
-      if (user) {
+      if (session.authenticated) {
         window.location.href = `/api/auth/token?service=${service}`;
       } else {
         router.push(`/login?redirect=/api/auth/token?service=${service}`);

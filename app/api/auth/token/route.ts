@@ -9,7 +9,7 @@ import {
 } from "@/lib/linkon/service-sync";
 import { ServiceName } from "@/lib/linkon/types";
 import { getAppUrl } from "@/lib/supabase/config";
-import { getServiceUrl } from "@/lib/linkon/service-config";
+import { getServiceUrl, isServiceDownstreamAuthReady } from "@/lib/linkon/service-config";
 
 export const dynamic = "force-dynamic";
 
@@ -63,6 +63,12 @@ export async function GET(request: NextRequest) {
     if (!serviceUrl) {
       return NextResponse.redirect(
         `${getAppUrl()}/select-service?error=service_unavailable`
+      );
+    }
+
+    if (!isServiceDownstreamAuthReady(service)) {
+      return NextResponse.redirect(
+        `${getAppUrl()}/select-service?error=service_setup_required`
       );
     }
 
