@@ -31,8 +31,15 @@ function isValidUrl(value: string) {
   }
 }
 
+function normalizeServiceUrl(value: string) {
+  if (!value) return "";
+  return value.startsWith("http://") || value.startsWith("https://")
+    ? value
+    : `https://${value}`;
+}
+
 export function getServiceUrl(service: ServiceName) {
-  return readEnv(SERVICE_ENV_NAMES[service]) || SERVICE_URL_FALLBACKS[service] || "";
+  return normalizeServiceUrl(readEnv(SERVICE_ENV_NAMES[service]) || SERVICE_URL_FALLBACKS[service] || "");
 }
 
 export function isServiceDownstreamAuthReady(service: ServiceName) {
