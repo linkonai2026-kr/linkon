@@ -7,6 +7,12 @@ export interface FeatureItem {
   icon: "spark" | "shield" | "pulse" | "document" | "chart" | "people";
 }
 
+export interface WhoCard {
+  emoji: string;
+  label: string;
+  desc: string;
+}
+
 export interface ServicePageContent {
   slug: ServiceName;
   name: string;
@@ -24,9 +30,11 @@ export interface ServicePageContent {
   backgroundImage: string;
   logo: string;
   logoMark: string;
+  expertBadge?: string;
   introLabel: string;
   introTitle: string;
   introBody: string[];
+  whoCards: WhoCard[];
   featuresLabel: string;
   featuresTitle: string;
   features: FeatureItem[];
@@ -42,11 +50,11 @@ export const servicePageContent: Record<ServiceName, ServicePageContent> = {
     slug: "vion",
     name: "Vion",
     title: "Vion | 케어 AI",
-    description: "심리 케어와 일상 체크인을 돕는 Linkon의 운영 중 AI 서비스입니다.",
-    tagline: "마음과 일상을 부드럽게 연결하는 케어 AI",
+    description: "심리 케어와 일상 체크인을 돕는 Linkon의 AI 서비스입니다. 지금 바로 시작할 수 있습니다.",
+    tagline: "마음이 힘들 때, 혼자 감당하지 않아도 됩니다",
     status: "live",
     heroDescription:
-      "Vion은 사용자의 상태를 차분하게 확인하고, 필요한 다음 행동을 제안하는 케어 AI입니다. Linkon 통합 계정으로 바로 시작할 수 있습니다.",
+      "심리 상담을 받고 싶지만 예약 대기와 비용이 부담된다면 — Vion이 오늘 당신의 상태를 확인하고 다음 행동을 함께 찾아드립니다.",
     heroPrimaryLabel: "Vion 시작하기",
     heroSecondaryLabel: "기능 살펴보기",
     heroPrimaryHref: "/api/auth/token?service=vion",
@@ -56,49 +64,55 @@ export const servicePageContent: Record<ServiceName, ServicePageContent> = {
     backgroundImage: "/assets/vion-mockup.png",
     logo: "/assets/vion-no.png",
     logoMark: "/assets/vion-noback.png",
-    introLabel: "서비스 소개",
-    introTitle: "케어 흐름은 Vion에, 계정과 권한은 Linkon에",
+    expertBadge: "🩺 임상심리사 자문 기반",
+    introLabel: "이런 분께 맞습니다",
+    introTitle: "마음이 힘들 때, 혼자 감당하지 않아도 됩니다",
     introBody: [
-      "Vion은 상담과 케어에 필요한 전문 데이터를 자체 서비스에서 관리합니다. Linkon은 계정 상태와 접근 권한만 확인해 안전하게 연결합니다.",
-      "사용자는 하나의 Linkon 계정으로 Vion에 진입하고, 운영자는 Linkon에서 계정 정지, 요금제, 서비스 접근 권한을 통합 관리합니다.",
+      "심리 상담을 받고 싶어도 예약 대기·비용 부담이 현실입니다. Vion은 언제든 내 상태를 이야기할 수 있는 AI 심리 케어 공간입니다.",
+      "임상 기반 기법으로 설계된 Vion이 오늘 당신의 상태를 확인하고, 다음에 필요한 행동을 함께 찾아드립니다.",
+    ],
+    whoCards: [
+      { emoji: "😮‍💨", label: "혼자 감당 중인 직장인", desc: "번아웃이 왔지만 어디서부터 털어야 할지 모르는 분" },
+      { emoji: "👨‍👩‍👧", label: "가족 케어가 필요한 분", desc: "고령 부모님의 일상을 조용히 확인하고 싶은 분" },
+      { emoji: "💸", label: "상담 비용이 부담스러운 분", desc: "전문 상담 전 가볍게 내 상태부터 파악하고 싶은 분" },
     ],
     featuresLabel: "핵심 기능",
-    featuresTitle: "Vion MVP에서 제공하는 경험",
+    featuresTitle: "Vion이 당신의 일상에서 하는 일",
     features: [
       {
-        title: "상태 체크인",
-        description: "사용자의 현재 상태를 확인하고 다음에 필요한 케어 흐름을 안내합니다.",
+        title: "매일 체크인",
+        description: "하루 5분, 오늘 내 감정 상태를 기록하고 케어 방향을 잡습니다.",
         icon: "pulse",
       },
       {
-        title: "언제든 다시 접근",
-        description: "Linkon 계정 상태가 정상이라면 필요한 순간 다시 Vion을 열 수 있습니다.",
+        title: "언제든 다시 열기",
+        description: "생각날 때마다 Vion을 찾으세요. 계정만 있으면 즉시 시작됩니다.",
         icon: "spark",
       },
       {
-        title: "가족 친화 흐름",
-        description: "일상 확인과 반복 안내처럼 케어 상황에서 필요한 흐름을 고려합니다.",
+        title: "가족 케어 흐름",
+        description: "고령 부모님이나 가족의 일상을 확인하는 반복 케어 흐름을 지원합니다.",
         icon: "people",
       },
       {
-        title: "요약 중심 관리",
-        description: "전문 데이터 원문은 Vion에 두고 Linkon에는 이용 요약만 남깁니다.",
-        icon: "chart",
-      },
-      {
-        title: "통합 권한 반영",
-        description: "계정 정지, 삭제, 요금제 변경이 서비스 접근 정책에 반영됩니다.",
+        title: "내 기록은 안전하게",
+        description: "케어 기록은 Vion 안에서만 보관됩니다. 외부로 공유되지 않습니다.",
         icon: "shield",
       },
       {
-        title: "운영 기록 연결",
-        description: "관리자 조치와 서비스 동기화 상태를 Linkon 감사 로그에 남깁니다.",
+        title: "Linkon 계정 하나로",
+        description: "별도 회원가입 없이 Linkon 계정으로 바로 Vion을 시작할 수 있습니다.",
+        icon: "chart",
+      },
+      {
+        title: "전문가 연결 안내",
+        description: "AI 케어 이후 전문 상담사 연결이 필요하다면 다음 단계를 안내받을 수 있습니다.",
         icon: "document",
       },
     ],
-    ctaTitle: "Vion은 지금 바로 이용할 수 있습니다",
-    ctaDescription: "Linkon 통합 계정으로 Vion에 연결하고 같은 기준으로 계정과 권한을 관리하세요.",
-    ctaPrimaryLabel: "Vion 열기",
+    ctaTitle: "오늘, 내 상태를 확인하는 것부터 시작하세요",
+    ctaDescription: "Linkon 계정만 있으면 지금 바로 Vion을 시작할 수 있습니다. 무료로 경험해보세요.",
+    ctaPrimaryLabel: "Vion 시작하기",
     ctaPrimaryHref: "/api/auth/token?service=vion",
     ctaSecondaryLabel: "Linkon 홈으로",
   },
@@ -106,11 +120,11 @@ export const servicePageContent: Record<ServiceName, ServicePageContent> = {
     slug: "rion",
     name: "Rion",
     title: "Rion | 법률 비서 AI",
-    description: "계약서와 법률 절차를 이해하기 쉬운 안내로 정리하는 출시 예정 서비스입니다.",
-    tagline: "복잡한 법률 절차를 이해하기 쉬운 다음 행동으로",
+    description: "계약서 위험 조항과 법률 절차를 쉽게 이해할 수 있도록 정리하는 출시 예정 법률 비서 AI입니다.",
+    tagline: "계약서 한 줄이 불안한 분들을 위해",
     status: "soon",
     heroDescription:
-      "Rion은 법률 문서, 계약서 검토, 절차 안내를 사용자가 이해할 수 있는 흐름으로 정리하는 법률 비서 AI로 준비 중입니다.",
+      "변호사 상담은 부담스럽고, 계약서는 혼자 읽기엔 너무 복잡합니다. Rion이 위험 조항과 핵심 내용을 먼저 짚어드립니다.",
     heroPrimaryLabel: "출시 알림 받기",
     heroSecondaryLabel: "기능 살펴보기",
     heroPrimaryHref: "#notify",
@@ -120,48 +134,54 @@ export const servicePageContent: Record<ServiceName, ServicePageContent> = {
     backgroundImage: "/assets/rion-mockup.png",
     logo: "/assets/rion-no.png",
     logoMark: "/assets/rion-noback.png",
-    introLabel: "서비스 소개",
-    introTitle: "법률 문서 원문은 Rion에, 접근 권한은 Linkon에",
+    expertBadge: "⚖️ 현직 변호사 자료 기반",
+    introLabel: "이런 분께 맞습니다",
+    introTitle: "계약서 한 줄이 불안한 분들을 위해",
     introBody: [
-      "Rion의 문서 분석 기록과 법률 검토 흐름은 Rion 서비스 서버에서 관리합니다. Linkon은 사용자가 Rion에 접근할 수 있는지와 서비스 관리자 권한만 관리합니다.",
-      "출시 전에는 Linkon의 출시 알림을 통해 관심 사용자를 모으고, 출시 후에는 통합 계정으로 자연스럽게 Rion 계정을 연결합니다.",
+      "변호사 상담은 부담스럽고, 혼자 읽기엔 계약서가 너무 복잡합니다. Rion은 위험 조항과 핵심 내용을 이해하기 쉬운 언어로 먼저 정리합니다.",
+      "현직 변호사 자료를 기반으로 준비 중인 Rion. 출시 알림을 신청하면 가장 먼저 만날 수 있습니다.",
+    ],
+    whoCards: [
+      { emoji: "📝", label: "첫 계약서 받은 프리랜서", desc: "조항이 불리한지 아닌지 판단이 어려운 분" },
+      { emoji: "🏠", label: "임대차 계약 앞둔 분", desc: "전세·월세 계약서의 특약 조항이 걱정되는 분" },
+      { emoji: "🚀", label: "창업 초기 대표", desc: "파트너십·외주 계약서를 처음 검토해야 하는 분" },
     ],
     featuresLabel: "준비 중인 기능",
-    featuresTitle: "Rion에서 우선 제공할 기능",
+    featuresTitle: "Rion이 제공할 경험",
     features: [
       {
-        title: "계약서 요약",
-        description: "긴 문서에서 먼저 확인해야 할 조항과 위험 신호를 이해하기 쉽게 정리합니다.",
+        title: "위험 조항 먼저",
+        description: "긴 계약서에서 반드시 확인해야 할 조항과 위험 신호를 먼저 짚어드립니다.",
         icon: "document",
       },
       {
-        title: "절차 안내",
-        description: "현재 상황에서 어떤 순서로 움직이면 좋을지 단계별로 안내합니다.",
-        icon: "shield",
-      },
-      {
-        title: "쉬운 표현",
-        description: "전문 용어를 가능한 쉬운 문장으로 바꿔 의사결정 속도를 높입니다.",
+        title: "쉬운 말로 설명",
+        description: "법률 전문 용어를 누구나 이해할 수 있는 문장으로 바꿔드립니다.",
         icon: "spark",
       },
       {
-        title: "전문가 연결 기반",
-        description: "필요 시 외부 검토나 운영자 확인으로 이어질 수 있는 구조를 고려합니다.",
+        title: "절차 단계별 안내",
+        description: "지금 상황에서 어떤 순서로 움직여야 하는지 단계별로 정리합니다.",
+        icon: "shield",
+      },
+      {
+        title: "내 상황 맞춤 분석",
+        description: "계약 유형과 맥락에 맞게 검토 포인트를 다르게 제시합니다.",
         icon: "people",
       },
       {
-        title: "서비스 이용 요약",
-        description: "Linkon에는 접근 여부와 사용 요약만 남기고 문서 원문은 Rion에 둡니다.",
+        title: "전문가 연결 안내",
+        description: "AI 검토 이후 실제 변호사 확인이 필요하다면 다음 단계를 안내합니다.",
         icon: "chart",
       },
       {
-        title: "권한 기반 접근",
-        description: "Linkon의 계정 상태와 서비스별 권한이 Rion 접근에 반영됩니다.",
+        title: "Linkon 계정으로 연결",
+        description: "출시 후 별도 가입 없이 Linkon 계정으로 바로 Rion을 이용할 수 있습니다.",
         icon: "pulse",
       },
     ],
-    ctaTitle: "Rion 출시 소식을 먼저 받아보세요",
-    ctaDescription: "출시 알림을 신청하면 Rion 공개 시점과 초기 이용 안내를 이메일로 보내드립니다.",
+    ctaTitle: "계약서, 이제 혼자 읽지 않아도 됩니다",
+    ctaDescription: "출시 알림을 신청하면 Rion 공개 시점과 초기 이용 안내를 이메일로 가장 먼저 받아볼 수 있습니다.",
     ctaPrimaryLabel: "출시 알림 받기",
     ctaPrimaryHref: "/register?service=rion",
     ctaSecondaryLabel: "다른 서비스 보기",
@@ -170,11 +190,11 @@ export const servicePageContent: Record<ServiceName, ServicePageContent> = {
     slug: "taxon",
     name: "Taxon",
     title: "Taxon | 세무 관리 AI",
-    description: "사업자의 세무 상태와 신고 준비 흐름을 정리하는 출시 예정 서비스입니다.",
-    tagline: "사업 숫자를 더 선명하게 보는 세무 AI",
+    description: "세금 신고 준비부터 절세 타이밍까지, 사업자의 세무 흐름을 정리하는 출시 예정 AI입니다.",
+    tagline: "세금 신고 시즌, 더 이상 막막하지 않게",
     status: "soon",
     heroDescription:
-      "Taxon은 반복되는 세무 업무, 제출 문서, 재무 상태 요약을 더 읽기 쉬운 운영 흐름으로 정리하는 세무 관리 AI로 준비 중입니다.",
+      "무엇부터 준비해야 하는지, 기한은 언제인지 매년 반복되는 고민 — Taxon이 사업자의 세무 흐름을 선명하게 정리합니다.",
     heroPrimaryLabel: "출시 알림 받기",
     heroSecondaryLabel: "기능 살펴보기",
     heroPrimaryHref: "#notify",
@@ -184,47 +204,53 @@ export const servicePageContent: Record<ServiceName, ServicePageContent> = {
     backgroundImage: "/assets/taxon-mockup.png",
     logo: "/assets/taxon-no.png",
     logoMark: "/assets/taxon-noback.png",
-    introLabel: "서비스 소개",
-    introTitle: "세무 자료는 Taxon에, 계정 기준은 Linkon에",
+    expertBadge: "📊 세무사 검토 기반",
+    introLabel: "이런 분께 맞습니다",
+    introTitle: "세금 신고 시즌, 더 이상 막막하지 않게",
     introBody: [
-      "Taxon의 재무 데이터, 세무 리포트, 제출 문서 원문은 Taxon 서비스 서버에서 관리합니다. Linkon은 요금제와 접근 권한, 이용 요약만 관리합니다.",
-      "이 구조는 민감한 전문 데이터를 한곳에 과도하게 모으지 않으면서도, 사용자에게는 하나의 계정 경험을 제공합니다.",
+      "무엇부터 준비해야 하는지, 기한은 언제인지, 서류는 어떻게 챙겨야 하는지 — 매년 반복되는 고민을 Taxon이 정리합니다.",
+      "사업자의 세무 흐름을 선명하게 만드는 Taxon. 출시 알림을 신청하면 가장 먼저 만날 수 있습니다.",
+    ],
+    whoCards: [
+      { emoji: "💼", label: "종합소득세가 처음인 N잡러", desc: "신고 항목이 여러 개라 어디서부터 시작할지 막막한 분" },
+      { emoji: "📈", label: "매출이 늘어난 1인 사업자", desc: "세금 부담은 느는데 세무사 선임까지는 아직 이른 분" },
+      { emoji: "🏢", label: "창업 초기 소규모 팀", desc: "반복되는 세무 업무를 체계적으로 관리하고 싶은 분" },
     ],
     featuresLabel: "준비 중인 기능",
-    featuresTitle: "Taxon에서 우선 제공할 기능",
+    featuresTitle: "Taxon이 제공할 경험",
     features: [
       {
-        title: "사업 상태 요약",
-        description: "흩어진 숫자보다 지금 먼저 확인해야 할 신호를 보여줍니다.",
-        icon: "chart",
-      },
-      {
-        title: "세무 준비 알림",
-        description: "기한이 가까워지기 전에 확인해야 할 항목과 준비 흐름을 안내합니다.",
+        title: "세무 일정 알림",
+        description: "신고 기한이 다가오기 전, 먼저 확인해야 할 항목을 알려드립니다.",
         icon: "spark",
       },
       {
-        title: "문서 흐름 정리",
-        description: "반복 제출 문서와 검토 자료를 안정적으로 준비할 수 있도록 돕습니다.",
+        title: "사업 현황 요약",
+        description: "흩어진 숫자보다 지금 당장 확인해야 할 신호를 한눈에 보여드립니다.",
+        icon: "chart",
+      },
+      {
+        title: "문서 준비 안내",
+        description: "반복 제출 서류와 검토 자료를 순서대로 준비할 수 있도록 안내합니다.",
         icon: "document",
       },
       {
-        title: "반복 업무 구조화",
-        description: "매번 새로 처리하던 세무 업무를 더 예측 가능한 흐름으로 바꿉니다.",
+        title: "반복 업무 흐름화",
+        description: "매번 새로 처리하던 세무 업무를 예측 가능한 흐름으로 바꿔드립니다.",
         icon: "pulse",
       },
       {
-        title: "통합 권한 관리",
-        description: "Linkon의 계정 상태와 요금제가 Taxon 접근 권한의 기준이 됩니다.",
+        title: "절세 타이밍 안내",
+        description: "놓치기 쉬운 공제 항목과 절세 포인트를 시기에 맞게 안내합니다.",
         icon: "shield",
       },
       {
-        title: "운영 계정 연결",
-        description: "서비스별 계정을 따로 관리하지 않고 Linkon 계정 기준으로 연결합니다.",
+        title: "Linkon 계정으로 연결",
+        description: "출시 후 별도 가입 없이 Linkon 계정으로 바로 Taxon을 이용할 수 있습니다.",
         icon: "people",
       },
     ],
-    ctaTitle: "Taxon 출시 알림을 신청하세요",
+    ctaTitle: "세금 걱정, 이제 혼자 하지 않아도 됩니다",
     ctaDescription: "Taxon 공개 시점과 초기 이용 안내를 이메일로 가장 먼저 받아볼 수 있습니다.",
     ctaPrimaryLabel: "출시 알림 받기",
     ctaPrimaryHref: "/register?service=taxon",

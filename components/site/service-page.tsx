@@ -136,6 +136,9 @@ export default function ServicePage({ content }: { content: ServicePageContent }
         <section className="sp-intro" id="overview">
           <div className="container sp-intro__grid">
             <div className="sp-intro__text">
+              {content.expertBadge && (
+                <p className="sp-expert-badge">{content.expertBadge}</p>
+              )}
               <p className="section-label">{content.introLabel}</p>
               <h2 className="section-title">{content.introTitle}</h2>
               {content.introBody.map((paragraph) => (
@@ -144,14 +147,16 @@ export default function ServicePage({ content }: { content: ServicePageContent }
                 </p>
               ))}
             </div>
-            <div className="sp-intro__visual">
-              <Image
-                src={content.backgroundImage}
-                alt={`${content.name} 화면 예시`}
-                width={1200}
-                height={900}
-                sizes="(max-width: 900px) 100vw, 560px"
-              />
+            <div className="sp-intro__visual sp-intro__visual--who">
+              <div className="sp-who-grid">
+                {content.whoCards.map((card) => (
+                  <div key={card.label} className={`sp-who-card sp-who-card--${content.accentClass}`}>
+                    <span className="sp-who-icon">{card.emoji}</span>
+                    <strong className="sp-who-label">{card.label}</strong>
+                    <p className="sp-who-desc">{card.desc}</p>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         </section>

@@ -123,17 +123,19 @@ export default function HomePage() {
                     key={service.key}
                     className={`lp-mockup-card lp-mockup-card--${service.color} lp-mockup-card--${index + 1}`}
                   >
-                    <Image
-                      src={service.mockup}
-                      alt={`${service.name} 화면 미리보기`}
-                      width={680}
-                      height={440}
-                      priority={index === 0}
-                      sizes="(max-width: 768px) 82vw, 420px"
-                    />
+                    <div className="lp-mockup-card__body">
+                      <Image
+                        src={`/assets/${service.key}-no.png`}
+                        alt={service.name}
+                        width={120}
+                        height={40}
+                        className="lp-mockup-card__logo"
+                      />
+                      <p className="lp-mockup-card__tagline">{service.label}</p>
+                    </div>
                     <figcaption>
-                      <Image src={service.logo} alt="" width={32} height={32} />
-                      <span>{service.name}</span>
+                      <Image src={service.logo} alt="" width={24} height={24} aria-hidden />
+                      <span>{service.status === "이용 가능" ? "서비스 중" : "출시 예정"}</span>
                     </figcaption>
                   </figure>
                 ))}
@@ -160,10 +162,12 @@ export default function HomePage() {
                 >
                   <div className="lp-service-card__visual">
                     <Image
-                      src={service.mockup}
-                      alt={`${service.name} 서비스 화면`}
-                      fill
-                      sizes="(max-width: 900px) 100vw, 360px"
+                      src={service.logo}
+                      alt=""
+                      aria-hidden
+                      width={80}
+                      height={80}
+                      className="lp-service-card__icon"
                     />
                   </div>
 

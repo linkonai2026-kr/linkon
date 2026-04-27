@@ -1357,6 +1357,67 @@ body {
   box-shadow: 0 30px 80px rgba(20, 27, 48, 0.16);
 }
 
+.sp-intro__visual--who {
+  align-items: stretch;
+  background: none;
+  box-shadow: none;
+  display: flex;
+  overflow: visible;
+}
+
+/* 전문가 뱃지 */
+.sp-expert-badge {
+  background: rgba(20, 27, 48, 0.06);
+  border-radius: var(--radius-full);
+  color: var(--text-secondary);
+  display: inline-block;
+  font-size: var(--text-sm);
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  margin-bottom: var(--space-3);
+  padding: 6px 14px;
+}
+
+/* 이런 분께 카드 그리드 */
+.sp-who-grid {
+  display: grid;
+  gap: var(--space-3);
+  width: 100%;
+}
+
+.sp-who-card {
+  background: #f7f8fc;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: var(--space-4) var(--space-5);
+}
+
+.sp-who-card--vion  { border-left: 3px solid #00C9B1; }
+.sp-who-card--rion  { border-left: 3px solid #0056A0; }
+.sp-who-card--taxon { border-left: 3px solid #DC143C; }
+
+.sp-who-icon {
+  display: block;
+  font-size: 1.75rem;
+  line-height: 1;
+  margin-bottom: var(--space-2);
+}
+
+.sp-who-label {
+  color: var(--text-primary);
+  display: block;
+  font-size: var(--text-base);
+  font-weight: 800;
+  margin-bottom: 4px;
+}
+
+.sp-who-desc {
+  color: var(--text-secondary);
+  font-size: var(--text-sm);
+  line-height: 1.6;
+  margin: 0;
+}
+
 .sp-features {
   background: white;
 }
@@ -1634,12 +1695,35 @@ body {
   width: min(78%, 460px);
 }
 
-.lp-mockup-card img {
-  border-radius: 22px;
-  height: auto;
-  object-fit: cover;
-  width: 100%;
+/* CSS-only mockup card — no photos */
+.lp-mockup-card__body {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  justify-content: center;
+  min-height: 140px;
+  padding: 28px 24px 44px;
 }
+
+.lp-mockup-card__logo {
+  height: auto;
+  max-width: 130px;
+  width: auto;
+}
+
+.lp-mockup-card__tagline {
+  color: var(--text-secondary);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  margin: 0;
+  text-align: center;
+}
+
+.lp-mockup-card--vion  .lp-mockup-card__body { background: linear-gradient(135deg, #e8fdf9, #c8f5ee); border-radius: 22px; }
+.lp-mockup-card--rion  .lp-mockup-card__body { background: linear-gradient(135deg, #e8eef8, #c4d4f0); border-radius: 22px; }
+.lp-mockup-card--taxon .lp-mockup-card__body { background: linear-gradient(135deg, #fceaed, #f5c2cb); border-radius: 22px; }
 
 .lp-mockup-card figcaption {
   align-items: center;
@@ -1695,16 +1779,26 @@ body {
 }
 
 .lp-service-card__visual {
+  align-items: center;
   aspect-ratio: 16 / 10;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(246, 248, 252, 0.9));
   border-radius: 24px;
+  display: flex;
+  justify-content: center;
   margin: var(--space-4) var(--space-4) 0;
   overflow: hidden;
   position: relative;
 }
 
-.lp-service-card__visual img {
-  object-fit: cover;
+/* 서비스별 그라디언트 배경 */
+.lp-service-card--public.service-card--vion  .lp-service-card__visual { background: linear-gradient(135deg, #dffaf5, #b2efdf); }
+.lp-service-card--public.service-card--rion  .lp-service-card__visual { background: linear-gradient(135deg, #deeaf8, #b5cef0); }
+.lp-service-card--public.service-card--taxon .lp-service-card__visual { background: linear-gradient(135deg, #fde8ec, #f0b2be); }
+
+.lp-service-card__icon {
+  height: auto;
+  object-fit: contain;
+  opacity: 0.88;
+  width: 80px;
 }
 
 .lp-trust-section {
