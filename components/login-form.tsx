@@ -3,9 +3,7 @@
 import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useSearchParams } from "next/navigation";
-import { createClient } from "@/lib/supabase/client";
 
 function getInitialErrorMessage(errorCode: string | null) {
   if (errorCode === "auth_callback_failed") {
@@ -17,7 +15,7 @@ function getInitialErrorMessage(errorCode: string | null) {
   }
 
   if (errorCode === "account_deleted") {
-    return "더 이상 활성화되지 않은 계정입니다. 새 계정을 만들거나 문의해 주세요.";
+    return "더 이상 활성화되지 않은 계정입니다. 새 계정을 만들거나 운영팀에 문의해 주세요.";
   }
 
   if (errorCode === "admin_required") {
@@ -44,7 +42,6 @@ function getSafeRedirect(value: string | null) {
 }
 
 export default function LoginForm() {
-  const router = useRouter();
   const searchParams = useSearchParams();
   const redirect = getSafeRedirect(searchParams.get("redirect"));
 
@@ -59,22 +56,28 @@ export default function LoginForm() {
     setError("");
 
     try {
-      const supabase = createClient();
-      const { error: authError } = await supabase.auth.signInWithPassword({ email, password });
+      const response = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email,
+          password,
+        }),
+      });
 
-      if (authError) {
-        const msg = authError.message.toLowerCase();
-        if (msg.includes("email not confirmed")) {
-          setError("이메일 확인이 필요합니다. 가입 시 받은 메일을 확인해 주세요.");
-        } else if (msg.includes("invalid login credentials") || msg.includes("invalid email or password")) {
-          setError("이메일 또는 비밀번호가 올바르지 않습니다.");
-        } else {
-          setError(authError.message);
-        }
+      if (!response.ok) {
+        const data = await response.json().catch(() => null);
+        setError(
+          data && typeof data.error === "string"
+            ? data.error
+            : "이메일 또는 비밀번호가 올바르지 않습니다."
+        );
         return;
       }
 
-      router.push(redirect);
+      window.location.assign(redirect);
     } catch {
       setError("네트워크 오류가 발생했습니다. 연결 상태를 확인한 뒤 다시 시도해 주세요.");
     } finally {
@@ -89,8 +92,8 @@ export default function LoginForm() {
         <p className="lp-kicker">Linkon Account</p>
         <h1>하나의 계정으로 모든 서비스를 시작하세요.</h1>
         <p>
-          Vion, Rion, Taxon의 접근 권한과 요금제는 Linkon 계정 상태를 기준으로
-          안전하게 관리됩니다.
+          Vion, Rion, Taxon을 하나의 Linkon 계정으로 연결합니다. 로그인 후 이용할
+          서비스를 선택해 주세요.
         </p>
       </aside>
 
@@ -158,8 +161,7 @@ export default function LoginForm() {
         </form>
 
         <p className="auth-switch">
-          아직 계정이 없나요?{" "}
-          <Link href="/register">통합 계정 만들기</Link>
+          아직 계정이 없나요? <Link href="/register">통합 계정 만들기</Link>
         </p>
       </div>
     </div>
