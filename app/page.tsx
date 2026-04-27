@@ -118,15 +118,6 @@ export default function HomePage() {
                   </div>
 
                   <div className="card-header">
-                    <div className={`service-logo-wrap service-logo-wrap--${service.color}`}>
-                      <Image
-                        src={service.logo}
-                        alt={`${service.name} 로고`}
-                        className="service-logo-img"
-                        width={48}
-                        height={48}
-                      />
-                    </div>
                     <span
                       className={`status-badge ${
                         service.key === "vion" ? "status-badge--live" : "status-badge--soon"
@@ -153,6 +144,7 @@ export default function HomePage() {
                         loadingLabel="연결 중..."
                         className="btn btn--vion btn--full"
                         style={{ marginTop: "var(--space-2)" }}
+                        href="https://vion-sandy.vercel.app/"
                       />
                     ) : (
                       <Link
