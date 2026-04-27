@@ -1,14 +1,6 @@
-function requireEnv(name: string) {
-  const value = process.env[name];
-
-  if (!value) {
-    throw new Error(`Missing required environment variable: ${name}`);
-  }
-
-  return value;
-}
+import { getAppUrl } from "@/lib/supabase/config";
 
 export const linkonEnv = {
-  appUrl: () => requireEnv("NEXT_PUBLIC_APP_URL"),
+  appUrl: getAppUrl,
   superAdminEmail: () => process.env.LINKON_SUPER_ADMIN_EMAIL?.trim().toLowerCase() ?? "",
 };
