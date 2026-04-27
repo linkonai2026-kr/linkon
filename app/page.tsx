@@ -54,12 +54,6 @@ const services = [
   },
 ] as const;
 
-const trustItems = [
-  "한 번의 가입으로 시작",
-  "서비스별 계정 자동 연결",
-  "민감한 전문 데이터는 각 서비스에서 보호",
-  "모바일에서도 편하게 이용",
-];
 
 export default function HomePage() {
   return (
@@ -76,70 +70,22 @@ export default function HomePage() {
 
       <main className="lp-page lp-page--public">
         <section className="lp-hero lp-hero--public">
-          <div className="lp-hero__grid lp-hero__grid--public container">
-            <div className="lp-hero__copy lp-hero__copy--public">
-              <p className="lp-kicker">Linkon AI Services</p>
-              <h1>
-                하나의 계정으로
-                <span>필요한 AI 서비스를 바로 시작하세요.</span>
-              </h1>
-              <p>
-                Linkon은 케어 AI Vion, 법률 비서 AI Rion, 세무 관리 AI Taxon을
-                하나의 계정으로 연결합니다. 가입은 간단하게, 서비스 이용은 자연스럽게 이어집니다.
-              </p>
-              <div className="lp-hero__actions">
-                <Link href="/register" className="btn btn--primary btn--lg">
-                  통합 계정 만들기
-                </Link>
-                <Link href="/login" className="btn btn--outline btn--lg">
-                  이미 계정이 있어요
-                </Link>
-              </div>
-              <div className="lp-trust-row" aria-label="Linkon 이용 장점">
-                {trustItems.map((item) => (
-                  <span key={item}>{item}</span>
-                ))}
-              </div>
-            </div>
-
-            <div className="lp-product-showcase" aria-label="Linkon 서비스 미리보기">
-              <div className="lp-showcase-brand">
-                <Image
-                  src="/assets/linkon-noback.png"
-                  alt="Linkon"
-                  width={86}
-                  height={86}
-                  priority
-                />
-                <div>
-                  <span>Unified account</span>
-                  <strong>Linkon으로 연결되는 AI 서비스</strong>
-                </div>
-              </div>
-
-              <div className="lp-mockup-stack">
-                {services.map((service, index) => (
-                  <figure
-                    key={service.key}
-                    className={`lp-mockup-card lp-mockup-card--${service.color} lp-mockup-card--${index + 1}`}
-                  >
-                    <div className="lp-mockup-card__body">
-                      <Image
-                        src={`/assets/${service.key}-no.png`}
-                        alt={service.name}
-                        width={120}
-                        height={40}
-                        className="lp-mockup-card__logo"
-                      />
-                      <p className="lp-mockup-card__tagline">{service.label}</p>
-                    </div>
-                    <figcaption>
-                      <Image src={service.logo} alt="" width={24} height={24} aria-hidden />
-                      <span>{service.status === "이용 가능" ? "서비스 중" : "출시 예정"}</span>
-                    </figcaption>
-                  </figure>
-                ))}
-              </div>
+          <div className="lp-hero__centered container">
+            <p className="lp-kicker">Linkon AI Services</p>
+            <h1>
+              하나의 계정으로
+              <span>필요한 AI 서비스를 바로 시작하세요.</span>
+            </h1>
+            <p className="lp-hero__desc">
+              Linkon 계정 하나로 Vion, Rion, Taxon을 연결합니다.
+            </p>
+            <div className="lp-hero__actions">
+              <Link href="/register" className="btn btn--primary btn--lg">
+                통합 계정 만들기
+              </Link>
+              <Link href="/login" className="btn btn--outline btn--lg">
+                이미 계정이 있어요
+              </Link>
             </div>
           </div>
         </section>

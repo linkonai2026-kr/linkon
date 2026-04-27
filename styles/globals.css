@@ -1140,6 +1140,13 @@ body {
   border: 1px solid rgba(20, 27, 48, 0.1);
   border-radius: 28px;
   box-shadow: 0 18px 50px rgba(20, 27, 48, 0.08);
+  transition: transform 0.22s ease, box-shadow 0.22s ease;
+  cursor: pointer;
+}
+
+.lp-service-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 24px 64px rgba(20, 27, 48, 0.15);
 }
 
 .lp-card-points {
@@ -1185,54 +1192,25 @@ body {
 }
 
 .auth-page--split {
-  background:
-    radial-gradient(circle at 16% 20%, rgba(0, 86, 160, 0.15), transparent 30%),
-    radial-gradient(circle at 84% 10%, rgba(212, 175, 55, 0.16), transparent 24%),
-    #f6f3ea;
-  display: grid;
-  grid-template-columns: minmax(320px, 0.88fr) minmax(360px, 480px);
-  gap: var(--space-6);
-  padding: calc(var(--space-7) + var(--nav-height)) var(--space-5) var(--space-7);
+  background: linear-gradient(135deg, #f0fdf8 0%, #eff6ff 50%, #fdf4ff 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: calc(var(--nav-height) + var(--space-6)) var(--space-5) var(--space-6);
 }
 
 .auth-panel {
-  align-self: stretch;
-  border-radius: 36px;
-  color: white;
-  padding: var(--space-7);
-  background:
-    linear-gradient(145deg, rgba(15, 23, 42, 0.95), rgba(30, 41, 59, 0.9)),
-    radial-gradient(circle at top right, rgba(0, 201, 177, 0.22), transparent 30%);
-  box-shadow: 0 32px 80px rgba(18, 25, 45, 0.22);
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
-  min-height: 560px;
-}
-
-.auth-panel .lp-kicker {
-  color: #f3d37a;
-}
-
-.auth-panel h1 {
-  font-size: clamp(2.2rem, 5vw, 4.7rem);
-  font-weight: 900;
-  line-height: 0.98;
-  letter-spacing: -0.07em;
-  max-width: 620px;
-}
-
-.auth-panel p:last-child {
-  color: rgba(255, 255, 255, 0.76);
-  line-height: 1.8;
-  max-width: 520px;
-  margin-top: var(--space-5);
+  display: none;
 }
 
 .auth-card {
-  align-self: center;
-  border: 1px solid rgba(20, 27, 48, 0.1);
-  box-shadow: 0 24px 70px rgba(20, 27, 48, 0.12);
+  max-width: 460px;
+  width: 100%;
+  border-radius: 28px;
+  padding: 48px 44px;
+  background: white;
+  box-shadow: 0 24px 80px rgba(20, 27, 48, 0.12);
+  border: none;
 }
 
 .auth-switch {
@@ -1607,25 +1585,46 @@ body {
 }
 
 .lp-hero--public {
-  min-height: min(920px, 100svh);
+  min-height: min(760px, 100svh);
   background:
-    radial-gradient(circle at 72% 20%, rgba(0, 201, 177, 0.16), transparent 28%),
-    radial-gradient(circle at 18% 18%, rgba(212, 175, 55, 0.16), transparent 24%),
-    linear-gradient(135deg, #fffaf0 0%, #f5f7ff 45%, #ecfbf8 100%);
+    radial-gradient(ellipse 80% 60% at 20% 40%, #d4f5ef 0%, transparent 60%),
+    radial-gradient(ellipse 60% 80% at 80% 20%, #dde8ff 0%, transparent 60%),
+    radial-gradient(ellipse 40% 60% at 60% 80%, #f5e0ff 0%, transparent 60%),
+    #f8f9fb;
 }
 
-.lp-hero__grid--public {
-  grid-template-columns: minmax(0, 0.95fr) minmax(340px, 0.9fr);
-  gap: clamp(32px, 6vw, 88px);
+.lp-hero__centered {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding-block: clamp(var(--space-8), 10vw, 120px);
+  max-width: 820px;
+  margin-inline: auto;
 }
 
-.lp-hero__copy--public h1 {
+.lp-hero__centered h1 {
+  color: #111118;
   font-size: clamp(2.9rem, 7.5vw, 6.25rem);
-  max-width: 900px;
+  line-height: 0.97;
+  letter-spacing: -0.05em;
+  font-weight: 900;
+  margin-block: var(--space-3) var(--space-5);
 }
 
-.lp-hero__copy--public h1 span {
+.lp-hero__centered h1 span {
+  display: block;
   color: #172554;
+}
+
+.lp-hero__desc {
+  color: #3d4157;
+  font-size: clamp(1.05rem, 2vw, 1.3rem);
+  line-height: 1.65;
+  max-width: 520px;
+  margin-bottom: var(--space-6);
 }
 
 .lp-product-showcase {
@@ -2017,11 +2016,22 @@ body {
   }
 
   .auth-page--split {
-    gap: var(--space-4);
+    padding-inline: var(--space-4);
+    align-items: flex-start;
   }
 
-  .auth-panel {
-    min-height: auto;
+  .auth-card {
+    border-radius: 20px;
+    padding: var(--space-6) var(--space-5);
+  }
+
+  .lp-hero__centered {
+    padding-block: var(--space-7);
+  }
+
+  .lp-hero__centered h1 {
+    font-size: clamp(2.4rem, 12vw, 3.8rem);
+    line-height: 1.02;
   }
 }
 

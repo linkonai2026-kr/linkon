@@ -3,7 +3,9 @@
 import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useSearchParams } from "next/navigation";
+import { createClient } from "@/lib/supabase/client";
 
 function getInitialErrorMessage(errorCode: string | null) {
   if (errorCode === "auth_callback_failed") {
@@ -42,6 +44,7 @@ function getSafeRedirect(value: string | null) {
 }
 
 export default function LoginForm() {
+  const router = useRouter();
   const searchParams = useSearchParams();
   const redirect = getSafeRedirect(searchParams.get("redirect"));
 
@@ -56,28 +59,22 @@ export default function LoginForm() {
     setError("");
 
     try {
-      const response = await fetch("/api/auth/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          email,
-          password,
-        }),
-      });
+      const supabase = createClient();
+      const { error: authError } = await supabase.auth.signInWithPassword({ email, password });
 
-      if (!response.ok) {
-        const data = await response.json().catch(() => null);
-        setError(
-          data && typeof data.error === "string"
-            ? data.error
-            : "이메일 또는 비밀번호가 올바르지 않습니다."
-        );
+      if (authError) {
+        const msg = authError.message.toLowerCase();
+        if (msg.includes("email not confirmed")) {
+          setError("이메일 확인이 필요합니다. 가입 시 받은 메일을 확인해 주세요.");
+        } else if (msg.includes("invalid login credentials") || msg.includes("invalid email or password")) {
+          setError("이메일 또는 비밀번호가 올바르지 않습니다.");
+        } else {
+          setError(authError.message);
+        }
         return;
       }
 
-      window.location.assign(redirect);
+      router.push(redirect);
     } catch {
       setError("네트워크 오류가 발생했습니다. 연결 상태를 확인한 뒤 다시 시도해 주세요.");
     } finally {
