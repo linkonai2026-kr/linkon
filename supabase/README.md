@@ -1,10 +1,28 @@
-# Linkon Supabase Setup
+# Linkon Supabase Fresh Setup
 
 This project uses the Linkon Supabase project as the canonical control plane for
 identity, plans, service access, service-level admin roles, usage summaries,
 launch notifications, sync jobs, and audit logs.
 
-## 1. Create the Linkon project
+## 1. Start clean
+
+The repository should not contain real environment files or a local Vercel link.
+Before connecting the fresh project, confirm these files/directories are absent:
+
+- `.env`
+- `.env.local`
+- `.env.production`
+- `.env.development`
+- `.vercel`
+
+If any of those exist locally from an older setup, remove them and then create a
+new `.env.local` from `.env.example`.
+
+In Vercel, delete old Supabase/Vercel environment variables before entering the
+new values. In Supabase, use the newly created Linkon project instead of reusing
+tables from an older project.
+
+## 2. Create the Linkon database
 
 1. Create a new Supabase project for Linkon.
 2. Open `SQL Editor`.
@@ -25,7 +43,7 @@ Service-specific content such as counseling records, legal documents, tax files,
 PDFs, reports, and detailed histories must remain in Vion, Rion, or Taxon.
 Linkon stores only shared account state and operational summaries.
 
-## 2. Configure Supabase Auth
+## 3. Configure Supabase Auth
 
 In the Linkon Supabase dashboard:
 
@@ -35,9 +53,9 @@ In the Linkon Supabase dashboard:
    - `https://<linkon-domain>/api/auth/callback`
 4. Keep service-role keys server-side only. Never expose them to the browser.
 
-## 3. Configure environment variables
+## 4. Configure environment variables
 
-Set these in Vercel and in local `.env.local` when testing locally:
+Set these fresh values in Vercel and in local `.env.local` when testing locally:
 
 ```env
 NEXT_PUBLIC_SUPABASE_URL=
@@ -49,7 +67,7 @@ NEXT_PUBLIC_APP_URL=
 ```
 
 Add downstream service variables only when that service is ready to receive
-Linkon users:
+Linkon users. Keep them blank during initial Linkon-only setup:
 
 ```env
 VION_SUPABASE_URL=
@@ -75,14 +93,14 @@ Generate `LINKON_WEBHOOK_SECRET` with:
 node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
 ```
 
-## 4. Bootstrap the first super admin
+## 5. Bootstrap the first super admin
 
 1. Set `LINKON_SUPER_ADMIN_EMAIL` to the founder/admin email.
 2. Sign up or sign in with that exact email.
 3. Visit `/admin`.
 4. The app promotes that profile to `super_admin` during profile normalization.
 
-## 5. Smoke test checklist
+## 6. Smoke test checklist
 
 After deploying to Vercel Preview:
 
@@ -96,4 +114,3 @@ After deploying to Vercel Preview:
    enabled state, and service role.
 6. Confirm `admin_audit_logs` records every admin action.
 7. Re-run `supabase/schema.sql` to confirm the schema remains idempotent.
-
