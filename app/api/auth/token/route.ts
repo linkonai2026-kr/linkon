@@ -9,24 +9,9 @@ import {
 } from "@/lib/linkon/service-sync";
 import { ServiceName } from "@/lib/linkon/types";
 import { getAppUrl } from "@/lib/supabase/config";
+import { getServiceUrl } from "@/lib/linkon/service-config";
 
 export const dynamic = "force-dynamic";
-
-function getServiceUrl(service: ServiceName) {
-  const fallbackUrls: Partial<Record<ServiceName, string>> = {
-    vion: "https://vion-sandy.vercel.app",
-  };
-
-  return (
-    {
-      vion: process.env.NEXT_PUBLIC_VION_URL,
-      rion: process.env.NEXT_PUBLIC_RION_URL,
-      taxon: process.env.NEXT_PUBLIC_TAXON_URL,
-    }[service]?.trim() ||
-    fallbackUrls[service] ||
-    ""
-  );
-}
 
 function getSafeReturnTo(returnTo: string | null, serviceUrl: string) {
   if (!returnTo) return null;
