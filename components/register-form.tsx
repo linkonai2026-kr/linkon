@@ -5,13 +5,14 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import { isSupabaseConfigError } from "@/lib/supabase/config";
 
 type Step = 1 | 2 | 3;
 
 const SERVICE_INFO = {
   vion: {
     name: "Vion",
-    desc: "심리 및 시니어 케어 AI",
+    desc: "케어 AI",
     logo: "/assets/vion-noback.png",
     color: "vion",
   },
@@ -39,9 +40,7 @@ export default function RegisterForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const serviceFromQuery = searchParams.get("service");
-  const initialPreferredService = isServiceKey(serviceFromQuery)
-    ? serviceFromQuery
-    : "";
+  const initialPreferredService = isServiceKey(serviceFromQuery) ? serviceFromQuery : "";
   const returnTo = searchParams.get("returnTo") ?? undefined;
 
   const [step, setStep] = useState<Step>(1);
@@ -55,7 +54,6 @@ export default function RegisterForm() {
   const [termsAgreed, setTermsAgreed] = useState(false);
   const [privacyAgreed, setPrivacyAgreed] = useState(false);
   const [marketingAgreed, setMarketingAgreed] = useState(false);
-
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -116,11 +114,10 @@ export default function RegisterForm() {
         }),
       });
 
-      const data = await response.json();
+      const data = await response.json().catch(() => null);
 
       if (!response.ok) {
-        setError(data.error ?? "회원가입에 실패했습니다.");
-        setLoading(false);
+        setError(data?.error ?? "회원가입에 실패했습니다.");
         return;
       }
 
@@ -130,29 +127,47 @@ export default function RegisterForm() {
         return;
       }
 
-      const supabase = createClient();
-      const { error: signInError } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
+      try {
+        const supabase = createClient();
+        const { error: signInError } = await supabase.auth.signInWithPassword({
+          email,
+          password,
+        });
 
-      if (signInError) {
-        setError("회원가입은 완료되었지만 자동 로그인을 할 수 없습니다. 직접 로그인해 주세요.");
-        router.push("/login");
-        return;
+        if (signInError) {
+          setError("계정은 생성되었지만 자동 로그인을 완료하지 못했습니다. 직접 로그인해 주세요.");
+          router.push("/login");
+          return;
+        }
+      } catch (authError) {
+        if (isSupabaseConfigError(authError)) {
+          setError("계정은 생성되었지만 로그인 설정 확인이 필요합니다. 관리자에게 문의해 주세요.");
+          router.push("/login");
+          return;
+        }
+        throw authError;
       }
 
       sessionStorage.setItem("linkon_sync", JSON.stringify(data.syncResults));
       router.push(data.nextPath ?? "/select-service");
     } catch {
-      setError("네트워크 오류가 발생했습니다. 다시 시도해 주세요.");
+      setError("네트워크 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="auth-page">
+    <div className="auth-page auth-page--split">
+      <aside className="auth-panel">
+        <Image src="/assets/linkon-noback.png" alt="" width={72} height={72} />
+        <p className="lp-kicker">Unified Signup</p>
+        <h1>가입 위치가 달라도 계정 기준은 하나입니다.</h1>
+        <p>
+          특정 서비스에서 가입하면 해당 서비스만 먼저 연결하고, 다른 서비스는 첫 진입 시 자동으로 연결됩니다.
+        </p>
+      </aside>
+
       <div className="auth-card">
         <div className="auth-logo">
           <Image
@@ -164,16 +179,12 @@ export default function RegisterForm() {
           />
         </div>
 
-        <div className="step-indicator" aria-label={`Step ${step} of 3`}>
+        <div className="step-indicator" aria-label={`3단계 중 ${step}단계`}>
           {([1, 2, 3] as Step[]).map((currentStep) => (
             <div
               key={currentStep}
               className={`step-dot ${
-                currentStep < step
-                  ? "is-done"
-                  : currentStep === step
-                    ? "is-active"
-                    : ""
+                currentStep < step ? "is-done" : currentStep === step ? "is-active" : ""
               }`}
             />
           ))}
@@ -186,10 +197,8 @@ export default function RegisterForm() {
               handleNextStep();
             }}
           >
-            <h1 className="auth-title">Linkon 통합 계정 만들기</h1>
-            <p className="auth-subtitle">
-              하나의 계정으로 Vion, Rion, Taxon을 연결합니다.
-            </p>
+            <h2 className="auth-title">통합 계정 만들기</h2>
+            <p className="auth-subtitle">하나의 계정으로 Vion, Rion, Taxon을 연결합니다.</p>
 
             {error && <div className="error-box" role="alert">{error}</div>}
 
@@ -263,38 +272,21 @@ export default function RegisterForm() {
               )}
             </div>
 
-            <button
-              type="submit"
-              className="btn btn--primary"
-              style={{ width: "100%", marginTop: "var(--space-4)" }}
-            >
+            <button type="submit" className="btn btn--primary" style={{ width: "100%", marginTop: "var(--space-4)" }}>
               다음
             </button>
 
-            <p
-              style={{
-                textAlign: "center",
-                fontSize: "var(--text-sm)",
-                color: "var(--text-muted)",
-                marginTop: "var(--space-4)",
-              }}
-            >
-              이미 계정이 있나요?{" "}
-              <Link
-                href="/login"
-                style={{ color: "var(--linkon-accent)", fontWeight: 600 }}
-              >
-                로그인
-              </Link>
+            <p className="auth-switch">
+              이미 계정이 있나요? <Link href="/login">로그인</Link>
             </p>
           </form>
         )}
 
         {step === 2 && (
           <div>
-            <h2 className="auth-title">가장 관심 있는 서비스를 선택해 주세요</h2>
+            <h2 className="auth-title">관심 서비스를 선택해 주세요</h2>
             <p className="auth-subtitle">
-              선택 사항이며, 첫 화면과 안내를 더 자연스럽게 맞추는 데 사용됩니다.
+              선택하지 않아도 가입할 수 있습니다. 서비스 연결은 첫 진입 시 자동으로 처리됩니다.
             </p>
 
             <div className="service-choice-grid">
@@ -306,14 +298,12 @@ export default function RegisterForm() {
                     className={`service-choice ${
                       preferredService === key ? `is-selected-${info.color}` : ""
                     }`}
-                    onClick={() =>
-                      setPreferredService((current) => (current === key ? "" : key))
-                    }
+                    onClick={() => setPreferredService((current) => (current === key ? "" : key))}
                   >
                     <Image src={info.logo} alt={info.name} width={48} height={48} />
-                    <div className="service-choice__body">
-                      <strong>{info.name}</strong>
-                      <span>{info.desc}</span>
+                    <div className="service-choice__info">
+                      <strong className="service-choice__name">{info.name}</strong>
+                      <span className="service-choice__desc">{info.desc}</span>
                     </div>
                   </button>
                 )
@@ -321,20 +311,10 @@ export default function RegisterForm() {
             </div>
 
             <div className="auth-actions" style={{ marginTop: "var(--space-5)" }}>
-              <button
-                type="button"
-                className="btn btn--outline"
-                onClick={() => setStep(1)}
-                style={{ flex: 1 }}
-              >
+              <button type="button" className="btn btn--outline" onClick={() => setStep(1)} style={{ flex: 1 }}>
                 이전
               </button>
-              <button
-                type="button"
-                className="btn btn--primary"
-                onClick={handleNextStep}
-                style={{ flex: 1 }}
-              >
+              <button type="button" className="btn btn--primary" onClick={handleNextStep} style={{ flex: 1 }}>
                 다음
               </button>
             </div>
@@ -344,9 +324,7 @@ export default function RegisterForm() {
         {step === 3 && (
           <form onSubmit={handleSubmit}>
             <h2 className="auth-title">약관 확인 및 동의</h2>
-            <p className="auth-subtitle">
-              계정 생성을 위해 필수 약관을 확인해 주세요.
-            </p>
+            <p className="auth-subtitle">계정 생성을 위해 필수 약관을 확인해 주세요.</p>
 
             {error && <div className="error-box" role="alert">{error}</div>}
 
@@ -357,11 +335,7 @@ export default function RegisterForm() {
                 onChange={(event) => setTermsAgreed(event.target.checked)}
               />
               <span>
-                Linkon{" "}
-                <Link href="/terms" target="_blank">
-                  이용약관
-                </Link>
-                에 동의합니다.
+                Linkon <Link href="/terms" target="_blank">이용약관</Link>에 동의합니다.
               </span>
             </label>
 
@@ -372,11 +346,7 @@ export default function RegisterForm() {
                 onChange={(event) => setPrivacyAgreed(event.target.checked)}
               />
               <span>
-                Linkon{" "}
-                <Link href="/privacy" target="_blank">
-                  개인정보처리방침
-                </Link>
-                에 동의합니다.
+                Linkon <Link href="/privacy" target="_blank">개인정보처리방침</Link>에 동의합니다.
               </span>
             </label>
 
@@ -399,12 +369,7 @@ export default function RegisterForm() {
               >
                 이전
               </button>
-              <button
-                type="submit"
-                className="btn btn--primary"
-                style={{ flex: 1 }}
-                disabled={loading}
-              >
+              <button type="submit" className="btn btn--primary" style={{ flex: 1 }} disabled={loading}>
                 {loading ? "계정 생성 중..." : "계정 만들기"}
               </button>
             </div>

@@ -1,5 +1,8 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
+import { useEffect, useState } from "react";
 
 interface NavItem {
   href: string;
@@ -16,10 +19,33 @@ interface SiteHeaderProps {
 export default function SiteHeader({
   navItems,
   ctaHref = "/register",
-  ctaLabel = "회원가입",
+  ctaLabel = "통합 계정 만들기",
   theme = "light",
 }: SiteHeaderProps) {
-  const navClassName = theme === "dark" ? "nav sp-nav" : "nav";
+  const [open, setOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 40);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  useEffect(() => {
+    document.body.style.overflow = open ? "hidden" : "";
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [open]);
+
+  const navClassName = [
+    "nav",
+    theme === "dark" ? "sp-nav" : "",
+    scrolled ? "nav--scrolled" : "",
+  ]
+    .filter(Boolean)
+    .join(" ");
 
   return (
     <header className={navClassName} id="nav">
@@ -44,34 +70,50 @@ export default function SiteHeader({
         </nav>
 
         <Link href={ctaHref} className="btn btn--primary btn--sm nav__cta">
-          <span>{ctaLabel}</span>
+          {ctaLabel}
         </Link>
 
         <button
-          className="nav__hamburger"
-          id="hamburger"
-          aria-label="메뉴 열기"
-          aria-expanded="false"
+          className={`nav__hamburger ${open ? "is-open" : ""}`}
+          aria-label={open ? "메뉴 닫기" : "메뉴 열기"}
+          aria-expanded={open}
+          onClick={() => setOpen((value) => !value)}
+          type="button"
         >
-          <span></span>
-          <span></span>
-          <span></span>
+          <span />
+          <span />
+          <span />
         </button>
       </div>
 
-      <div className="nav__drawer" id="drawer" aria-hidden="true">
+      <div className={`nav__drawer ${open ? "is-open" : ""}`} aria-hidden={!open}>
         <div className="nav__drawer-inner">
           {navItems.map((item) => (
-            <Link key={item.href} href={item.href} className="nav__drawer-link">
+            <Link
+              key={item.href}
+              href={item.href}
+              className="nav__drawer-link"
+              onClick={() => setOpen(false)}
+            >
               {item.label}
             </Link>
           ))}
-          <Link href={ctaHref} className="btn btn--primary nav__drawer-cta">
+          <Link
+            href={ctaHref}
+            className="btn btn--primary nav__drawer-cta"
+            onClick={() => setOpen(false)}
+          >
             {ctaLabel}
           </Link>
         </div>
       </div>
-      <div className="nav__overlay" id="nav-overlay" aria-hidden="true"></div>
+      <button
+        className={`nav__overlay ${open ? "is-visible" : ""}`}
+        aria-hidden={!open}
+        aria-label="메뉴 닫기"
+        onClick={() => setOpen(false)}
+        type="button"
+      />
     </header>
   );
 }

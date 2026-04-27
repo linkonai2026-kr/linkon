@@ -1,16 +1,27 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { createServerClient, type CookieOptions } from "@supabase/ssr";
 import { getBlockedReason, getCanonicalUserProfile } from "@/lib/linkon/users";
+import { getSupabasePublicConfig, isSupabaseConfigError } from "@/lib/supabase/config";
 
-// 인증이 필요한 라우트
 const PROTECTED_ROUTES = ["/select-service", "/admin", "/api/auth/token", "/api/admin"];
+
+function redirectToLogin(request: NextRequest, error?: string) {
+  const loginUrl = request.nextUrl.clone();
+  loginUrl.pathname = "/login";
+  loginUrl.search = "";
+
+  if (error) {
+    loginUrl.searchParams.set("error", error);
+  } else {
+    loginUrl.searchParams.set("redirect", `${request.nextUrl.pathname}${request.nextUrl.search}`);
+  }
+
+  return NextResponse.redirect(loginUrl);
+}
 
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
-
-  const isProtected = PROTECTED_ROUTES.some((route) =>
-    pathname.startsWith(route)
-  );
+  const isProtected = PROTECTED_ROUTES.some((route) => pathname.startsWith(route));
 
   if (!isProtected) {
     return NextResponse.next();
@@ -20,37 +31,39 @@ export async function proxy(request: NextRequest) {
     request,
   });
 
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        getAll() {
-          return request.cookies.getAll();
-        },
-        setAll(cookiesToSet: { name: string; value: string; options: CookieOptions }[]) {
-          cookiesToSet.forEach(({ name, value }) =>
-            request.cookies.set(name, value)
-          );
-          response = NextResponse.next({ request });
-          cookiesToSet.forEach(({ name, value, options }) =>
-            response.cookies.set(name, value, options)
-          );
-        },
-      },
+  let supabaseConfig: ReturnType<typeof getSupabasePublicConfig>;
+
+  try {
+    supabaseConfig = getSupabasePublicConfig();
+  } catch (error) {
+    if (isSupabaseConfigError(error)) {
+      return redirectToLogin(request, "service_unavailable");
     }
-  );
+
+    throw error;
+  }
+
+  const supabase = createServerClient(supabaseConfig.url, supabaseConfig.key, {
+    cookies: {
+      getAll() {
+        return request.cookies.getAll();
+      },
+      setAll(cookiesToSet: { name: string; value: string; options: CookieOptions }[]) {
+        cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value));
+        response = NextResponse.next({ request });
+        cookiesToSet.forEach(({ name, value, options }) =>
+          response.cookies.set(name, value, options)
+        );
+      },
+    },
+  });
 
   const {
     data: { user },
   } = await supabase.auth.getUser();
 
   if (!user) {
-    const loginUrl = request.nextUrl.clone();
-    loginUrl.pathname = "/login";
-    loginUrl.search = "";
-    loginUrl.searchParams.set("redirect", `${pathname}${request.nextUrl.search}`);
-    return NextResponse.redirect(loginUrl);
+    return redirectToLogin(request);
   }
 
   const profile = await getCanonicalUserProfile(user.id);
@@ -59,19 +72,11 @@ export async function proxy(request: NextRequest) {
     const blockedReason = getBlockedReason(profile);
 
     if (blockedReason) {
-      const loginUrl = request.nextUrl.clone();
-      loginUrl.pathname = "/login";
-      loginUrl.searchParams.set("error", blockedReason);
-      return NextResponse.redirect(loginUrl);
+      return redirectToLogin(request, blockedReason);
     }
 
-    if (pathname.startsWith("/admin") || pathname.startsWith("/api/admin")) {
-      if (profile.role !== "super_admin") {
-        const loginUrl = request.nextUrl.clone();
-        loginUrl.pathname = "/login";
-        loginUrl.searchParams.set("error", "admin_required");
-        return NextResponse.redirect(loginUrl);
-      }
+    if ((pathname.startsWith("/admin") || pathname.startsWith("/api/admin")) && profile.role !== "super_admin") {
+      return redirectToLogin(request, "admin_required");
     }
   }
 

@@ -4,8 +4,7 @@ import RegisterForm from "@/components/register-form";
 
 export const metadata: Metadata = {
   title: "회원가입",
-  description:
-    "Vion, Rion, Taxon을 이용하기 위한 Linkon 통합 계정을 만듭니다.",
+  description: "Vion, Rion, Taxon을 이용하기 위한 Linkon 통합 계정을 만듭니다.",
 };
 
 export default function RegisterPage() {

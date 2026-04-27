@@ -7,27 +7,27 @@ import { useSearchParams } from "next/navigation";
 
 function getInitialErrorMessage(errorCode: string | null) {
   if (errorCode === "auth_callback_failed") {
-    return "Login could not be completed. Please try again.";
+    return "로그인을 완료하지 못했습니다. 다시 시도해 주세요.";
   }
 
   if (errorCode === "account_suspended") {
-    return "This account is suspended. Please contact the Linkon team.";
+    return "정지된 계정입니다. Linkon 운영팀에 문의해 주세요.";
   }
 
   if (errorCode === "account_deleted") {
-    return "This account is no longer active. Please create a new account or contact support.";
+    return "더 이상 활성화되지 않은 계정입니다. 새 계정을 만들거나 문의해 주세요.";
   }
 
   if (errorCode === "admin_required") {
-    return "This area requires super admin access.";
+    return "최고 관리자 권한이 필요한 화면입니다.";
   }
 
   if (errorCode === "service_unavailable") {
-    return "This service is not configured yet. Please try again shortly.";
+    return "아직 연결 준비 중인 서비스입니다. 잠시 후 다시 시도해 주세요.";
   }
 
   if (errorCode === "service_disabled") {
-    return "Access to this service is disabled by an administrator.";
+    return "관리자에 의해 해당 서비스 접근 권한이 비활성화되었습니다.";
   }
 
   return "";
@@ -48,42 +48,55 @@ export default function LoginForm() {
   const [email, setEmail] = useState(searchParams.get("email") ?? "");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(
-    getInitialErrorMessage(searchParams.get("error"))
-  );
+  const [error, setError] = useState(getInitialErrorMessage(searchParams.get("error")));
 
   const handleLogin = async (event: React.FormEvent) => {
     event.preventDefault();
     setLoading(true);
     setError("");
 
-    const response = await fetch("/api/auth/login", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        email,
-        password,
-      }),
-    });
+    try {
+      const response = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email,
+          password,
+        }),
+      });
 
-    if (!response.ok) {
-      const data = await response.json().catch(() => null);
-      setError(
-        data && typeof data.error === "string"
-          ? data.error
-          : "The email or password is incorrect."
-      );
+      if (!response.ok) {
+        const data = await response.json().catch(() => null);
+        setError(
+          data && typeof data.error === "string"
+            ? data.error
+            : "이메일 또는 비밀번호가 올바르지 않습니다."
+        );
+        return;
+      }
+
+      window.location.assign(redirect);
+    } catch {
+      setError("네트워크 오류가 발생했습니다. 연결 상태를 확인한 뒤 다시 시도해 주세요.");
+    } finally {
       setLoading(false);
-      return;
     }
-
-    window.location.assign(redirect);
   };
 
   return (
-    <div className="auth-page">
+    <div className="auth-page auth-page--split">
+      <aside className="auth-panel">
+        <Image src="/assets/linkon-noback.png" alt="" width={72} height={72} />
+        <p className="lp-kicker">Linkon Account</p>
+        <h1>하나의 계정으로 모든 서비스를 시작하세요.</h1>
+        <p>
+          Vion, Rion, Taxon의 접근 권한과 요금제는 Linkon 계정 상태를 기준으로
+          안전하게 관리됩니다.
+        </p>
+      </aside>
+
       <div className="auth-card">
         <div className="auth-logo">
           <Image
@@ -95,10 +108,8 @@ export default function LoginForm() {
           />
         </div>
 
-        <h1 className="auth-title">Sign in to Linkon</h1>
-        <p className="auth-subtitle">
-          Use your unified Linkon account to continue.
-        </p>
+        <h2 className="auth-title">로그인</h2>
+        <p className="auth-subtitle">통합 Linkon 계정으로 계속 진행합니다.</p>
 
         {error && (
           <div className="error-box" role="alert">
@@ -109,7 +120,7 @@ export default function LoginForm() {
         <form onSubmit={handleLogin}>
           <div className="form-group">
             <label className="form-label" htmlFor="email">
-              Email
+              이메일
             </label>
             <input
               id="email"
@@ -125,13 +136,13 @@ export default function LoginForm() {
 
           <div className="form-group">
             <label className="form-label" htmlFor="password">
-              Password
+              비밀번호
             </label>
             <input
               id="password"
               type="password"
               className="form-input"
-              placeholder="Enter your password"
+              placeholder="비밀번호를 입력해 주세요"
               value={password}
               onChange={(event) => setPassword(event.target.value)}
               required
@@ -145,25 +156,13 @@ export default function LoginForm() {
             style={{ width: "100%", marginTop: "var(--space-4)" }}
             disabled={loading}
           >
-            {loading ? "Signing in..." : "Sign in"}
+            {loading ? "로그인 중..." : "로그인"}
           </button>
         </form>
 
-        <p
-          style={{
-            textAlign: "center",
-            fontSize: "var(--text-sm)",
-            color: "var(--text-muted)",
-            marginTop: "var(--space-4)",
-          }}
-        >
-          Need a Linkon account?{" "}
-          <Link
-            href="/register"
-            style={{ color: "var(--linkon-accent)", fontWeight: 600 }}
-          >
-            Create one
-          </Link>
+        <p className="auth-switch">
+          아직 계정이 없나요?{" "}
+          <Link href="/register">통합 계정 만들기</Link>
         </p>
       </div>
     </div>

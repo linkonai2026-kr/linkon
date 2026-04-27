@@ -2,24 +2,24 @@ import type { Metadata, Viewport } from "next";
 import "@/styles/globals.css";
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://linkon.io"),
+  metadataBase: new URL("https://linkon-xi.vercel.app"),
   icons: {
     icon: "/assets/linkon.png",
     shortcut: "/assets/linkon.png",
     apple: "/assets/linkon.png",
   },
   title: {
-    default: "Linkon | 통합 AI 서비스 플랫폼",
+    default: "Linkon | 통합 AI 서비스 관제 플랫폼",
     template: "%s | Linkon",
   },
   description:
-    "심리 케어, 법률 안내, 재무 관리를 하나의 통합 계정으로 연결하는 AI 서비스 플랫폼입니다.",
+    "Vion, Rion, Taxon을 하나의 통합 계정과 권한 체계로 연결하는 Linkon 공식 플랫폼입니다.",
   openGraph: {
-    title: "Linkon | 통합 AI 서비스 플랫폼",
+    title: "Linkon | 통합 AI 서비스 관제 플랫폼",
     description:
-      "Vion, Rion, Taxon을 하나의 계정과 운영 기준으로 연결하는 Linkon 플랫폼입니다.",
+      "통합 로그인, 서비스 접근 권한, 요금제, 관리자 권한을 하나의 기준으로 관리합니다.",
     type: "website",
-    url: "https://linkon.io",
+    url: "https://linkon-xi.vercel.app",
     images: [
       {
         url: "/assets/linkon.png",
@@ -31,15 +31,14 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Linkon | 통합 AI 서비스 플랫폼",
-    description:
-      "Linkon 생태계를 위한 통합 계정, 서비스 진입, 관리자 제어.",
+    title: "Linkon | 통합 AI 서비스 관제 플랫폼",
+    description: "Vion, Rion, Taxon을 위한 통합 계정과 서비스 접근 관리.",
     images: ["/assets/linkon.png"],
   },
 };
 
 export const viewport: Viewport = {
-  themeColor: "#F7F8FC",
+  themeColor: "#F6F3EA",
 };
 
 export default function RootLayout({

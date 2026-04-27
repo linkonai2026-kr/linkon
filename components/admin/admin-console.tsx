@@ -28,12 +28,12 @@ async function readJson<T>(response: Response): Promise<T> {
       "error" in data &&
       typeof data.error === "string"
         ? data.error
-        : "The request could not be completed.";
+        : "요청을 완료하지 못했습니다.";
     throw new Error(message);
   }
 
   if (!data) {
-    throw new Error("The server returned an unreadable response.");
+    throw new Error("서버 응답을 읽을 수 없습니다.");
   }
 
   return data as T;
@@ -81,7 +81,7 @@ export default function AdminConsole({
       setSelectedId(nextSelected);
       await loadDetail(nextSelected);
     } catch (error) {
-      setMessage(error instanceof Error ? error.message : "Could not load users.");
+      setMessage(error instanceof Error ? error.message : "사용자 목록을 불러오지 못했습니다.");
     }
   }
 
@@ -94,7 +94,7 @@ export default function AdminConsole({
       );
       setDetail(data.user);
     } catch (error) {
-      setMessage(error instanceof Error ? error.message : "Could not load user detail.");
+      setMessage(error instanceof Error ? error.message : "사용자 상세 정보를 불러오지 못했습니다.");
     }
   }
 
@@ -121,10 +121,10 @@ export default function AdminConsole({
 
       const data = await readJson<{ user: AdminUserDetail }>(response);
       setDetail(data.user);
-      setMessage("Changes saved and sync requested.");
+      setMessage("변경 사항을 저장하고 서비스 동기화를 요청했습니다.");
       await loadUsers();
     } catch (error) {
-      setMessage(error instanceof Error ? error.message : "The action could not be completed.");
+      setMessage(error instanceof Error ? error.message : "작업을 완료하지 못했습니다.");
     } finally {
       setBusyAction(null);
     }
@@ -139,12 +139,12 @@ export default function AdminConsole({
       <div className="admin-topbar">
         <div>
           <p className="section-label">Admin Console</p>
-          <h1 className="admin-title font-serif">Linkon operations control</h1>
+          <h1 className="admin-title">Linkon 운영 관제</h1>
           <p className="admin-subtitle">
-            Manage unified identity, plans, suspensions, deletions, and service sync from one place.
+            통합 계정, 요금제, 계정 상태, 서비스 접근 권한, 서비스별 관리자 권한을 한 화면에서 관리합니다.
           </p>
         </div>
-        <div className="admin-chip">Signed in as: {currentAdminEmail}</div>
+        <div className="admin-chip">접속 관리자: {currentAdminEmail}</div>
       </div>
 
       {message && <div className="admin-banner">{message}</div>}
@@ -154,14 +154,14 @@ export default function AdminConsole({
           className="admin-input"
           value={query}
           onChange={(event) => setQuery(event.target.value)}
-          placeholder="Search by name or email"
+          placeholder="이름 또는 이메일 검색"
         />
         <select
           className="admin-select"
           value={statusFilter}
           onChange={(event) => setStatusFilter(event.target.value)}
         >
-          <option value="all">All statuses</option>
+          <option value="all">전체 상태</option>
           {ACCOUNT_STATUSES.map((status) => (
             <option key={status} value={status}>
               {status}
@@ -173,7 +173,7 @@ export default function AdminConsole({
           value={planFilter}
           onChange={(event) => setPlanFilter(event.target.value)}
         >
-          <option value="all">All plans</option>
+          <option value="all">전체 요금제</option>
           {PLAN_TIERS.map((plan) => (
             <option key={plan} value={plan}>
               {plan}
@@ -189,14 +189,14 @@ export default function AdminConsole({
             })
           }
         >
-          Refresh
+          새로고침
         </button>
       </div>
 
       <div className="admin-grid">
         <section className="admin-card admin-list-card">
           <div className="admin-card__header">
-            <h2>Users</h2>
+            <h2>사용자</h2>
             <span>{users.length}</span>
           </div>
           <div className="admin-user-list">
@@ -211,7 +211,7 @@ export default function AdminConsole({
                 }}
               >
                 <div>
-                  <strong>{user.name || "No name"}</strong>
+                  <strong>{user.name || "이름 없음"}</strong>
                   <span>{user.email}</span>
                 </div>
                 <div className="admin-user-meta">
@@ -221,12 +221,12 @@ export default function AdminConsole({
                   <span className="admin-pill">{user.plan}</span>
                   <span className="admin-pill">{user.role}</span>
                   <span className="admin-pill">
-                    Last: {user.last_used_service ?? "-"}
+                    최근: {user.last_used_service ?? "-"}
                   </span>
                 </div>
               </button>
             ))}
-            {users.length === 0 && <p className="admin-empty">No users matched this filter.</p>}
+            {users.length === 0 && <p className="admin-empty">조건에 맞는 사용자가 없습니다.</p>}
           </div>
         </section>
 
@@ -235,7 +235,7 @@ export default function AdminConsole({
             <>
               <div className="admin-card__header">
                 <div>
-                  <h2>{selectedUser.name || "No name"}</h2>
+                  <h2>{selectedUser.name || "이름 없음"}</h2>
                   <p>{selectedUser.email}</p>
                 </div>
                 <div className="admin-detail-meta">
@@ -248,10 +248,10 @@ export default function AdminConsole({
               </div>
 
               <div className="admin-section">
-                <h3>Account controls</h3>
+                <h3>계정 제어</h3>
                 <div className="admin-form-grid">
                   <label>
-                    Role
+                    전역 역할
                     <select
                       className="admin-select"
                       defaultValue={selectedUser.role}
@@ -270,7 +270,7 @@ export default function AdminConsole({
                     </select>
                   </label>
                   <label>
-                    Status
+                    계정 상태
                     <select
                       className="admin-select"
                       defaultValue={selectedUser.account_status}
@@ -289,7 +289,7 @@ export default function AdminConsole({
                     </select>
                   </label>
                   <label>
-                    Plan
+                    요금제
                     <select
                       className="admin-select"
                       defaultValue={selectedUser.plan}
@@ -316,7 +316,7 @@ export default function AdminConsole({
                     disabled={Boolean(busyAction)}
                     onClick={() => void submitAction(`/api/admin/users/${selectedUser.id}/resync`)}
                   >
-                    Resync services
+                    서비스 재동기화
                   </button>
                   <button
                     type="button"
@@ -331,11 +331,11 @@ export default function AdminConsole({
                         suspensionReason:
                           selectedUser.account_status === "suspended"
                             ? null
-                            : "Suspended by administrator",
+                            : "관리자에 의해 정지됨",
                       })
                     }
                   >
-                    {selectedUser.account_status === "suspended" ? "Unsuspend" : "Suspend"}
+                    {selectedUser.account_status === "suspended" ? "정지 해제" : "계정 정지"}
                   </button>
                   <button
                     type="button"
@@ -344,38 +344,38 @@ export default function AdminConsole({
                     onClick={() => {
                       if (
                         window.confirm(
-                          "Mark this account as deleted and revoke access across linked services?"
+                          "이 계정을 삭제 상태로 전환하고 연결 서비스 접근 권한을 회수할까요?"
                         )
                       ) {
                         void submitAction(`/api/admin/users/${selectedUser.id}/delete`);
                       }
                     }}
                   >
-                    Delete account
+                    계정 삭제
                   </button>
                 </div>
               </div>
 
               <div className="admin-section">
-                <h3>Service usage summary</h3>
+                <h3>서비스 이용 요약</h3>
                 <div className="admin-detail-meta">
                   <span className="admin-pill">
-                    Primary: {selectedUser.primary_service ?? "-"}
+                    우선 서비스: {selectedUser.primary_service ?? "-"}
                   </span>
                   <span className="admin-pill">
-                    Most used: {selectedUser.most_used_service ?? "-"}
+                    최다 이용: {selectedUser.most_used_service ?? "-"}
                   </span>
                   <span className="admin-pill">
-                    Last used: {selectedUser.last_used_service ?? "-"}
+                    최근 이용: {selectedUser.last_used_service ?? "-"}
                   </span>
                   <span className="admin-pill">
-                    Last login: {selectedUser.last_login_at ?? "-"}
+                    최근 로그인: {selectedUser.last_login_at ?? "-"}
                   </span>
                 </div>
               </div>
 
               <div className="admin-section">
-                <h3>Service access and roles</h3>
+                <h3>서비스 접근 및 역할</h3>
                 <div className="admin-service-grid">
                   {SERVICE_NAMES.map((serviceName) => {
                     const service = getServiceAccount(serviceName);
@@ -388,13 +388,13 @@ export default function AdminConsole({
                         className="admin-service-card"
                       >
                         <strong>{serviceName.toUpperCase()}</strong>
-                        <span>ID: {service?.service_uid ?? "Not linked"}</span>
-                        <span>Access: {isEnabled ? "enabled" : "disabled"}</span>
-                        <span>Role: {serviceRole}</span>
-                        <span>Usage: {service?.usage_count ?? 0}</span>
-                        <span>Last access: {service?.last_accessed_at ?? "-"}</span>
-                        <span>Sync: {service?.sync_status ?? "not linked"}</span>
-                        <span>Last sync: {service?.last_synced_at ?? "-"}</span>
+                        <span>ID: {service?.service_uid ?? "연결 안 됨"}</span>
+                        <span>접근: {isEnabled ? "활성" : "비활성"}</span>
+                        <span>역할: {serviceRole}</span>
+                        <span>이용 횟수: {service?.usage_count ?? 0}</span>
+                        <span>최근 접속: {service?.last_accessed_at ?? "-"}</span>
+                        <span>동기화: {service?.sync_status ?? "연결 안 됨"}</span>
+                        <span>최근 동기화: {service?.last_synced_at ?? "-"}</span>
                         {service?.sync_error && (
                           <span className="admin-error-text">{service.sync_error}</span>
                         )}
@@ -411,7 +411,7 @@ export default function AdminConsole({
                               )
                             }
                           >
-                            {isEnabled ? "Disable" : "Enable"}
+                            {isEnabled ? "접근 비활성화" : "접근 활성화"}
                           </button>
                           <select
                             className="admin-select"
@@ -438,7 +438,7 @@ export default function AdminConsole({
               </div>
 
               <div className="admin-section">
-                <h3>Audit log</h3>
+                <h3>감사 로그</h3>
                 <div className="admin-log-list">
                   {selectedUser.audit_logs.map((log) => (
                     <article
@@ -449,7 +449,7 @@ export default function AdminConsole({
                         <strong>{log.action}</strong>
                         <span>{log.created_at ?? "-"}</span>
                       </div>
-                      <p>Actor: {log.actor_uid ?? "system"}</p>
+                      <p>실행자: {log.actor_uid ?? "system"}</p>
                       {log.sync_result && (
                         <pre className="admin-pre">
                           {JSON.stringify(log.sync_result, null, 2)}
@@ -458,15 +458,15 @@ export default function AdminConsole({
                     </article>
                   ))}
                   {selectedUser.audit_logs.length === 0 && (
-                    <p className="admin-empty">No audit entries yet.</p>
+                    <p className="admin-empty">아직 감사 로그가 없습니다.</p>
                   )}
                 </div>
               </div>
             </>
           ) : (
             <div className="admin-empty-state">
-              <h2>Select a user</h2>
-              <p>Choose an account from the list to inspect permissions, sync state, and audit history.</p>
+              <h2>사용자를 선택해 주세요</h2>
+              <p>목록에서 계정을 선택하면 권한, 동기화 상태, 감사 로그를 확인할 수 있습니다.</p>
             </div>
           )}
         </section>

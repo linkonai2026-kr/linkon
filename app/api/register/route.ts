@@ -66,7 +66,7 @@ export async function POST(req: Request) {
       body = await req.json();
     } catch {
       return NextResponse.json(
-        { error: "The request body is invalid." },
+        { error: "회원가입 요청 형식이 올바르지 않습니다." },
         { status: 400 }
       );
     }
@@ -83,14 +83,14 @@ export async function POST(req: Request) {
 
     if (!email || !password || !name || !termsAgreed) {
       return NextResponse.json(
-        { error: "Name, email, password, and terms agreement are required." },
+        { error: "이름, 이메일, 비밀번호, 필수 약관 동의가 필요합니다." },
         { status: 400 }
       );
     }
 
     if (password.length < 8) {
       return NextResponse.json(
-        { error: "Password must be at least 8 characters long." },
+        { error: "비밀번호는 8자 이상이어야 합니다." },
         { status: 400 }
       );
     }
@@ -112,9 +112,7 @@ export async function POST(req: Request) {
 
       return NextResponse.json(
         {
-          error: isAlreadyRegistered
-            ? "This email is already registered."
-            : createError.message,
+          error: isAlreadyRegistered ? "이미 가입된 이메일입니다." : createError.message,
         },
         { status: isAlreadyRegistered ? 409 : 400 }
       );
@@ -122,7 +120,7 @@ export async function POST(req: Request) {
 
     if (!createdUser.user) {
       return NextResponse.json(
-        { error: "The account could not be created." },
+        { error: "계정을 생성하지 못했습니다." },
         { status: 500 }
       );
     }
@@ -156,7 +154,7 @@ export async function POST(req: Request) {
     if (preferenceError) {
       return NextResponse.json(
         {
-          error: `The account was created, but preferences could not be saved: ${preferenceError.message}`,
+          error: `계정은 생성되었지만 가입 설정 저장에 실패했습니다: ${preferenceError.message}`,
         },
         { status: 500 }
       );
@@ -170,9 +168,7 @@ export async function POST(req: Request) {
           preferred_service: selectedService,
           interest_tags: selectedService ? [selectedService] : [],
           user_traits: {},
-          memo_summary: selectedService
-            ? `${selectedService} signup interest`
-            : "Linkon signup",
+          memo_summary: selectedService ? `${selectedService} signup interest` : "Linkon signup",
           risk_flags: [],
         },
         { onConflict: "linkon_uid" }
@@ -181,7 +177,7 @@ export async function POST(req: Request) {
     if (contextError) {
       return NextResponse.json(
         {
-          error: `The account was created, but user context could not be saved: ${contextError.message}`,
+          error: `계정은 생성되었지만 사용자 컨텍스트 저장에 실패했습니다: ${contextError.message}`,
         },
         { status: 500 }
       );
@@ -196,6 +192,11 @@ export async function POST(req: Request) {
         },
       });
 
+    const serializedSyncResults = syncResults.map((result) => ({
+      service: result.service,
+      success: result.success,
+    }));
+
     if (sessionError || !sessionData?.properties?.action_link) {
       return NextResponse.json({
         ok: true,
@@ -203,10 +204,7 @@ export async function POST(req: Request) {
         nextPath: selectedService
           ? `/api/auth/token?service=${selectedService}`
           : "/select-service",
-        syncResults: syncResults.map((result) => ({
-          service: result.service,
-          success: result.success,
-        })),
+        syncResults: serializedSyncResults,
       });
     }
 
@@ -217,10 +215,7 @@ export async function POST(req: Request) {
       nextPath: selectedService
         ? `/api/auth/token?service=${selectedService}`
         : "/select-service",
-      syncResults: syncResults.map((result) => ({
-        service: result.service,
-        success: result.success,
-      })),
+      syncResults: serializedSyncResults,
     });
   } catch (error) {
     return NextResponse.json(
@@ -228,7 +223,7 @@ export async function POST(req: Request) {
         error:
           error instanceof Error
             ? error.message
-            : "Registration failed due to an unexpected error.",
+            : "회원가입 중 예상하지 못한 오류가 발생했습니다.",
       },
       { status: 500 }
     );

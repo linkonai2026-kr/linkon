@@ -3,18 +3,7 @@ import Image from "next/image";
 
 export default function NotFound() {
   return (
-    <div
-      style={{
-        minHeight: "100vh",
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        justifyContent: "center",
-        background: "var(--bg-secondary)",
-        padding: "var(--space-5)",
-        textAlign: "center",
-      }}
-    >
+    <div className="not-found-page">
       <Image
         src="/assets/linkon-no.png"
         alt="Linkon"
@@ -22,41 +11,13 @@ export default function NotFound() {
         height={40}
         style={{ objectFit: "contain", marginBottom: "var(--space-6)" }}
       />
-      <p
-        style={{
-          fontSize: "var(--text-xs)",
-          fontWeight: 700,
-          color: "var(--linkon-accent)",
-          letterSpacing: "0.1em",
-          marginBottom: "var(--space-3)",
-        }}
-      >
-        404
-      </p>
-      <h1
-        style={{
-          fontSize: "var(--text-3xl)",
-          fontWeight: 700,
-          color: "var(--text-primary)",
-          marginBottom: "var(--space-4)",
-        }}
-      >
-        We could not find that page.
-      </h1>
-      <p
-        style={{
-          fontSize: "var(--text-base)",
-          color: "var(--text-muted)",
-          marginBottom: "var(--space-7)",
-          maxWidth: "360px",
-          lineHeight: 1.7,
-        }}
-      >
-        The page may have moved, been removed, or never existed in this
-        environment.
+      <p className="lp-kicker">404</p>
+      <h1>페이지를 찾을 수 없습니다.</h1>
+      <p>
+        주소가 변경되었거나 삭제된 페이지일 수 있습니다. Linkon 홈에서 다시 시작해 주세요.
       </p>
       <Link href="/" className="btn btn--primary">
-        Return home
+        홈으로 돌아가기
       </Link>
     </div>
   );

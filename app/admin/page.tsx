@@ -3,9 +3,9 @@ import { getAdminUserDetail, listAdminUsers } from "@/lib/linkon/admin";
 import { requireSuperAdminSession } from "@/lib/linkon/session";
 
 export const metadata = {
-  title: "Admin Console",
+  title: "관리자 콘솔",
   description:
-    "Linkon super admin control for user permissions, status changes, plan updates, deletions, and service synchronization.",
+    "Linkon 통합 계정, 권한, 요금제, 서비스 접근, 감사 로그를 관리하는 최고 관리자 콘솔입니다.",
 };
 
 export default async function AdminPage() {

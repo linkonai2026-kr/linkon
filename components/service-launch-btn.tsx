@@ -17,7 +17,7 @@ interface ServiceLaunchBtnProps {
 export default function ServiceLaunchBtn({
   service,
   label,
-  loadingLabel = "Connecting...",
+  loadingLabel = "연결 중...",
   className,
   style,
 }: ServiceLaunchBtnProps) {
@@ -26,15 +26,22 @@ export default function ServiceLaunchBtn({
 
   const handleClick = async () => {
     setLoading(true);
-    const supabase = createClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
 
-    if (user) {
-      window.location.href = `/api/auth/token?service=${service}`;
-    } else {
-      router.push(`/login?redirect=/api/auth/token?service=${service}`);
+    try {
+      const supabase = createClient();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+
+      if (user) {
+        window.location.href = `/api/auth/token?service=${service}`;
+      } else {
+        router.push(`/login?redirect=/api/auth/token?service=${service}`);
+      }
+    } catch {
+      router.push("/login?error=service_unavailable");
+    } finally {
+      setLoading(false);
     }
   };
 

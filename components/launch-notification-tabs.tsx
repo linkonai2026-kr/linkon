@@ -23,7 +23,7 @@ const SERVICES: Record<
     tabLabel: "Rion",
     tagline: "법률 비서 AI",
     description:
-      "복잡한 계약서와 법률 절차를 이해하기 쉬운 언어로 정리하고, 다음 행동까지 안내하는 AI 법률 비서입니다.",
+      "계약서, 약관, 절차 안내를 이해하기 쉬운 언어로 정리하고 다음 행동까지 안내하는 법률 비서 AI입니다.",
     logo: "/assets/rion-no.png",
     buttonClass: "btn--rion",
     accent: "var(--rion-primary)",
@@ -31,9 +31,9 @@ const SERVICES: Record<
   taxon: {
     name: "Taxon",
     tabLabel: "Taxon",
-    tagline: "재무 관리 AI",
+    tagline: "세무 관리 AI",
     description:
-      "사업 운영에 필요한 숫자, 반복 보고, 세무 준비 흐름을 더 명확하게 볼 수 있도록 돕는 AI 재무 관리 서비스입니다.",
+      "사업 운영에 필요한 숫자, 반복 보고, 세무 준비 흐름을 선명하게 볼 수 있도록 돕는 세무 관리 AI입니다.",
     logo: "/assets/taxon-no.png",
     buttonClass: "btn--taxon",
     accent: "var(--taxon-primary)",
@@ -104,10 +104,10 @@ export default function LaunchNotificationTabs() {
         }),
       });
 
-      const data = await response.json();
+      const data = await response.json().catch(() => null);
 
       if (!response.ok) {
-        throw new Error(data.error ?? "출시 알림 신청에 실패했습니다.");
+        throw new Error(data?.error ?? "출시 알림 신청에 실패했습니다.");
       }
 
       setEmail("");
@@ -127,11 +127,7 @@ export default function LaunchNotificationTabs() {
 
   return (
     <div className="launch-notify" data-active-service={activeService}>
-      <div
-        className="launch-notify__tabs"
-        role="tablist"
-        aria-label="출시 예정 서비스 선택"
-      >
+      <div className="launch-notify__tabs" role="tablist" aria-label="출시 예정 서비스 선택">
         {(Object.keys(SERVICES) as LaunchService[]).map((key) => {
           const item = SERVICES[key];
           const selected = activeService === key;
@@ -168,7 +164,7 @@ export default function LaunchNotificationTabs() {
         style={{ ["--launch-accent" as string]: service.accent }}
       >
         <div className="launch-notify__logo">
-          <Image src={service.logo} alt={`${service.name} logo`} width={160} height={52} />
+          <Image src={service.logo} alt={`${service.name} 로고`} width={160} height={52} />
         </div>
         <p className="launch-notify__eyebrow">출시 예정</p>
         <h3 className="launch-notify__title">
@@ -186,11 +182,7 @@ export default function LaunchNotificationTabs() {
               aria-label={`${service.name} 출시 알림 이메일`}
               disabled={loading}
             />
-            <button
-              type="submit"
-              className={`btn ${service.buttonClass}`}
-              disabled={loading}
-            >
+            <button type="submit" className={`btn ${service.buttonClass}`} disabled={loading}>
               {loading ? "신청 중..." : "출시 알림 받기"}
             </button>
           </div>

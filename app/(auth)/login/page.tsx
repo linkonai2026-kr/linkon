@@ -4,7 +4,7 @@ import LoginForm from "@/components/login-form";
 
 export const metadata: Metadata = {
   title: "로그인",
-  description: "Linkon 계정으로 로그인하세요.",
+  description: "Linkon 통합 계정으로 로그인합니다.",
 };
 
 export default function LoginPage() {
@@ -13,7 +13,7 @@ export default function LoginPage() {
       fallback={
         <div className="auth-page">
           <div className="auth-card" style={{ textAlign: "center" }}>
-            불러오는 중...
+            로그인 화면을 불러오는 중...
           </div>
         </div>
       }
