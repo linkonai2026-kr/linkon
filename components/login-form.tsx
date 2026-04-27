@@ -3,33 +3,47 @@
 import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
-import { createClient } from "@/lib/supabase/client";
+import { useSearchParams } from "next/navigation";
 
 function getInitialErrorMessage(errorCode: string | null) {
   if (errorCode === "auth_callback_failed") {
-    return "로그인을 완료하지 못했습니다. 다시 시도해 주세요.";
+    return "Login could not be completed. Please try again.";
   }
 
   if (errorCode === "account_suspended") {
-    return "이 계정은 이용이 정지되었습니다. Linkon 운영팀에 문의해 주세요.";
+    return "This account is suspended. Please contact the Linkon team.";
   }
 
   if (errorCode === "account_deleted") {
-    return "이 계정은 더 이상 활성 상태가 아닙니다. 새 계정을 만들거나 운영팀에 문의해 주세요.";
+    return "This account is no longer active. Please create a new account or contact support.";
   }
 
   if (errorCode === "admin_required") {
-    return "이 영역은 최고 관리자 권한이 필요합니다.";
+    return "This area requires super admin access.";
+  }
+
+  if (errorCode === "service_unavailable") {
+    return "This service is not configured yet. Please try again shortly.";
+  }
+
+  if (errorCode === "service_disabled") {
+    return "Access to this service is disabled by an administrator.";
   }
 
   return "";
 }
 
+function getSafeRedirect(value: string | null) {
+  if (!value || !value.startsWith("/") || value.startsWith("//")) {
+    return "/select-service";
+  }
+
+  return value;
+}
+
 export default function LoginForm() {
-  const router = useRouter();
   const searchParams = useSearchParams();
-  const redirect = searchParams.get("redirect") ?? "/select-service";
+  const redirect = getSafeRedirect(searchParams.get("redirect"));
 
   const [email, setEmail] = useState(searchParams.get("email") ?? "");
   const [password, setPassword] = useState("");
@@ -43,20 +57,29 @@ export default function LoginForm() {
     setLoading(true);
     setError("");
 
-    const supabase = createClient();
-    const { error: signInError } = await supabase.auth.signInWithPassword({
-      email,
-      password,
+    const response = await fetch("/api/auth/login", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        email,
+        password,
+      }),
     });
 
-    if (signInError) {
-      setError("이메일 또는 비밀번호가 올바르지 않습니다.");
+    if (!response.ok) {
+      const data = await response.json().catch(() => null);
+      setError(
+        data && typeof data.error === "string"
+          ? data.error
+          : "The email or password is incorrect."
+      );
       setLoading(false);
       return;
     }
 
-    router.push(redirect);
-    router.refresh();
+    window.location.assign(redirect);
   };
 
   return (
@@ -72,8 +95,10 @@ export default function LoginForm() {
           />
         </div>
 
-        <h1 className="auth-title">다시 만나서 반가워요</h1>
-        <p className="auth-subtitle">Linkon 통합 계정으로 로그인해 주세요.</p>
+        <h1 className="auth-title">Sign in to Linkon</h1>
+        <p className="auth-subtitle">
+          Use your unified Linkon account to continue.
+        </p>
 
         {error && (
           <div className="error-box" role="alert">
@@ -84,7 +109,7 @@ export default function LoginForm() {
         <form onSubmit={handleLogin}>
           <div className="form-group">
             <label className="form-label" htmlFor="email">
-              이메일
+              Email
             </label>
             <input
               id="email"
@@ -100,13 +125,13 @@ export default function LoginForm() {
 
           <div className="form-group">
             <label className="form-label" htmlFor="password">
-              비밀번호
+              Password
             </label>
             <input
               id="password"
               type="password"
               className="form-input"
-              placeholder="비밀번호를 입력해 주세요"
+              placeholder="Enter your password"
               value={password}
               onChange={(event) => setPassword(event.target.value)}
               required
@@ -120,7 +145,7 @@ export default function LoginForm() {
             style={{ width: "100%", marginTop: "var(--space-4)" }}
             disabled={loading}
           >
-            {loading ? "로그인 중..." : "로그인"}
+            {loading ? "Signing in..." : "Sign in"}
           </button>
         </form>
 
@@ -132,12 +157,12 @@ export default function LoginForm() {
             marginTop: "var(--space-4)",
           }}
         >
-          아직 Linkon 계정이 없나요?{" "}
+          Need a Linkon account?{" "}
           <Link
             href="/register"
             style={{ color: "var(--linkon-accent)", fontWeight: 600 }}
           >
-            회원가입
+            Create one
           </Link>
         </p>
       </div>
