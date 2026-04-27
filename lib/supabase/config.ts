@@ -10,7 +10,8 @@ type UrlSource =
   | "NEXT_PUBLIC_SUPABASE_URL"
   | "SUPABASE_URL"
   | "LINKON_SUPABASE_URL"
-  | "derived_from_public_key";
+  | "derived_from_public_key"
+  | "derived_from_service_role_key";
 
 export interface SupabasePublicConfig {
   url: string;
@@ -113,6 +114,13 @@ function getPublicKey() {
   ] as const);
 }
 
+function getServiceRoleKeyValue() {
+  return readFirstEnv([
+    "SUPABASE_SERVICE_ROLE_KEY",
+    "LINKON_SUPABASE_SERVICE_ROLE_KEY",
+  ] as const);
+}
+
 function getPublicUrl(publicKey: string) {
   const configured = readFirstEnv([
     "NEXT_PUBLIC_SUPABASE_URL",
@@ -124,9 +132,20 @@ function getPublicUrl(publicKey: string) {
     return configured;
   }
 
+  const derivedFromPublicKey = deriveSupabaseUrlFromJwtKey(publicKey);
+
+  if (derivedFromPublicKey) {
+    return {
+      value: derivedFromPublicKey,
+      source: "derived_from_public_key" as const,
+    };
+  }
+
+  const serviceRoleKey = getServiceRoleKeyValue();
+
   return {
-    value: deriveSupabaseUrlFromJwtKey(publicKey),
-    source: "derived_from_public_key" as const,
+    value: deriveSupabaseUrlFromJwtKey(serviceRoleKey.value),
+    source: "derived_from_service_role_key" as const,
   };
 }
 
@@ -151,10 +170,7 @@ export function getSupabasePublicConfig(): SupabasePublicConfig {
 }
 
 export function getSupabaseServiceRoleKey() {
-  const { value } = readFirstEnv([
-    "SUPABASE_SERVICE_ROLE_KEY",
-    "LINKON_SUPABASE_SERVICE_ROLE_KEY",
-  ] as const);
+  const { value } = getServiceRoleKeyValue();
 
   if (!value.startsWith("eyJ")) {
     throw new Error("SUPABASE_SERVICE_ROLE_KEY_INVALID");
@@ -176,10 +192,7 @@ export function getAppUrl() {
 export function getConfigHealth() {
   const publicKey = getPublicKey();
   const publicUrl = getPublicUrl(publicKey.value);
-  const serviceRoleKey = readFirstEnv([
-    "SUPABASE_SERVICE_ROLE_KEY",
-    "LINKON_SUPABASE_SERVICE_ROLE_KEY",
-  ] as const);
+  const serviceRoleKey = getServiceRoleKeyValue();
   const appUrl = getAppUrl();
   const webhookSecret = readEnv("LINKON_WEBHOOK_SECRET");
 
