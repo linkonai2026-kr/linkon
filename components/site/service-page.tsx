@@ -145,7 +145,13 @@ export default function ServicePage({ content }: { content: ServicePageContent }
               ))}
             </div>
             <div className="sp-intro__visual">
-              <Image src={content.backgroundImage} alt={`${content.name} 화면 예시`} width={1200} height={900} />
+              <Image
+                src={content.backgroundImage}
+                alt={`${content.name} 화면 예시`}
+                width={1200}
+                height={900}
+                sizes="(max-width: 900px) 100vw, 560px"
+              />
             </div>
           </div>
         </section>

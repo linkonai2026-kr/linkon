@@ -7,9 +7,9 @@ import SiteFooter from "@/components/site/site-footer";
 import SiteHeader from "@/components/site/site-header";
 
 export const metadata: Metadata = {
-  title: "Linkon | 통합 계정과 서비스 권한 관리",
+  title: "Linkon | 하나의 계정으로 만나는 AI 서비스",
   description:
-    "Linkon은 Vion, Rion, Taxon을 하나의 계정, 요금제, 접근 권한으로 연결하는 통합 관제 서버입니다.",
+    "Vion, Rion, Taxon을 하나의 Linkon 계정으로 시작하는 통합 AI 서비스 플랫폼입니다.",
 };
 
 const services = [
@@ -17,13 +17,14 @@ const services = [
     key: "vion",
     name: "Vion",
     label: "케어 AI",
-    status: "운영 중",
+    status: "이용 가능",
     logo: "/assets/vion-noback.png",
+    mockup: "/assets/vion-mockup.png",
     href: "/vion",
     color: "vion",
     description:
-      "심리 케어와 일상 체크인을 돕는 AI 서비스입니다. Linkon 계정으로 바로 접근할 수 있습니다.",
-    points: ["통합 로그인", "서비스 계정 자동 연결", "운영 중"],
+      "마음과 일상 체크인을 돕는 케어 AI입니다. Linkon 계정으로 바로 시작할 수 있습니다.",
+    actionLabel: "Vion 시작하기",
   },
   {
     key: "rion",
@@ -31,11 +32,12 @@ const services = [
     label: "법률 비서 AI",
     status: "출시 예정",
     logo: "/assets/rion-noback.png",
+    mockup: "/assets/rion-mockup.png",
     href: "/rion",
     color: "rion",
     description:
       "계약서와 법률 절차를 이해하기 쉬운 안내로 정리하는 법률 비서 AI입니다.",
-    points: ["출시 알림", "법률 문서 흐름", "권한 준비"],
+    actionLabel: "출시 알림 받기",
   },
   {
     key: "taxon",
@@ -43,13 +45,21 @@ const services = [
     label: "세무 관리 AI",
     status: "출시 예정",
     logo: "/assets/taxon-noback.png",
+    mockup: "/assets/taxon-mockup.png",
     href: "/taxon",
     color: "taxon",
     description:
-      "사업자의 세무 상태, 반복 보고, 신고 준비 흐름을 선명하게 정리하는 세무 AI입니다.",
-    points: ["출시 알림", "세무 요약", "권한 준비"],
+      "사업자의 세무 상태와 신고 준비 흐름을 선명하게 정리하는 세무 관리 AI입니다.",
+    actionLabel: "출시 알림 받기",
   },
 ] as const;
+
+const trustItems = [
+  "한 번의 가입으로 시작",
+  "서비스별 계정 자동 연결",
+  "민감한 전문 데이터는 각 서비스에서 보호",
+  "모바일에서도 편하게 이용",
+];
 
 export default function HomePage() {
   return (
@@ -57,69 +67,76 @@ export default function HomePage() {
       <SiteHeader
         navItems={[
           { href: "#services", label: "서비스" },
-          { href: "#control", label: "관리 기준" },
+          { href: "#trust", label: "이용 흐름" },
           { href: "#launch", label: "출시 알림" },
         ]}
         ctaHref="/register"
         ctaLabel="통합 계정 만들기"
       />
 
-      <main className="lp-page">
-        <section className="lp-hero">
-          <div className="lp-hero__grid container">
-            <div className="lp-hero__copy">
-              <p className="lp-kicker">Unified AI Service Control Plane</p>
+      <main className="lp-page lp-page--public">
+        <section className="lp-hero lp-hero--public">
+          <div className="lp-hero__grid lp-hero__grid--public container">
+            <div className="lp-hero__copy lp-hero__copy--public">
+              <p className="lp-kicker">Linkon AI Services</p>
               <h1>
-                하나의 Linkon 계정으로
-                <span> 케어, 법률, 세무 AI를 연결합니다.</span>
+                하나의 계정으로
+                <span>필요한 AI 서비스를 바로 시작하세요.</span>
               </h1>
               <p>
-                Linkon은 Vion, Rion, Taxon의 통합 로그인, 요금제, 접근 권한,
-                서비스별 관리자 권한을 관리하는 공식 관제 서버입니다.
+                Linkon은 케어 AI Vion, 법률 비서 AI Rion, 세무 관리 AI Taxon을
+                하나의 계정으로 연결합니다. 가입은 간단하게, 서비스 이용은 자연스럽게 이어집니다.
               </p>
               <div className="lp-hero__actions">
                 <Link href="/register" className="btn btn--primary btn--lg">
-                  무료로 시작하기
+                  통합 계정 만들기
                 </Link>
-                <Link href="#services" className="btn btn--outline btn--lg">
-                  서비스 둘러보기
+                <Link href="/login" className="btn btn--outline btn--lg">
+                  이미 계정이 있어요
                 </Link>
               </div>
-              <div className="lp-trust-row" aria-label="Linkon 관리 범위">
-                <span>통합 계정</span>
-                <span>서비스 접근 권한</span>
-                <span>요금제 관리</span>
-                <span>감사 로그</span>
+              <div className="lp-trust-row" aria-label="Linkon 이용 장점">
+                {trustItems.map((item) => (
+                  <span key={item}>{item}</span>
+                ))}
               </div>
             </div>
 
-            <div className="lp-command-card" aria-label="Linkon 관제 요약">
-              <div className="lp-command-card__top">
-                <span>Linkon Control</span>
-                <strong>Live</strong>
-              </div>
-              <div className="lp-command-card__identity">
+            <div className="lp-product-showcase" aria-label="Linkon 서비스 미리보기">
+              <div className="lp-showcase-brand">
+                <Image
+                  src="/assets/linkon-noback.png"
+                  alt="Linkon"
+                  width={86}
+                  height={86}
+                  priority
+                />
                 <div>
-                  <small>Unified user</small>
-                  <strong>one-account@linkon</strong>
+                  <span>Unified account</span>
+                  <strong>Linkon으로 연결되는 AI 서비스</strong>
                 </div>
-                <span className="lp-status-dot" />
               </div>
-              <div className="lp-service-stack">
-                {services.map((service) => (
-                  <div key={service.key} className={`lp-mini-service lp-mini-service--${service.color}`}>
-                    <Image src={service.logo} alt="" width={34} height={34} />
-                    <div>
-                      <strong>{service.name}</strong>
-                      <span>{service.status}</span>
-                    </div>
-                    <em>{service.key === "vion" ? "enabled" : "ready"}</em>
-                  </div>
+
+              <div className="lp-mockup-stack">
+                {services.map((service, index) => (
+                  <figure
+                    key={service.key}
+                    className={`lp-mockup-card lp-mockup-card--${service.color} lp-mockup-card--${index + 1}`}
+                  >
+                    <Image
+                      src={service.mockup}
+                      alt={`${service.name} 화면 미리보기`}
+                      width={680}
+                      height={440}
+                      priority={index === 0}
+                      sizes="(max-width: 768px) 82vw, 420px"
+                    />
+                    <figcaption>
+                      <Image src={service.logo} alt="" width={32} height={32} />
+                      <span>{service.name}</span>
+                    </figcaption>
+                  </figure>
                 ))}
-              </div>
-              <div className="lp-command-card__footer">
-                <span>최근 동기화</span>
-                <strong>계정, 권한, 요금제 기준 정상</strong>
               </div>
             </div>
           </div>
@@ -129,15 +146,27 @@ export default function HomePage() {
           <div className="container">
             <div className="section-header">
               <p className="section-label">Services</p>
-              <h2 className="section-title">각 서비스는 전문적으로, 계정 관리는 하나로</h2>
+              <h2 className="section-title">지금 필요한 AI를 선택하세요</h2>
               <p className="section-desc">
-                전문 데이터는 각 서비스에 두고, Linkon은 공통으로 필요한 계정과 권한만 안정적으로 관리합니다.
+                각 서비스는 전문 영역에 집중하고, 사용자는 Linkon 계정 하나로 편하게 시작합니다.
               </p>
             </div>
 
-            <div className="services-grid">
+            <div className="services-grid lp-services-grid">
               {services.map((service) => (
-                <article key={service.key} className={`service-card lp-service-card service-card--${service.color}`}>
+                <article
+                  key={service.key}
+                  className={`service-card lp-service-card lp-service-card--public service-card--${service.color}`}
+                >
+                  <div className="lp-service-card__visual">
+                    <Image
+                      src={service.mockup}
+                      alt={`${service.name} 서비스 화면`}
+                      fill
+                      sizes="(max-width: 900px) 100vw, 360px"
+                    />
+                  </div>
+
                   <div className="card-header">
                     <div className={`service-logo-wrap service-logo-wrap--${service.color}`}>
                       <Image
@@ -148,20 +177,21 @@ export default function HomePage() {
                         height={48}
                       />
                     </div>
-                    <span className={`status-badge ${service.key === "vion" ? "status-badge--live" : "status-badge--soon"}`}>
+                    <span
+                      className={`status-badge ${
+                        service.key === "vion" ? "status-badge--live" : "status-badge--soon"
+                      }`}
+                    >
                       {service.status}
                     </span>
                   </div>
+
                   <div className="card-body">
                     <h3 className="service-name">{service.name}</h3>
                     <p className="service-tagline">{service.label}</p>
                     <p className="service-desc">{service.description}</p>
-                    <ul className="lp-card-points">
-                      {service.points.map((point) => (
-                        <li key={point}>{point}</li>
-                      ))}
-                    </ul>
                   </div>
+
                   <div className="card-footer">
                     <Link href={service.href} className="btn btn--outline btn--full">
                       자세히 보기
@@ -169,7 +199,7 @@ export default function HomePage() {
                     {service.key === "vion" ? (
                       <ServiceLaunchBtn
                         service="vion"
-                        label="Vion 시작하기"
+                        label={service.actionLabel}
                         loadingLabel="연결 중..."
                         className="btn btn--vion btn--full"
                         style={{ marginTop: "var(--space-2)" }}
@@ -180,7 +210,7 @@ export default function HomePage() {
                         className={`btn btn--${service.color} btn--full`}
                         style={{ marginTop: "var(--space-2)" }}
                       >
-                        출시 알림 받기
+                        {service.actionLabel}
                       </Link>
                     )}
                   </div>
@@ -190,32 +220,32 @@ export default function HomePage() {
           </div>
         </section>
 
-        <section className="section section--alt lp-control" id="control">
-          <div className="container lp-control__grid">
-            <div>
-              <p className="section-label">Control Model</p>
-              <h2 className="section-title">Linkon은 통합 관제만 맡습니다</h2>
+        <section className="section section--alt lp-trust-section" id="trust">
+          <div className="container lp-trust-grid">
+            <div className="lp-trust-copy">
+              <p className="section-label">How It Works</p>
+              <h2 className="section-title">가입은 한 번, 이용은 필요한 만큼</h2>
               <p className="about-body">
-                Linkon에는 이메일, 이름, 역할, 계정 상태, 요금제, 서비스 연결 여부,
-                서비스별 관리자 권한, 이용 요약, 감사 로그만 저장합니다.
-              </p>
-              <p className="about-body">
-                상담 내용, 법률 문서 원문, 세무 파일, PDF 리포트처럼 민감하고 전문적인 데이터는
-                Vion, Rion, Taxon 각 서비스 서버에서만 관리합니다.
+                Linkon에서 계정을 만들면 Vion을 바로 시작할 수 있고, Rion과 Taxon은 출시 알림을 받아볼 수 있습니다.
+                이후 새 서비스가 열리면 같은 계정으로 자연스럽게 이어집니다.
               </p>
             </div>
-            <div className="lp-principles">
+
+            <div className="lp-flow-cards">
               <article>
-                <strong>사용자에게는 단순하게</strong>
-                <span>한 번 가입하고 필요한 서비스를 선택합니다.</span>
+                <span>01</span>
+                <strong>Linkon 계정 만들기</strong>
+                <p>이메일과 비밀번호만으로 통합 계정을 생성합니다.</p>
               </article>
               <article>
-                <strong>운영자에게는 명확하게</strong>
-                <span>상태, 요금제, 접근 권한을 한 화면에서 확인합니다.</span>
+                <span>02</span>
+                <strong>서비스 선택하기</strong>
+                <p>Vion을 바로 이용하거나 Rion, Taxon 출시 알림을 신청합니다.</p>
               </article>
               <article>
-                <strong>서비스에는 가볍게</strong>
-                <span>전문 데이터는 각 서비스가 소유하고 Linkon은 권한만 전달합니다.</span>
+                <span>03</span>
+                <strong>필요할 때 다시 연결</strong>
+                <p>같은 계정으로 서비스 간 이동과 재접근을 더 쉽게 이어갑니다.</p>
               </article>
             </div>
           </div>
