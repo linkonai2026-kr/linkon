@@ -1,5 +1,7 @@
 type RuntimeEnvironment = "development" | "preview" | "production" | "unknown";
 
+const LINKON_PRODUCTION_SUPABASE_URL = "https://hethmddgjmupatsnxszz.supabase.co";
+
 type PublicKeySource =
   | "NEXT_PUBLIC_SUPABASE_ANON_KEY"
   | "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY"
@@ -11,7 +13,8 @@ type UrlSource =
   | "SUPABASE_URL"
   | "LINKON_SUPABASE_URL"
   | "derived_from_public_key"
-  | "derived_from_service_role_key";
+  | "derived_from_service_role_key"
+  | "production_fallback";
 
 export interface SupabasePublicConfig {
   url: string;
@@ -143,9 +146,18 @@ function getPublicUrl(publicKey: string) {
 
   const serviceRoleKey = getServiceRoleKeyValue();
 
+  const derivedFromServiceRole = deriveSupabaseUrlFromJwtKey(serviceRoleKey.value);
+
+  if (derivedFromServiceRole) {
+    return {
+      value: derivedFromServiceRole,
+      source: "derived_from_service_role_key" as const,
+    };
+  }
+
   return {
-    value: deriveSupabaseUrlFromJwtKey(serviceRoleKey.value),
-    source: "derived_from_service_role_key" as const,
+    value: LINKON_PRODUCTION_SUPABASE_URL,
+    source: "production_fallback" as const,
   };
 }
 
