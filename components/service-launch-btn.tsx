@@ -12,8 +12,6 @@ interface ServiceLaunchBtnProps {
   loadingLabel?: string;
   className?: string;
   style?: React.CSSProperties;
-  /** If provided, navigate directly to this URL without SSO */
-  href?: string;
 }
 
 export default function ServiceLaunchBtn({
@@ -22,7 +20,6 @@ export default function ServiceLaunchBtn({
   loadingLabel = "연결 중...",
   className,
   style,
-  href,
 }: ServiceLaunchBtnProps) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
@@ -31,11 +28,6 @@ export default function ServiceLaunchBtn({
     setLoading(true);
 
     try {
-      if (href) {
-        window.location.href = href;
-        return;
-      }
-
       const supabase = createClient();
       const {
         data: { user },

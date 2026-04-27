@@ -958,6 +958,29 @@ body {
   background: #f6f3ea;
 }
 
+.nav__session,
+.nav__drawer-session {
+  align-items: center;
+  background: rgba(22, 163, 74, 0.1);
+  border: 1px solid rgba(22, 163, 74, 0.2);
+  border-radius: var(--radius-full);
+  color: #0f8d40;
+  display: inline-flex;
+  font-size: var(--text-xs);
+  font-weight: 800;
+  gap: 6px;
+  padding: 8px 12px;
+}
+
+.nav__session::before,
+.nav__drawer-session::before {
+  background: currentColor;
+  border-radius: var(--radius-full);
+  content: "";
+  height: 6px;
+  width: 6px;
+}
+
 .lp-page {
   background:
     linear-gradient(135deg, rgba(255, 255, 255, 0.72), rgba(246, 243, 234, 0.88)),

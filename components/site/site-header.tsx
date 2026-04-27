@@ -3,6 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { createClient } from "@/lib/supabase/client";
 
 interface NavItem {
   href: string;
@@ -24,6 +25,7 @@ export default function SiteHeader({
 }: SiteHeaderProps) {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [isSignedIn, setIsSignedIn] = useState(false);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 40);
@@ -39,6 +41,28 @@ export default function SiteHeader({
     };
   }, [open]);
 
+  useEffect(() => {
+    let mounted = true;
+    const supabase = createClient();
+
+    supabase.auth.getUser().then(({ data }) => {
+      if (mounted) {
+        setIsSignedIn(Boolean(data.user));
+      }
+    });
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setIsSignedIn(Boolean(session?.user));
+    });
+
+    return () => {
+      mounted = false;
+      subscription.unsubscribe();
+    };
+  }, []);
+
   const navClassName = [
     "nav",
     theme === "dark" ? "sp-nav" : "",
@@ -46,6 +70,8 @@ export default function SiteHeader({
   ]
     .filter(Boolean)
     .join(" ");
+  const actionHref = isSignedIn ? "/select-service" : ctaHref;
+  const actionLabel = isSignedIn ? "서비스 선택" : ctaLabel;
 
   return (
     <header className={navClassName} id="nav">
@@ -69,8 +95,10 @@ export default function SiteHeader({
           ))}
         </nav>
 
-        <Link href={ctaHref} className="btn btn--primary btn--sm nav__cta">
-          {ctaLabel}
+        {isSignedIn && <span className="nav__session">로그인됨</span>}
+
+        <Link href={actionHref} className="btn btn--primary btn--sm nav__cta">
+          {actionLabel}
         </Link>
 
         <button
@@ -98,12 +126,13 @@ export default function SiteHeader({
               {item.label}
             </Link>
           ))}
+          {isSignedIn && <span className="nav__drawer-session">로그인된 상태입니다</span>}
           <Link
-            href={ctaHref}
+            href={actionHref}
             className="btn btn--primary nav__drawer-cta"
             onClick={() => setOpen(false)}
           >
-            {ctaLabel}
+            {actionLabel}
           </Link>
         </div>
       </div>

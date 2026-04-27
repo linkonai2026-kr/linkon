@@ -8,14 +8,25 @@ import {
   syncServiceUserState,
 } from "@/lib/linkon/service-sync";
 import { ServiceName } from "@/lib/linkon/types";
+import { getAppUrl } from "@/lib/supabase/config";
 
 export const dynamic = "force-dynamic";
 
-const SERVICE_URLS: Record<ServiceName, string> = {
-  vion: process.env.NEXT_PUBLIC_VION_URL ?? "",
-  rion: process.env.NEXT_PUBLIC_RION_URL ?? "",
-  taxon: process.env.NEXT_PUBLIC_TAXON_URL ?? "",
-};
+function getServiceUrl(service: ServiceName) {
+  const fallbackUrls: Partial<Record<ServiceName, string>> = {
+    vion: "https://vion-sandy.vercel.app",
+  };
+
+  return (
+    {
+      vion: process.env.NEXT_PUBLIC_VION_URL,
+      rion: process.env.NEXT_PUBLIC_RION_URL,
+      taxon: process.env.NEXT_PUBLIC_TAXON_URL,
+    }[service]?.trim() ||
+    fallbackUrls[service] ||
+    ""
+  );
+}
 
 function getSafeReturnTo(returnTo: string | null, serviceUrl: string) {
   if (!returnTo) return null;
@@ -50,7 +61,7 @@ export async function GET(request: NextRequest) {
 
     if (authError || !user?.email) {
       return NextResponse.redirect(
-        `${process.env.NEXT_PUBLIC_APP_URL}/login?redirect=/api/auth/token?service=${service}`
+        `${getAppUrl()}/login?redirect=/api/auth/token?service=${service}`
       );
     }
 
@@ -59,14 +70,14 @@ export async function GET(request: NextRequest) {
 
     if (blockedReason) {
       return NextResponse.redirect(
-        `${process.env.NEXT_PUBLIC_APP_URL}/login?error=${blockedReason}`
+        `${getAppUrl()}/login?error=${blockedReason}`
       );
     }
 
-    const serviceUrl = SERVICE_URLS[service];
+    const serviceUrl = getServiceUrl(service);
     if (!serviceUrl) {
       return NextResponse.redirect(
-        `${process.env.NEXT_PUBLIC_APP_URL}/select-service?error=service_unavailable`
+        `${getAppUrl()}/select-service?error=service_unavailable`
       );
     }
 
@@ -74,7 +85,7 @@ export async function GET(request: NextRequest) {
 
     if (existingServiceAccount && existingServiceAccount.is_enabled === false) {
       return NextResponse.redirect(
-        `${process.env.NEXT_PUBLIC_APP_URL}/select-service?error=service_disabled`
+        `${getAppUrl()}/select-service?error=service_disabled`
       );
     }
 
@@ -87,7 +98,7 @@ export async function GET(request: NextRequest) {
 
     if (!syncResult.success) {
       return NextResponse.redirect(
-        `${process.env.NEXT_PUBLIC_APP_URL}/select-service?error=service_sync_failed`
+        `${getAppUrl()}/select-service?error=service_sync_failed`
       );
     }
 
@@ -111,14 +122,15 @@ export async function GET(request: NextRequest) {
 
     if (error || !data?.properties?.action_link) {
       return NextResponse.redirect(
-        `${process.env.NEXT_PUBLIC_APP_URL}/select-service?error=service_signin_failed`
+        `${getAppUrl()}/select-service?error=service_signin_failed`
       );
     }
 
     return NextResponse.redirect(data.properties.action_link);
-  } catch {
+  } catch (error) {
+    console.error("[linkon] service token handoff failed:", error);
     return NextResponse.redirect(
-      `${process.env.NEXT_PUBLIC_APP_URL}/select-service?error=service_signin_failed`
+      `${getAppUrl()}/select-service?error=service_signin_failed`
     );
   }
 }

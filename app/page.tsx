@@ -144,7 +144,6 @@ export default function HomePage() {
                         loadingLabel="연결 중..."
                         className="btn btn--vion btn--full"
                         style={{ marginTop: "var(--space-2)" }}
-                        href="https://vion-sandy.vercel.app/"
                       />
                     ) : (
                       <Link
