@@ -5,7 +5,9 @@ import { getServiceHealth } from "@/lib/linkon/service-config";
 export const dynamic = "force-dynamic";
 
 export async function GET() {
-  const auth = await requireSuperAdminRequest();
+  const auth = await requireSuperAdminRequest().catch(() => ({
+    error: NextResponse.json({ error: "Authentication is required." }, { status: 401 }),
+  }));
 
   if (auth.error) {
     return auth.error;
