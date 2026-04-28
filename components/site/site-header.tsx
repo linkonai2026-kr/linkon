@@ -3,7 +3,6 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { createClient } from "@/lib/supabase/client";
 
 interface NavItem {
   href: string;
@@ -43,7 +42,6 @@ export default function SiteHeader({
 
   useEffect(() => {
     let mounted = true;
-    const supabase = createClient();
 
     const refreshSession = async () => {
       try {
@@ -65,19 +63,8 @@ export default function SiteHeader({
 
     refreshSession();
 
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      if (session?.user) {
-        setIsSignedIn(true);
-      } else {
-        refreshSession();
-      }
-    });
-
     return () => {
       mounted = false;
-      subscription.unsubscribe();
     };
   }, []);
 
