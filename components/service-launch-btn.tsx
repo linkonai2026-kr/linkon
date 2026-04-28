@@ -8,6 +8,7 @@ type ServiceName = "vion" | "rion" | "taxon";
 interface ServiceLaunchBtnProps {
   service: ServiceName;
   label: string;
+  href?: string;
   loadingLabel?: string;
   className?: string;
   style?: React.CSSProperties;
@@ -16,6 +17,7 @@ interface ServiceLaunchBtnProps {
 export default function ServiceLaunchBtn({
   service,
   label,
+  href,
   loadingLabel = "연결 중...",
   className,
   style,
@@ -24,6 +26,11 @@ export default function ServiceLaunchBtn({
   const [loading, setLoading] = useState(false);
 
   const handleClick = async () => {
+    if (href) {
+      window.location.href = href;
+      return;
+    }
+
     setLoading(true);
 
     try {
@@ -46,14 +53,8 @@ export default function ServiceLaunchBtn({
   };
 
   return (
-    <button
-      type="button"
-      className={className}
-      style={style}
-      onClick={handleClick}
-      disabled={loading}
-    >
-      {loading ? loadingLabel : label}
+    <button type="button" className={className} style={style} onClick={handleClick} disabled={loading}>
+      {loading && !href ? loadingLabel : label}
     </button>
   );
 }

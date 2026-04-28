@@ -1,7 +1,5 @@
 type RuntimeEnvironment = "development" | "preview" | "production" | "unknown";
 
-const LINKON_PRODUCTION_SUPABASE_URL = "https://hethmddgjmupatsnxszz.supabase.co";
-
 const PUBLIC_ENV: Record<string, string | undefined> = {
   NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL,
   NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
@@ -20,8 +18,7 @@ type UrlSource =
   | "SUPABASE_URL"
   | "LINKON_SUPABASE_URL"
   | "derived_from_public_key"
-  | "derived_from_service_role_key"
-  | "production_fallback";
+  | "derived_from_service_role_key";
 
 export interface SupabasePublicConfig {
   url: string;
@@ -172,10 +169,7 @@ function getPublicUrl(publicKey: string) {
     };
   }
 
-  return {
-    value: LINKON_PRODUCTION_SUPABASE_URL,
-    source: "production_fallback" as const,
-  };
+  return configured;
 }
 
 export function getSupabasePublicConfig(): SupabasePublicConfig {

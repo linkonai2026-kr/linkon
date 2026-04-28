@@ -32,7 +32,6 @@ const services = [
     label: "케어 AI",
     status: "이용 가능",
     logo: "/assets/vion-noback.png",
-    mockup: "/assets/vion-mockup.png",
     href: "/vion",
     color: "vion",
     description:
@@ -45,7 +44,6 @@ const services = [
     label: "법률 비서 AI",
     status: "출시 예정",
     logo: "/assets/rion-noback.png",
-    mockup: "/assets/rion-mockup.png",
     href: "/rion",
     color: "rion",
     description:
@@ -58,7 +56,6 @@ const services = [
     label: "세무 관리 AI",
     status: "출시 예정",
     logo: "/assets/taxon-noback.png",
-    mockup: "/assets/taxon-mockup.png",
     href: "/taxon",
     color: "taxon",
     description:
@@ -154,6 +151,7 @@ export default function HomePage() {
                       <ServiceLaunchBtn
                         service="vion"
                         label={service.actionLabel}
+                        href="https://vion-sandy.vercel.app/"
                         loadingLabel="연결 중..."
                         className="btn btn--vion btn--full"
                         style={{ marginTop: "var(--space-2)" }}

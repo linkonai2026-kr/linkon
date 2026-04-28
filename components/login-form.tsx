@@ -4,45 +4,23 @@ import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
+import { createClient } from "@/lib/supabase/client";
+import { isSupabaseConfigError } from "@/lib/supabase/config";
+
+const ERROR_MESSAGES: Record<string, string> = {
+  auth_callback_failed: "로그인을 완료하지 못했습니다. 다시 시도해 주세요.",
+  account_suspended: "정지된 계정입니다. Linkon 운영팀에 문의해 주세요.",
+  account_deleted: "더 이상 활성화되지 않은 계정입니다. 새 계정을 만들거나 운영팀에 문의해 주세요.",
+  admin_required: "최고 관리자 권한이 필요한 화면입니다.",
+  service_unavailable: "아직 연결 준비 중인 서비스입니다. 잠시 후 다시 시도해 주세요.",
+  service_setup_required: "서비스 자동 로그인을 준비 중입니다. 연결 설정이 완료되면 바로 이용할 수 있습니다.",
+  service_sync_failed: "서비스 계정 연결에 실패했습니다. 다시 시도하거나 Linkon 운영팀에 문의해 주세요.",
+  service_signin_failed: "서비스 자동 로그인을 완료하지 못했습니다. 다시 시도해 주세요.",
+  service_disabled: "관리자에 의해 해당 서비스 접근 권한이 비활성화되었습니다.",
+};
 
 function getInitialErrorMessage(errorCode: string | null) {
-  if (errorCode === "auth_callback_failed") {
-    return "로그인을 완료하지 못했습니다. 다시 시도해 주세요.";
-  }
-
-  if (errorCode === "account_suspended") {
-    return "정지된 계정입니다. Linkon 운영팀에 문의해 주세요.";
-  }
-
-  if (errorCode === "account_deleted") {
-    return "더 이상 활성화되지 않은 계정입니다. 새 계정을 만들거나 운영팀에 문의해 주세요.";
-  }
-
-  if (errorCode === "admin_required") {
-    return "최고 관리자 권한이 필요한 화면입니다.";
-  }
-
-  if (errorCode === "service_unavailable") {
-    return "아직 연결 준비 중인 서비스입니다. 잠시 후 다시 시도해 주세요.";
-  }
-
-  if (errorCode === "service_setup_required") {
-    return "서비스 자동 로그인을 준비 중입니다. 연결 설정이 완료되면 바로 이용할 수 있습니다.";
-  }
-
-  if (errorCode === "service_sync_failed") {
-    return "서비스 계정 연결에 실패했습니다. 다시 시도하거나 Linkon 운영팀에 문의해 주세요.";
-  }
-
-  if (errorCode === "service_signin_failed") {
-    return "서비스 자동 로그인을 완료하지 못했습니다. 다시 시도해 주세요.";
-  }
-
-  if (errorCode === "service_disabled") {
-    return "관리자에 의해 해당 서비스 접근 권한이 비활성화되었습니다.";
-  }
-
-  return "";
+  return errorCode ? ERROR_MESSAGES[errorCode] ?? "" : "";
 }
 
 function getSafeRedirect(value: string | null) {
@@ -68,29 +46,24 @@ export default function LoginForm() {
     setError("");
 
     try {
-      const response = await fetch("/api/auth/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          email,
-          password,
-        }),
+      const supabase = createClient();
+      const { error: signInError } = await supabase.auth.signInWithPassword({
+        email: email.trim().toLowerCase(),
+        password,
       });
 
-      if (!response.ok) {
-        const data = await response.json().catch(() => null);
-        setError(
-          data && typeof data.error === "string"
-            ? data.error
-            : "이메일 또는 비밀번호가 올바르지 않습니다."
-        );
+      if (signInError) {
+        setError("이메일 또는 비밀번호가 올바르지 않습니다.");
         return;
       }
 
       window.location.assign(redirect);
-    } catch {
+    } catch (loginError) {
+      if (isSupabaseConfigError(loginError)) {
+        setError("로그인 설정이 아직 완료되지 않았습니다. 운영팀에 문의해 주세요.");
+        return;
+      }
+
       setError("네트워크 오류가 발생했습니다. 연결 상태를 확인한 뒤 다시 시도해 주세요.");
     } finally {
       setLoading(false);
@@ -104,8 +77,8 @@ export default function LoginForm() {
         <p className="lp-kicker">Linkon Account</p>
         <h1>하나의 계정으로 모든 서비스를 시작하세요.</h1>
         <p>
-          Vion, Rion, Taxon을 하나의 Linkon 계정으로 연결합니다. 로그인 후 이용할
-          서비스를 선택해 주세요.
+          Vion, Rion, Taxon을 하나의 Linkon 계정으로 연결합니다.
+          로그인 후 이용할 서비스를 선택해 주세요.
         </p>
       </aside>
 
@@ -121,7 +94,7 @@ export default function LoginForm() {
         </div>
 
         <h2 className="auth-title">로그인</h2>
-        <p className="auth-subtitle">통합 Linkon 계정으로 계속 진행합니다.</p>
+        <p className="auth-subtitle">Linkon 통합 계정으로 계속 진행합니다.</p>
 
         {error && (
           <div className="error-box" role="alert">
@@ -154,7 +127,7 @@ export default function LoginForm() {
               id="password"
               type="password"
               className="form-input"
-              placeholder="비밀번호를 입력해 주세요"
+              placeholder="비밀번호를 입력해 주세요."
               value={password}
               onChange={(event) => setPassword(event.target.value)}
               required
