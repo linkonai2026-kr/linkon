@@ -121,12 +121,6 @@ export default function RegisterForm() {
         return;
       }
 
-      if (data.autoLogin && data.magicLink) {
-        sessionStorage.setItem("linkon_sync", JSON.stringify(data.syncResults));
-        window.location.href = data.magicLink;
-        return;
-      }
-
       try {
         const supabase = createClient();
         const { error: signInError } = await supabase.auth.signInWithPassword({

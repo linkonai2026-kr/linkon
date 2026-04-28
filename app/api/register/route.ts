@@ -4,7 +4,6 @@ import { ensureCanonicalUserProfile } from "@/lib/linkon/users";
 import { syncServiceUserState, toServiceSyncPayload } from "@/lib/linkon/service-sync";
 import { ServiceName, SERVICE_NAMES } from "@/lib/linkon/types";
 import { getServiceUrl, isServiceDownstreamAuthReady } from "@/lib/linkon/service-config";
-import { getAppUrl } from "@/lib/supabase/config";
 
 export const dynamic = "force-dynamic";
 
@@ -36,11 +35,9 @@ function isAllowedReturnTo(returnTo: string | undefined, service: ServiceName | 
   }
 }
 
-function getPostRegisterRedirect(service: ServiceName | null, returnTo: string | undefined) {
-  const appUrl = getAppUrl();
-
+function getPostRegisterPath(service: ServiceName | null, returnTo: string | undefined) {
   if (!service) {
-    return `${appUrl}/select-service`;
+    return "/select-service";
   }
 
   const params = new URLSearchParams({ service });
@@ -49,7 +46,7 @@ function getPostRegisterRedirect(service: ServiceName | null, returnTo: string |
     params.set("returnTo", returnTo);
   }
 
-  return `${appUrl}/api/auth/token?${params.toString()}`;
+  return `/api/auth/token?${params.toString()}`;
 }
 
 export async function POST(req: Request) {
@@ -187,38 +184,15 @@ export async function POST(req: Request) {
       );
     }
 
-    const { data: sessionData, error: sessionError } =
-      await linkonAdmin.auth.admin.generateLink({
-        type: "magiclink",
-        email,
-        options: {
-          redirectTo: getPostRegisterRedirect(selectedService, returnTo),
-        },
-      });
-
     const serializedSyncResults = syncResults.map((result) => ({
       service: result.service,
       success: result.success,
     }));
 
-    if (sessionError || !sessionData?.properties?.action_link) {
-      return NextResponse.json({
-        ok: true,
-        autoLogin: false,
-        nextPath: selectedService
-          ? `/api/auth/token?service=${selectedService}`
-          : "/select-service",
-        syncResults: serializedSyncResults,
-      });
-    }
-
     return NextResponse.json({
       ok: true,
-      autoLogin: true,
-      magicLink: sessionData.properties.action_link,
-      nextPath: selectedService
-        ? `/api/auth/token?service=${selectedService}`
-        : "/select-service",
+      autoLogin: false,
+      nextPath: getPostRegisterPath(selectedService, returnTo),
       syncResults: serializedSyncResults,
     });
   } catch (error) {

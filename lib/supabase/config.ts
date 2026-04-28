@@ -203,20 +203,28 @@ export function getSupabaseServiceRoleKey() {
 }
 
 export function getAppUrl() {
-  return (
+  const appUrl =
     normalizeAppUrl(readEnv("NEXT_PUBLIC_APP_URL")) ||
     normalizeAppUrl(readEnv("APP_URL")) ||
     normalizeAppUrl(readEnv("VERCEL_PROJECT_PRODUCTION_URL")) ||
-    normalizeAppUrl(readEnv("VERCEL_URL")) ||
-    "https://linkon-xi.vercel.app"
-  );
+    normalizeAppUrl(readEnv("VERCEL_URL"));
+
+  if (!appUrl) {
+    throw new Error("APP_URL_REQUIRED");
+  }
+
+  return appUrl;
 }
 
 export function getConfigHealth() {
   const publicKey = getPublicKey();
   const publicUrl = getPublicUrl(publicKey.value);
   const serviceRoleKey = getServiceRoleKeyValue();
-  const appUrl = getAppUrl();
+  const appUrl =
+    normalizeAppUrl(readEnv("NEXT_PUBLIC_APP_URL")) ||
+    normalizeAppUrl(readEnv("APP_URL")) ||
+    normalizeAppUrl(readEnv("VERCEL_PROJECT_PRODUCTION_URL")) ||
+    normalizeAppUrl(readEnv("VERCEL_URL"));
   const webhookSecret = readEnv("LINKON_WEBHOOK_SECRET");
 
   const checks: ConfigCheck[] = [
@@ -254,7 +262,7 @@ export function getConfigHealth() {
             ? "VERCEL_PROJECT_PRODUCTION_URL"
             : readEnv("VERCEL_URL")
               ? "VERCEL_URL"
-              : "default",
+              : undefined,
     },
     {
       name: "LINKON_SUPER_ADMIN_EMAIL",
@@ -287,7 +295,8 @@ export function isSupabaseConfigError(error: unknown) {
     error instanceof Error &&
     (error.message === "SUPABASE_PUBLIC_URL_INVALID" ||
       error.message === "SUPABASE_PUBLIC_KEY_INVALID" ||
-      error.message === "SUPABASE_SERVICE_ROLE_KEY_INVALID")
+      error.message === "SUPABASE_SERVICE_ROLE_KEY_INVALID" ||
+      error.message === "APP_URL_REQUIRED")
   );
 }
 
