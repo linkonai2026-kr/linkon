@@ -1,6 +1,15 @@
 type RuntimeEnvironment = "development" | "preview" | "production" | "unknown";
 
 const LINKON_PRODUCTION_SUPABASE_URL = "https://hethmddgjmupatsnxszz.supabase.co";
+const PROCESS_ENV: Record<string, string | undefined> =
+  typeof process !== "undefined" ? process.env : {};
+
+const PUBLIC_ENV: Record<string, string | undefined> = {
+  NEXT_PUBLIC_SUPABASE_URL: PROCESS_ENV.NEXT_PUBLIC_SUPABASE_URL,
+  NEXT_PUBLIC_SUPABASE_ANON_KEY: PROCESS_ENV.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+  NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: PROCESS_ENV.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY,
+  NEXT_PUBLIC_APP_URL: PROCESS_ENV.NEXT_PUBLIC_APP_URL,
+};
 
 type PublicKeySource =
   | "NEXT_PUBLIC_SUPABASE_ANON_KEY"
@@ -32,7 +41,17 @@ export interface ConfigCheck {
 }
 
 function readEnv(name: string) {
-  return process.env[name]?.trim() ?? "";
+  const publicValue = PUBLIC_ENV[name]?.trim();
+
+  if (publicValue) {
+    return publicValue;
+  }
+
+  if (typeof process === "undefined") {
+    return "";
+  }
+
+  return PROCESS_ENV[name]?.trim() ?? "";
 }
 
 function readFirstEnv<T extends string>(names: readonly T[]) {
