@@ -10,22 +10,28 @@ interface SyncResult {
   success: boolean;
 }
 
+interface SessionState {
+  authenticated?: boolean;
+  email?: string | null;
+  isSuperAdmin?: boolean;
+}
+
 const SERVICE_INFO = {
   vion: {
     name: "Vion",
-    desc: "케어 AI",
+    desc: "일상 케어와 마음 관리를 돕는 AI",
     logo: "/assets/vion-no.png",
     color: "vion",
   },
   rion: {
     name: "Rion",
-    desc: "법률 비서 AI",
+    desc: "법률 문서 이해를 돕는 AI",
     logo: "/assets/rion-no.png",
     color: "rion",
   },
   taxon: {
     name: "Taxon",
-    desc: "세무 관리 AI",
+    desc: "세무와 정산 관리를 돕는 AI",
     logo: "/assets/taxon-no.png",
     color: "taxon",
   },
@@ -43,7 +49,7 @@ function getErrorMessage(error: string | null) {
   }
 
   if (error === "service_setup_required") {
-    return "서비스 자동 로그인을 준비 중입니다. Vion 연결 설정이 완료되면 바로 이용할 수 있습니다.";
+    return "서비스 자동 로그인을 준비 중입니다. 연결 설정이 완료되면 바로 이용할 수 있습니다.";
   }
 
   if (error === "service_disabled") {
@@ -62,6 +68,7 @@ export default function SelectServiceClient() {
   const [syncResults, setSyncResults] = useState<SyncResult[]>([]);
   const [loading, setLoading] = useState<ServiceKey | null>(null);
   const [errorMessage, setErrorMessage] = useState("");
+  const [session, setSession] = useState<SessionState>({});
 
   useEffect(() => {
     try {
@@ -79,6 +86,34 @@ export default function SelectServiceClient() {
     setErrorMessage(getErrorMessage(searchParams.get("error")));
   }, [searchParams]);
 
+  useEffect(() => {
+    let mounted = true;
+
+    const loadSession = async () => {
+      try {
+        const response = await fetch("/api/auth/session", {
+          cache: "no-store",
+          credentials: "same-origin",
+        });
+        const data = (await response.json()) as SessionState;
+
+        if (mounted) {
+          setSession(data);
+        }
+      } catch {
+        if (mounted) {
+          setSession({});
+        }
+      }
+    };
+
+    loadSession();
+
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
   const getSyncStatus = (service: string) => {
     const result = syncResults.find((item) => item.service === service);
     return result ? result.success : null;
@@ -94,9 +129,10 @@ export default function SelectServiceClient() {
       <aside className="auth-panel">
         <Image src="/assets/linkon-noback.png" alt="" width={72} height={72} />
         <p className="lp-kicker">Service Gateway</p>
-        <h1>이제 이용할 서비스를 선택해 주세요.</h1>
+        <h1>이용할 AI 서비스를 선택하세요</h1>
         <p>
-          서비스 계정이 아직 없으면 Linkon이 첫 진입 시 안전하게 생성하거나 연결합니다.
+          Linkon 통합 계정으로 Vion, Rion, Taxon을 연결합니다. 서비스 계정이 없으면 첫 진입 시
+          안전하게 생성하거나 연결합니다.
         </p>
       </aside>
 
@@ -113,10 +149,17 @@ export default function SelectServiceClient() {
               />
             </svg>
           </div>
-          <h2 className="auth-title">계정 준비가 완료되었습니다</h2>
+          <h2 className="auth-title">로그인되어 있습니다</h2>
           <p className="auth-subtitle">
-            통합 계정이 활성화되었습니다. 계속 이용할 서비스를 선택해 주세요.
+            {session.email
+              ? `${session.email} 계정으로 이용할 서비스를 선택해 주세요.`
+              : "계정 준비가 완료되었습니다. 이용할 서비스를 선택해 주세요."}
           </p>
+          {session.isSuperAdmin && (
+            <Link href="/admin" className="btn btn--outline btn--sm">
+              관리자 페이지로 이동
+            </Link>
+          )}
         </div>
 
         {errorMessage && (
@@ -151,7 +194,11 @@ export default function SelectServiceClient() {
                     <div className="service-select-card__name">{info.name}</div>
                     <div className="service-select-card__desc">{info.desc}</div>
                     {syncOk !== null && (
-                      <div className={`service-select-card__sync service-select-card__sync--${syncOk ? "ok" : "fail"}`}>
+                      <div
+                        className={`service-select-card__sync service-select-card__sync--${
+                          syncOk ? "ok" : "fail"
+                        }`}
+                      >
                         {syncOk ? "동기화 완료" : "동기화 확인 필요"}
                       </div>
                     )}

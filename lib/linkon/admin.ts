@@ -1,9 +1,12 @@
 import { createAdminClient } from "@/lib/supabase/admin";
 import {
   AdminAuditLogRecord,
+  AccountStatus,
   AdminListFilters,
   CanonicalUserProfile,
+  PlanTier,
   ServiceAccountRecord,
+  SERVICE_NAMES,
   SERVICE_ROLES,
   SYNC_JOB_STATUSES,
 } from "@/lib/linkon/types";
@@ -21,6 +24,18 @@ export interface AdminUserListItem extends CanonicalUserProfile {
 
 export interface AdminUserDetail extends AdminUserListItem {
   audit_logs: AdminAuditLogRecord[];
+}
+
+export interface AdminOverview {
+  totalUsers: number;
+  statusCounts: Record<AccountStatus, number>;
+  planCounts: Record<PlanTier, number>;
+  serviceAccountCounts: Record<(typeof SERVICE_NAMES)[number], number>;
+  recentUsers: Pick<
+    CanonicalUserProfile,
+    "id" | "email" | "name" | "role" | "account_status" | "plan" | "created_at"
+  >[];
+  recentAuditLogs: AdminAuditLogRecord[];
 }
 
 function normalizeAdminUser(row: UserRow): AdminUserListItem {
@@ -55,6 +70,104 @@ function normalizeAuditLog(row: AuditRow): AdminAuditLogRecord {
     sync_result: typeof row.sync_result === "object" && row.sync_result ? (row.sync_result as Record<string, unknown>) : null,
     created_at: typeof row.created_at === "string" ? row.created_at : undefined,
   };
+}
+
+function countBy<T extends string>(
+  items: Record<string, unknown>[],
+  key: string,
+  values: readonly T[]
+): Record<T, number> {
+  const initial = Object.fromEntries(values.map((value) => [value, 0])) as Record<T, number>;
+
+  return items.reduce<Record<T, number>>((counts, item) => {
+    const value = item[key];
+
+    if (typeof value === "string" && values.includes(value as T)) {
+      const countKey = value as T;
+      counts[countKey] = (counts[countKey] ?? 0) + 1;
+    }
+
+    return counts;
+  }, initial);
+}
+
+function toAdminDataError(error: unknown) {
+  if (error instanceof Error) {
+    return new Error(
+      `Linkon DB를 불러오지 못했습니다. Supabase SQL Editor에서 supabase/schema.sql이 적용되어 있는지 확인해 주세요. 원인: ${error.message}`
+    );
+  }
+
+  return new Error(
+    "Linkon DB를 불러오지 못했습니다. Supabase SQL Editor에서 supabase/schema.sql이 적용되어 있는지 확인해 주세요."
+  );
+}
+
+export async function getAdminOverview() {
+  try {
+    const admin = createAdminClient("linkon");
+    const { data: users, error: usersError } = await admin
+      .from("users")
+      .select("id,email,name,role,account_status,plan,created_at")
+      .order("created_at", { ascending: false })
+      .limit(1000);
+
+    if (usersError) {
+      throw usersError;
+    }
+
+    const { data: serviceAccounts, error: serviceError } = await admin
+      .from("service_accounts")
+      .select("service")
+      .limit(5000);
+
+    if (serviceError) {
+      throw serviceError;
+    }
+
+    const { data: auditLogs, error: auditError } = await admin
+      .from("admin_audit_logs")
+      .select("*")
+      .order("created_at", { ascending: false })
+      .limit(8);
+
+    if (auditError) {
+      throw auditError;
+    }
+
+    const normalizedUsers = (users ?? []).map((row) =>
+      normalizeCanonicalUserProfile(row as Record<string, unknown>)
+    );
+    const serviceRows = (serviceAccounts ?? []) as Record<string, unknown>[];
+
+    return {
+      totalUsers: normalizedUsers.length,
+      statusCounts: countBy(normalizedUsers as unknown as Record<string, unknown>[], "account_status", [
+        "active",
+        "suspended",
+        "deleted",
+      ] as const),
+      planCounts: countBy(normalizedUsers as unknown as Record<string, unknown>[], "plan", [
+        "free",
+        "standard",
+        "premium",
+        "enterprise",
+      ] as const),
+      serviceAccountCounts: countBy(serviceRows, "service", SERVICE_NAMES),
+      recentUsers: normalizedUsers.slice(0, 6).map((user) => ({
+        id: user.id,
+        email: user.email,
+        name: user.name,
+        role: user.role,
+        account_status: user.account_status,
+        plan: user.plan,
+        created_at: user.created_at,
+      })),
+      recentAuditLogs: (auditLogs ?? []).map((row) => normalizeAuditLog(row as AuditRow)),
+    } satisfies AdminOverview;
+  } catch (error) {
+    throw toAdminDataError(error);
+  }
 }
 
 export async function listAdminUsers(filters: AdminListFilters = {}) {

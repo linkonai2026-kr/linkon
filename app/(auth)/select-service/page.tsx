@@ -4,7 +4,7 @@ import SelectServiceClient from "@/components/select-service-client";
 
 export const metadata: Metadata = {
   title: "서비스 선택",
-  description: "Linkon 통합 계정으로 이용할 서비스를 선택합니다.",
+  description: "Linkon 통합 계정으로 이용할 AI 서비스를 선택합니다.",
 };
 
 export default function SelectServicePage() {

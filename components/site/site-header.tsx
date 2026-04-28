@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 interface NavItem {
@@ -16,15 +17,34 @@ interface SiteHeaderProps {
   theme?: "light" | "dark";
 }
 
+interface SessionState {
+  authenticated: boolean;
+  email: string | null;
+  role: string | null;
+  accountStatus: string | null;
+  isSuperAdmin: boolean;
+}
+
+const signedOutSession: SessionState = {
+  authenticated: false,
+  email: null,
+  role: null,
+  accountStatus: null,
+  isSuperAdmin: false,
+};
+
 export default function SiteHeader({
   navItems,
   ctaHref = "/register",
   ctaLabel = "통합 계정 만들기",
   theme = "light",
 }: SiteHeaderProps) {
+  const router = useRouter();
+  const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const [isSignedIn, setIsSignedIn] = useState(false);
+  const [session, setSession] = useState<SessionState>(signedOutSession);
+  const [loggingOut, setLoggingOut] = useState(false);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 40);
@@ -49,14 +69,20 @@ export default function SiteHeader({
           cache: "no-store",
           credentials: "same-origin",
         });
-        const data = (await response.json()) as { authenticated?: boolean };
+        const data = (await response.json()) as Partial<SessionState>;
 
         if (mounted) {
-          setIsSignedIn(Boolean(data.authenticated));
+          setSession({
+            authenticated: Boolean(data.authenticated),
+            email: data.email ?? null,
+            role: data.role ?? null,
+            accountStatus: data.accountStatus ?? null,
+            isSuperAdmin: Boolean(data.isSuperAdmin),
+          });
         }
       } catch {
         if (mounted) {
-          setIsSignedIn(false);
+          setSession(signedOutSession);
         }
       }
     };
@@ -66,7 +92,24 @@ export default function SiteHeader({
     return () => {
       mounted = false;
     };
-  }, []);
+  }, [pathname]);
+
+  async function handleLogout() {
+    setLoggingOut(true);
+
+    try {
+      await fetch("/api/auth/logout", {
+        method: "POST",
+        credentials: "same-origin",
+      });
+    } finally {
+      setSession(signedOutSession);
+      setOpen(false);
+      setLoggingOut(false);
+      router.push("/");
+      router.refresh();
+    }
+  }
 
   const navClassName = [
     "nav",
@@ -75,8 +118,7 @@ export default function SiteHeader({
   ]
     .filter(Boolean)
     .join(" ");
-  const actionHref = isSignedIn ? "/select-service" : ctaHref;
-  const actionLabel = isSignedIn ? "서비스 선택" : ctaLabel;
+  const isSignedIn = session.authenticated;
 
   return (
     <header className={navClassName} id="nav">
@@ -100,11 +142,40 @@ export default function SiteHeader({
           ))}
         </nav>
 
-        {isSignedIn && <span className="nav__session">로그인됨</span>}
-
-        <Link href={actionHref} className="btn btn--primary btn--sm nav__cta">
-          {actionLabel}
-        </Link>
+        <div className="nav__account" aria-label="계정 메뉴">
+          {isSignedIn ? (
+            <>
+              <span className="nav__session" title={session.email ?? undefined}>
+                {session.email}
+              </span>
+              <Link href="/select-service" className="btn btn--outline btn--sm nav__account-link">
+                서비스 선택
+              </Link>
+              {session.isSuperAdmin && (
+                <Link href="/admin" className="btn btn--primary btn--sm nav__account-link">
+                  관리자
+                </Link>
+              )}
+              <button
+                type="button"
+                className="btn btn--ghost btn--sm nav__account-link"
+                onClick={handleLogout}
+                disabled={loggingOut}
+              >
+                {loggingOut ? "로그아웃 중..." : "로그아웃"}
+              </button>
+            </>
+          ) : (
+            <>
+              <Link href="/login" className="btn btn--outline btn--sm nav__account-link">
+                로그인
+              </Link>
+              <Link href={ctaHref} className="btn btn--primary btn--sm nav__account-link">
+                {ctaLabel}
+              </Link>
+            </>
+          )}
+        </div>
 
         <button
           className={`nav__hamburger ${open ? "is-open" : ""}`}
@@ -131,14 +202,52 @@ export default function SiteHeader({
               {item.label}
             </Link>
           ))}
-          {isSignedIn && <span className="nav__drawer-session">로그인된 상태입니다</span>}
-          <Link
-            href={actionHref}
-            className="btn btn--primary nav__drawer-cta"
-            onClick={() => setOpen(false)}
-          >
-            {actionLabel}
-          </Link>
+          {isSignedIn ? (
+            <div className="nav__drawer-account">
+              <span className="nav__drawer-session">{session.email}</span>
+              <Link
+                href="/select-service"
+                className="btn btn--outline nav__drawer-cta"
+                onClick={() => setOpen(false)}
+              >
+                서비스 선택
+              </Link>
+              {session.isSuperAdmin && (
+                <Link
+                  href="/admin"
+                  className="btn btn--primary nav__drawer-cta"
+                  onClick={() => setOpen(false)}
+                >
+                  관리자 페이지
+                </Link>
+              )}
+              <button
+                type="button"
+                className="btn btn--ghost nav__drawer-cta"
+                onClick={handleLogout}
+                disabled={loggingOut}
+              >
+                {loggingOut ? "로그아웃 중..." : "로그아웃"}
+              </button>
+            </div>
+          ) : (
+            <>
+              <Link
+                href="/login"
+                className="btn btn--outline nav__drawer-cta"
+                onClick={() => setOpen(false)}
+              >
+                로그인
+              </Link>
+              <Link
+                href={ctaHref}
+                className="btn btn--primary nav__drawer-cta"
+                onClick={() => setOpen(false)}
+              >
+                {ctaLabel}
+              </Link>
+            </>
+          )}
         </div>
       </div>
       <button
