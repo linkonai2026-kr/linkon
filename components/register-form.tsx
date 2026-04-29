@@ -155,10 +155,10 @@ export default function RegisterForm() {
     <div className="auth-page auth-page--split">
       <aside className="auth-panel">
         <Image src="/assets/linkon-noback.png" alt="" width={72} height={72} />
-        <p className="lp-kicker">Unified Signup</p>
-        <h1>가입 위치가 달라도 계정 기준은 하나입니다.</h1>
+        <p className="lp-kicker">통합 계정 만들기</p>
+        <h1>가입은 한 번, 이용은 필요한 만큼.</h1>
         <p>
-          특정 서비스에서 가입하면 해당 서비스만 먼저 연결하고, 다른 서비스는 첫 진입 시 자동으로 연결됩니다.
+          하나의 계정으로 Vion을 바로 시작하고, Rion과 Taxon은 출시 이후 자연스럽게 이어집니다.
         </p>
       </aside>
 

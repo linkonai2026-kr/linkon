@@ -128,11 +128,10 @@ export default function SelectServiceClient() {
     <div className="auth-page auth-page--split">
       <aside className="auth-panel">
         <Image src="/assets/linkon-noback.png" alt="" width={72} height={72} />
-        <p className="lp-kicker">Service Gateway</p>
-        <h1>이용할 AI 서비스를 선택하세요</h1>
+        <p className="lp-kicker">서비스 선택</p>
+        <h1>오늘 어떤 AI가 필요하신가요?</h1>
         <p>
-          Linkon 통합 계정으로 Vion, Rion, Taxon을 연결합니다. 서비스 계정이 없으면 첫 진입 시
-          안전하게 생성하거나 연결합니다.
+          Linkon 계정 하나로 Vion, Rion, Taxon을 이용할 수 있습니다. 처음 접속하는 서비스는 자동으로 연결됩니다.
         </p>
       </aside>
 
@@ -149,11 +148,11 @@ export default function SelectServiceClient() {
               />
             </svg>
           </div>
-          <h2 className="auth-title">로그인되어 있습니다</h2>
+          <h2 className="auth-title">어떤 서비스를 시작할까요?</h2>
           <p className="auth-subtitle">
             {session.email
-              ? `${session.email} 계정으로 이용할 서비스를 선택해 주세요.`
-              : "계정 준비가 완료되었습니다. 이용할 서비스를 선택해 주세요."}
+              ? `${session.email}으로 로그인되어 있습니다. 이용할 서비스를 선택해 주세요.`
+              : "로그인이 완료되었습니다. 이용할 서비스를 선택해 주세요."}
           </p>
           {session.isSuperAdmin && (
             <Link href="/admin" className="btn btn--outline btn--sm">

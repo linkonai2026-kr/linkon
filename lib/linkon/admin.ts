@@ -106,34 +106,29 @@ function toAdminDataError(error: unknown) {
 export async function getAdminOverview() {
   try {
     const admin = createAdminClient("linkon");
-    const { data: users, error: usersError } = await admin
-      .from("users")
-      .select("id,email,name,role,account_status,plan,created_at")
-      .order("created_at", { ascending: false })
-      .limit(1000);
 
-    if (usersError) {
-      throw usersError;
-    }
+    // 3개 쿼리를 병렬로 실행 — 순차 실행 대비 ~3배 빠름
+    const [
+      { data: users, error: usersError },
+      { data: serviceAccounts, error: serviceError },
+      { data: auditLogs, error: auditError },
+    ] = await Promise.all([
+      admin
+        .from("users")
+        .select("id,email,name,role,account_status,plan,created_at")
+        .order("created_at", { ascending: false })
+        .limit(1000),
+      admin.from("service_accounts").select("service").limit(5000),
+      admin
+        .from("admin_audit_logs")
+        .select("*")
+        .order("created_at", { ascending: false })
+        .limit(8),
+    ]);
 
-    const { data: serviceAccounts, error: serviceError } = await admin
-      .from("service_accounts")
-      .select("service")
-      .limit(5000);
-
-    if (serviceError) {
-      throw serviceError;
-    }
-
-    const { data: auditLogs, error: auditError } = await admin
-      .from("admin_audit_logs")
-      .select("*")
-      .order("created_at", { ascending: false })
-      .limit(8);
-
-    if (auditError) {
-      throw auditError;
-    }
+    if (usersError) throw usersError;
+    if (serviceError) throw serviceError;
+    if (auditError) throw auditError;
 
     const normalizedUsers = (users ?? []).map((row) =>
       normalizeCanonicalUserProfile(row as Record<string, unknown>)
@@ -202,22 +197,24 @@ export async function listAdminUsers(filters: AdminListFilters = {}) {
 
 export async function getAdminUserDetail(userId: string) {
   const admin = createAdminClient("linkon");
-  const { data, error } = await admin
-    .from("users")
-    .select("*, service_accounts(*)")
-    .eq("id", userId)
-    .single();
+
+  // 사용자 정보 + 감사 로그를 병렬로 조회 — 순차 실행 대비 ~2배 빠름
+  const [
+    { data, error },
+    { data: auditData, error: auditError },
+  ] = await Promise.all([
+    admin.from("users").select("*, service_accounts(*)").eq("id", userId).single(),
+    admin
+      .from("admin_audit_logs")
+      .select("*")
+      .eq("target_uid", userId)
+      .order("created_at", { ascending: false })
+      .limit(20),
+  ]);
 
   if (error) {
     throw new Error(`Failed to load user detail: ${error.message}`);
   }
-
-  const { data: auditData, error: auditError } = await admin
-    .from("admin_audit_logs")
-    .select("*")
-    .eq("target_uid", userId)
-    .order("created_at", { ascending: false })
-    .limit(20);
 
   if (auditError) {
     throw new Error(`Failed to load audit logs: ${auditError.message}`);

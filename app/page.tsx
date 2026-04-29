@@ -7,20 +7,20 @@ import SiteFooter from "@/components/site/site-footer";
 import SiteHeader from "@/components/site/site-header";
 
 export const metadata: Metadata = {
-  title: "LinkON | 일상에 필요한 AI 서비스를 연결하는 브랜드",
+  title: "Linkon | 일상에 필요한 AI 서비스를 연결하는 브랜드",
   description:
-    "LinkON은 Vion, Rion, Taxon을 통해 일상 케어, 법률 이해, 세무 관리를 더 쉽게 시작할 수 있도록 돕는 AI 서비스 브랜드입니다.",
+    "Linkon은 Vion, Rion, Taxon을 통해 일상 케어, 법률 이해, 세무 관리를 더 쉽게 시작할 수 있도록 돕는 AI 서비스 브랜드입니다.",
   openGraph: {
-    title: "LinkON | 일상에 필요한 AI 서비스를 연결하는 브랜드",
+    title: "Linkon | 일상에 필요한 AI 서비스를 연결하는 브랜드",
     description:
       "Vion, Rion, Taxon으로 마음과 일상, 법률과 세무까지 더 편안하게 시작할 수 있도록 돕습니다.",
     images: [{ url: "/assets/linkon.png", width: 1200, height: 630 }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "LinkON | 일상에 필요한 AI 서비스를 연결하는 브랜드",
+    title: "Linkon | 일상에 필요한 AI 서비스를 연결하는 브랜드",
     description:
-      "일상 케어, 법률 이해, 세무 관리를 더 쉽게 시작할 수 있도록 돕는 LinkON의 AI 서비스 브랜드를 만나보세요.",
+      "일상 케어, 법률 이해, 세무 관리를 더 쉽게 시작할 수 있도록 돕는 Linkon의 AI 서비스 브랜드를 만나보세요.",
     images: ["/assets/linkon.png"],
   },
 };
@@ -71,7 +71,7 @@ export default function HomePage() {
       <SiteHeader
         navItems={[
           { href: "#services", label: "서비스" },
-          { href: "#trust", label: "이용 흐름" },
+          { href: "#trust", label: "이용 방법" },
           { href: "#launch", label: "출시 알림" },
         ]}
         ctaHref="/register"
@@ -81,7 +81,7 @@ export default function HomePage() {
       <main className="lp-page lp-page--public">
         <section className="lp-hero lp-hero--public">
           <div className="lp-hero__centered container">
-            <p className="lp-kicker">Linkon AI Services</p>
+            <p className="lp-kicker">Linkon AI 서비스</p>
             <h1>
               하나의 계정으로
               <span>필요한 AI 서비스를 바로 시작하세요.</span>
@@ -94,7 +94,7 @@ export default function HomePage() {
                 통합 계정 만들기
               </Link>
               <Link href="/login" className="btn btn--outline btn--lg">
-                이미 계정이 있어요
+                로그인하기
               </Link>
             </div>
           </div>
@@ -103,7 +103,7 @@ export default function HomePage() {
         <section className="section lp-services" id="services">
           <div className="container">
             <div className="section-header">
-              <p className="section-label">Services</p>
+              <p className="section-label">서비스 소개</p>
               <h2 className="section-title">지금 필요한 AI를 선택하세요</h2>
               <p className="section-desc">
                 각 서비스는 전문 영역에 집중하고, 사용자는 Linkon 계정 하나로 편하게 시작합니다.
@@ -175,7 +175,7 @@ export default function HomePage() {
         <section className="section section--alt lp-trust-section" id="trust">
           <div className="container lp-trust-grid">
             <div className="lp-trust-copy">
-              <p className="section-label">How It Works</p>
+              <p className="section-label">이용 방법</p>
               <h2 className="section-title">가입은 한 번, 이용은 필요한 만큼</h2>
               <p className="about-body">
                 Linkon에서 계정을 만들면 Vion을 바로 시작할 수 있고, Rion과 Taxon은 출시 알림을 받아볼 수 있습니다.
@@ -206,7 +206,7 @@ export default function HomePage() {
         <section className="section teaser-section" id="launch">
           <div className="container">
             <div className="section-header">
-              <p className="section-label">Coming Soon</p>
+              <p className="section-label">출시 예정</p>
               <h2 className="section-title">Rion과 Taxon 출시 소식을 먼저 받아보세요</h2>
               <p className="section-desc">
                 관심 있는 서비스를 선택하고 이메일을 남기면 출시 일정과 초기 이용 안내를 보내드립니다.

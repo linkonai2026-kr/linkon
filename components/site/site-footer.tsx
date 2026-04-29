@@ -14,7 +14,8 @@ export default function SiteFooter() {
             height={30}
           />
           <p className="footer-tagline">
-            Vion, Rion, Taxon을 하나의 통합 계정과 권한 체계로 연결하는 AI 서비스 관제 플랫폼입니다.
+            Vion, Rion, Taxon을 하나의 Linkon 계정으로 연결합니다.<br />
+            일상 케어, 법률, 세무 — 필요한 AI 서비스를 더 쉽게 시작하세요.
           </p>
           <p className="footer-email">
             <a href="mailto:linkon.ai2026@gmail.com">linkon.ai2026@gmail.com</a>

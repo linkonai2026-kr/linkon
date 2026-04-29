@@ -137,7 +137,12 @@ export default function ServicePage({ content }: { content: ServicePageContent }
           <div className="container sp-intro__grid">
             <div className="sp-intro__text">
               {content.expertBadge && (
-                <p className="sp-expert-badge">{content.expertBadge}</p>
+                <>
+                  <p className="sp-expert-badge">{content.expertBadge}</p>
+                  <p className="sp-expert-disclaimer">
+                    ※ AI가 제공하는 안내는 참고용이며 전문가의 최종 판단을 대체하지 않습니다.
+                  </p>
+                </>
               )}
               <p className="section-label">{content.introLabel}</p>
               <h2 className="section-title">{content.introTitle}</h2>
@@ -166,9 +171,7 @@ export default function ServicePage({ content }: { content: ServicePageContent }
             <div className="section-header">
               <p className="section-label">{content.featuresLabel}</p>
               <h2 className="section-title">{content.featuresTitle}</h2>
-              <p className="section-desc">
-                모든 서비스는 Linkon 통합 계정과 권한 기준 위에서 안정적으로 연결됩니다.
-              </p>
+              <p className="section-desc">{content.featuresDescription}</p>
             </div>
 
             <div className="sp-features__grid">

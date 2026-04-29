@@ -37,6 +37,7 @@ export interface ServicePageContent {
   whoCards: WhoCard[];
   featuresLabel: string;
   featuresTitle: string;
+  featuresDescription: string;
   features: FeatureItem[];
   ctaTitle: string;
   ctaDescription: string;
@@ -66,7 +67,7 @@ export const servicePageContent: Record<ServiceName, ServicePageContent> = {
     logoMark: "/assets/vion-noback.png",
     expertBadge: "🩺 임상심리사 자문 기반",
     introLabel: "이런 분께 맞습니다",
-    introTitle: "마음이 힘들 때, 혼자 감당하지 않아도 됩니다",
+    introTitle: "오늘 내 상태를 확인하는 것, 그것만으로 충분합니다",
     introBody: [
       "심리 상담을 받고 싶어도 예약 대기·비용 부담이 현실입니다. Vion은 언제든 내 상태를 이야기할 수 있는 AI 심리 케어 공간입니다.",
       "임상 기반 기법으로 설계된 Vion이 오늘 당신의 상태를 확인하고, 다음에 필요한 행동을 함께 찾아드립니다.",
@@ -78,6 +79,7 @@ export const servicePageContent: Record<ServiceName, ServicePageContent> = {
     ],
     featuresLabel: "핵심 기능",
     featuresTitle: "Vion이 당신의 일상에서 하는 일",
+    featuresDescription: "임상 기반 접근 방식으로 설계된 기능들이 일상 속 케어를 지속적으로 지원합니다.",
     features: [
       {
         title: "매일 체크인",
@@ -111,7 +113,7 @@ export const servicePageContent: Record<ServiceName, ServicePageContent> = {
       },
     ],
     ctaTitle: "오늘, 내 상태를 확인하는 것부터 시작하세요",
-    ctaDescription: "Linkon 계정만 있으면 지금 바로 Vion을 시작할 수 있습니다. 무료로 경험해보세요.",
+    ctaDescription: "Linkon 계정만 있으면 지금 바로 Vion을 시작할 수 있습니다.",
     ctaPrimaryLabel: "Vion 시작하기",
     ctaPrimaryHref: "/api/auth/token?service=vion",
     ctaSecondaryLabel: "Linkon 홈으로",
@@ -148,6 +150,7 @@ export const servicePageContent: Record<ServiceName, ServicePageContent> = {
     ],
     featuresLabel: "준비 중인 기능",
     featuresTitle: "Rion이 제공할 경험",
+    featuresDescription: "변호사 자문을 기반으로 준비 중인 기능들로, 출시 후 Linkon 계정으로 바로 이용할 수 있습니다.",
     features: [
       {
         title: "위험 조항 먼저",
@@ -184,7 +187,7 @@ export const servicePageContent: Record<ServiceName, ServicePageContent> = {
     ctaDescription: "출시 알림을 신청하면 Rion 공개 시점과 초기 이용 안내를 이메일로 가장 먼저 받아볼 수 있습니다.",
     ctaPrimaryLabel: "출시 알림 받기",
     ctaPrimaryHref: "/register?service=rion",
-    ctaSecondaryLabel: "다른 서비스 보기",
+    ctaSecondaryLabel: "Linkon 홈으로",
   },
   taxon: {
     slug: "taxon",
@@ -218,6 +221,7 @@ export const servicePageContent: Record<ServiceName, ServicePageContent> = {
     ],
     featuresLabel: "준비 중인 기능",
     featuresTitle: "Taxon이 제공할 경험",
+    featuresDescription: "세무사 검토를 기반으로 준비 중인 기능들로, 출시 후 Linkon 계정으로 바로 이용할 수 있습니다.",
     features: [
       {
         title: "세무 일정 알림",
@@ -254,7 +258,7 @@ export const servicePageContent: Record<ServiceName, ServicePageContent> = {
     ctaDescription: "Taxon 공개 시점과 초기 이용 안내를 이메일로 가장 먼저 받아볼 수 있습니다.",
     ctaPrimaryLabel: "출시 알림 받기",
     ctaPrimaryHref: "/register?service=taxon",
-    ctaSecondaryLabel: "다른 서비스 보기",
+    ctaSecondaryLabel: "Linkon 홈으로",
   },
 };
 
