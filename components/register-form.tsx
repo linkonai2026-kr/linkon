@@ -12,7 +12,7 @@ type Step = 1 | 2 | 3;
 const SERVICE_INFO = {
   vion: {
     name: "Vion",
-    desc: "케어 AI",
+    desc: "일상 케어 AI",
     logo: "/assets/vion-noback.png",
     color: "vion",
   },
@@ -100,11 +100,12 @@ export default function RegisterForm() {
     setLoading(true);
 
     try {
+      const normalizedEmail = email.trim().toLowerCase();
       const response = await fetch("/api/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          email,
+          email: normalizedEmail,
           password,
           name,
           preferredService: preferredService || undefined,
@@ -124,25 +125,25 @@ export default function RegisterForm() {
       try {
         const supabase = createClient();
         const { error: signInError } = await supabase.auth.signInWithPassword({
-          email,
+          email: normalizedEmail,
           password,
         });
 
         if (signInError) {
           setError("계정은 생성되었지만 자동 로그인을 완료하지 못했습니다. 직접 로그인해 주세요.");
-          router.push("/login");
+          router.push(`/login?email=${encodeURIComponent(normalizedEmail)}`);
           return;
         }
       } catch (authError) {
         if (isSupabaseConfigError(authError)) {
           setError("계정은 생성되었지만 로그인 설정 확인이 필요합니다. 관리자에게 문의해 주세요.");
-          router.push("/login");
+          router.push(`/login?email=${encodeURIComponent(normalizedEmail)}`);
           return;
         }
         throw authError;
       }
 
-      sessionStorage.setItem("linkon_sync", JSON.stringify(data.syncResults));
+      sessionStorage.setItem("linkon_sync", JSON.stringify(data.syncResults ?? []));
       router.push(data.nextPath ?? "/select-service");
     } catch {
       setError("네트워크 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.");
@@ -278,7 +279,7 @@ export default function RegisterForm() {
 
         {step === 2 && (
           <div>
-            <h2 className="auth-title">관심 서비스를 선택해 주세요</h2>
+            <h2 className="auth-title">관심 있는 서비스를 선택해 주세요</h2>
             <p className="auth-subtitle">
               선택하지 않아도 가입할 수 있습니다. 서비스 연결은 첫 진입 시 자동으로 처리됩니다.
             </p>

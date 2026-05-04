@@ -4,36 +4,46 @@ import { ensureCanonicalUserProfile, getBlockedReason } from "@/lib/linkon/users
 
 export const dynamic = "force-dynamic";
 
+function getSafeNextPath(value: string | null) {
+  if (!value || !value.startsWith("/") || value.startsWith("//")) {
+    return "/select-service";
+  }
+
+  return value;
+}
+
 export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url);
   const code = searchParams.get("code");
-  const next = searchParams.get("next") ?? "/select-service";
+  const next = getSafeNextPath(searchParams.get("next"));
 
   try {
-    if (code) {
-      const supabase = await createClient();
-      const { error } = await supabase.auth.exchangeCodeForSession(code);
+    if (!code) {
+      return NextResponse.redirect(`${origin}/login?error=auth_callback_failed`);
+    }
 
-      if (!error) {
-        const {
-          data: { user },
-        } = await supabase.auth.getUser();
+    const supabase = await createClient();
+    const { error } = await supabase.auth.exchangeCodeForSession(code);
 
-        if (user) {
-          const profile = await ensureCanonicalUserProfile(user);
-          const blockedReason = getBlockedReason(profile);
+    if (error) {
+      return NextResponse.redirect(`${origin}/login?error=auth_callback_failed`);
+    }
 
-          if (blockedReason) {
-            return NextResponse.redirect(`${origin}/login?error=${blockedReason}`);
-          }
-        }
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
 
-        return NextResponse.redirect(`${origin}${next}`);
+    if (user) {
+      const profile = await ensureCanonicalUserProfile(user);
+      const blockedReason = getBlockedReason(profile);
+
+      if (blockedReason) {
+        return NextResponse.redirect(`${origin}/login?error=${blockedReason}`);
       }
     }
+
+    return NextResponse.redirect(`${origin}${next}`);
   } catch {
     return NextResponse.redirect(`${origin}/login?error=auth_callback_failed`);
   }
-
-  return NextResponse.redirect(`${origin}/login?error=auth_callback_failed`);
 }

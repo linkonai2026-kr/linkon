@@ -1,9 +1,30 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { createServerClient, type CookieOptions } from "@supabase/ssr";
-import { getBlockedReason, getCanonicalUserProfile } from "@/lib/linkon/users";
 import { getSupabasePublicConfig, isSupabaseConfigError } from "@/lib/supabase/config";
 
-const PROTECTED_ROUTES = ["/select-service", "/admin", "/api/auth/token", "/api/admin"];
+const PROTECTED_PAGE_ROUTES = ["/select-service", "/admin"];
+const PROTECTED_REDIRECT_API_ROUTES = ["/api/auth/token"];
+const PROTECTED_JSON_API_ROUTES = ["/api/admin"];
+
+function pathStartsWith(pathname: string, routes: string[]) {
+  return routes.some((route) => pathname === route || pathname.startsWith(`${route}/`));
+}
+
+function isProtectedPath(pathname: string) {
+  return (
+    pathStartsWith(pathname, PROTECTED_PAGE_ROUTES) ||
+    pathStartsWith(pathname, PROTECTED_REDIRECT_API_ROUTES) ||
+    pathStartsWith(pathname, PROTECTED_JSON_API_ROUTES)
+  );
+}
+
+function isAdminPath(pathname: string) {
+  return pathname === "/admin" || pathname.startsWith("/admin/") || pathStartsWith(pathname, PROTECTED_JSON_API_ROUTES);
+}
+
+function shouldReturnJson(pathname: string) {
+  return pathStartsWith(pathname, PROTECTED_JSON_API_ROUTES);
+}
 
 function redirectToLogin(request: NextRequest, error?: string) {
   const loginUrl = request.nextUrl.clone();
@@ -19,17 +40,22 @@ function redirectToLogin(request: NextRequest, error?: string) {
   return NextResponse.redirect(loginUrl);
 }
 
+function deny(request: NextRequest, status: 401 | 403 | 503, message: string, error?: string) {
+  if (shouldReturnJson(request.nextUrl.pathname)) {
+    return NextResponse.json({ error: message, code: error }, { status });
+  }
+
+  return redirectToLogin(request, error);
+}
+
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
-  const isProtected = PROTECTED_ROUTES.some((route) => pathname.startsWith(route));
 
-  if (!isProtected) {
+  if (!isProtectedPath(pathname)) {
     return NextResponse.next();
   }
 
-  let response = NextResponse.next({
-    request,
-  });
+  let response = NextResponse.next({ request });
 
   let supabaseConfig: ReturnType<typeof getSupabasePublicConfig>;
 
@@ -37,7 +63,7 @@ export async function proxy(request: NextRequest) {
     supabaseConfig = getSupabasePublicConfig();
   } catch (error) {
     if (isSupabaseConfigError(error)) {
-      return redirectToLogin(request, "service_unavailable");
+      return deny(request, 503, "Supabase authentication is not configured.", "service_unavailable");
     }
 
     throw error;
@@ -60,24 +86,32 @@ export async function proxy(request: NextRequest) {
 
   const {
     data: { user },
+    error: userError,
   } = await supabase.auth.getUser();
 
-  if (!user) {
-    return redirectToLogin(request);
+  if (userError || !user) {
+    return deny(request, 401, "Sign-in is required.");
   }
 
-  const profile = await getCanonicalUserProfile(user.id);
+  const { data: profile } = await supabase
+    .from("users")
+    .select("role, account_status, deleted_at")
+    .eq("id", user.id)
+    .maybeSingle();
 
-  if (profile) {
-    const blockedReason = getBlockedReason(profile);
+  const accountStatus = typeof profile?.account_status === "string" ? profile.account_status : "active";
+  const deletedAt = typeof profile?.deleted_at === "string" ? profile.deleted_at : null;
 
-    if (blockedReason) {
-      return redirectToLogin(request, blockedReason);
-    }
+  if (accountStatus === "suspended") {
+    return deny(request, 403, "This account is suspended.", "account_suspended");
+  }
 
-    if ((pathname.startsWith("/admin") || pathname.startsWith("/api/admin")) && profile.role !== "super_admin") {
-      return redirectToLogin(request, "admin_required");
-    }
+  if (accountStatus === "deleted" || deletedAt) {
+    return deny(request, 403, "This account is deleted.", "account_deleted");
+  }
+
+  if (isAdminPath(pathname) && profile?.role !== "super_admin") {
+    return deny(request, 403, "Super admin access is required.", "admin_required");
   }
 
   return response;
@@ -85,7 +119,7 @@ export async function proxy(request: NextRequest) {
 
 export const config = {
   matcher: [
-    "/select-service",
+    "/select-service/:path*",
     "/admin/:path*",
     "/api/auth/token/:path*",
     "/api/admin/:path*",

@@ -33,6 +33,10 @@ export async function GET() {
       {
         authenticated: false,
         email: null,
+        role: null,
+        accountStatus: null,
+        isSuperAdmin: false,
+        blockedReason: null,
       },
       {
         headers: {
