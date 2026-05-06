@@ -25,10 +25,22 @@ function getInitialErrorMessage(errorCode: string | null) {
 
 function getSafeRedirect(value: string | null) {
   if (!value || !value.startsWith("/") || value.startsWith("//")) {
-    return "/select-service";
+    return null;
   }
 
   return value;
+}
+
+async function getPostLoginPath() {
+  const response = await fetch("/api/auth/post-login", {
+    cache: "no-store",
+    credentials: "same-origin",
+  });
+  const data = (await response.json().catch(() => null)) as { nextPath?: string } | null;
+
+  return data?.nextPath && data.nextPath.startsWith("/") && !data.nextPath.startsWith("//")
+    ? data.nextPath
+    : "/";
 }
 
 export default function LoginForm() {
@@ -73,7 +85,7 @@ export default function LoginForm() {
         // 로그인 이동은 캐시 저장 실패와 무관하게 계속 진행합니다.
       }
 
-      window.location.assign(redirect);
+      window.location.assign(redirect ?? (await getPostLoginPath()));
     } catch (loginError) {
       if (isSupabaseConfigError(loginError)) {
         setError("로그인 설정이 아직 완료되지 않았습니다. 운영팀에 문의해 주세요.");

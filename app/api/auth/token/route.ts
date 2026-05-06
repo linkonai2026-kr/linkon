@@ -10,6 +10,7 @@ import {
 import { ServiceName } from "@/lib/linkon/types";
 import { getAppUrl } from "@/lib/supabase/config";
 import { getServiceUrl, isServiceDownstreamAuthReady } from "@/lib/linkon/service-config";
+import { rememberPreferredService } from "@/lib/linkon/service-preferences";
 
 export const dynamic = "force-dynamic";
 
@@ -60,6 +61,16 @@ export async function GET(request: NextRequest) {
       );
     }
 
+    const existingServiceAccount = await findServiceAccount(user.id, service);
+
+    if (existingServiceAccount && existingServiceAccount.is_enabled === false) {
+      return NextResponse.redirect(
+        `${getAppUrl()}/select-service?error=service_disabled`
+      );
+    }
+
+    await rememberPreferredService(user.id, service);
+
     const serviceUrl = getServiceUrl(service);
     if (!serviceUrl) {
       return NextResponse.redirect(
@@ -70,14 +81,6 @@ export async function GET(request: NextRequest) {
     if (!isServiceDownstreamAuthReady(service)) {
       return NextResponse.redirect(
         `${getAppUrl()}/select-service?error=service_setup_required`
-      );
-    }
-
-    const existingServiceAccount = await findServiceAccount(user.id, service);
-
-    if (existingServiceAccount && existingServiceAccount.is_enabled === false) {
-      return NextResponse.redirect(
-        `${getAppUrl()}/select-service?error=service_disabled`
       );
     }
 
