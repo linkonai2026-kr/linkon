@@ -127,22 +127,12 @@ export default function SiteHeader({
       void refreshSession();
     };
 
-    const handleVisibilityRefresh = () => {
-      if (document.visibilityState === "visible") {
-        void refreshSession();
-      }
-    };
-
     void refreshSession();
     window.addEventListener("linkon:session-changed", handleSessionChanged);
-    window.addEventListener("focus", refreshSession);
-    document.addEventListener("visibilitychange", handleVisibilityRefresh);
 
     return () => {
       controller.abort();
       window.removeEventListener("linkon:session-changed", handleSessionChanged);
-      window.removeEventListener("focus", refreshSession);
-      document.removeEventListener("visibilitychange", handleVisibilityRefresh);
     };
   }, []);
 

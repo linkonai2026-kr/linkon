@@ -4,6 +4,15 @@ const SERVICE_URL_FALLBACKS: Partial<Record<ServiceName, string>> = {
   vion: "https://vion-sandy.vercel.app",
 };
 
+const SERVICE_ALLOWED_ORIGIN_FALLBACKS: Partial<Record<ServiceName, string[]>> = {
+  vion: [
+    "https://vion.ai",
+    "https://vion-sandy.vercel.app",
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+  ],
+};
+
 const SERVICE_ENV_NAMES: Record<ServiceName, string> = {
   vion: "NEXT_PUBLIC_VION_URL",
   rion: "NEXT_PUBLIC_RION_URL",
@@ -38,6 +47,16 @@ function normalizeServiceUrl(value: string) {
     : `https://${value}`;
 }
 
+function getUrlOrigin(value: string) {
+  if (!value) return "";
+
+  try {
+    return new URL(normalizeServiceUrl(value)).origin;
+  } catch {
+    return "";
+  }
+}
+
 export function getServiceUrl(service: ServiceName) {
   return normalizeServiceUrl(readEnv(SERVICE_ENV_NAMES[service]) || SERVICE_URL_FALLBACKS[service] || "");
 }
@@ -45,6 +64,57 @@ export function getServiceUrl(service: ServiceName) {
 export function isServiceDownstreamAuthReady(service: ServiceName) {
   const supabaseEnv = SERVICE_SUPABASE_ENV_NAMES[service];
   return Boolean(readEnv(supabaseEnv.url) && readEnv(supabaseEnv.key));
+}
+
+export function getAllowedServiceOrigins(service: ServiceName) {
+  const origins = new Set<string>();
+  const configuredOrigin = getUrlOrigin(getServiceUrl(service));
+
+  if (configuredOrigin) {
+    origins.add(configuredOrigin);
+  }
+
+  for (const value of SERVICE_ALLOWED_ORIGIN_FALLBACKS[service] ?? []) {
+    const origin = getUrlOrigin(value);
+
+    if (origin) {
+      origins.add(origin);
+    }
+  }
+
+  return Array.from(origins);
+}
+
+export function isAllowedServiceReturnTo(service: ServiceName, returnTo: string | null | undefined) {
+  if (!returnTo) return false;
+
+  try {
+    const parsed = new URL(returnTo);
+
+    if (parsed.protocol !== "https:" && parsed.protocol !== "http:") {
+      return false;
+    }
+
+    return getAllowedServiceOrigins(service).includes(parsed.origin);
+  } catch {
+    return false;
+  }
+}
+
+export function getDefaultServiceReturnTo(service: ServiceName) {
+  const serviceUrl = getServiceUrl(service);
+
+  if (!serviceUrl) {
+    return "";
+  }
+
+  if (service === "vion") {
+    const callbackUrl = new URL("/auth/callback", serviceUrl);
+    callbackUrl.searchParams.set("next", "/chat");
+    return callbackUrl.toString();
+  }
+
+  return new URL("/api/auth/linkon-callback", serviceUrl).toString();
 }
 
 export function getServiceHealth() {

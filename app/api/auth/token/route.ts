@@ -9,21 +9,18 @@ import {
 } from "@/lib/linkon/service-sync";
 import { ServiceName } from "@/lib/linkon/types";
 import { getAppUrl } from "@/lib/supabase/config";
-import { getServiceUrl, isServiceDownstreamAuthReady } from "@/lib/linkon/service-config";
+import {
+  getDefaultServiceReturnTo,
+  getServiceUrl,
+  isAllowedServiceReturnTo,
+  isServiceDownstreamAuthReady,
+} from "@/lib/linkon/service-config";
 import { rememberPreferredService } from "@/lib/linkon/service-preferences";
 
 export const dynamic = "force-dynamic";
 
-function getSafeReturnTo(returnTo: string | null, serviceUrl: string) {
-  if (!returnTo) return null;
-
-  try {
-    const parsedReturnTo = new URL(returnTo);
-    const parsedServiceUrl = new URL(serviceUrl);
-    return parsedReturnTo.origin === parsedServiceUrl.origin ? returnTo : null;
-  } catch {
-    return null;
-  }
+function getSafeReturnTo(service: ServiceName, returnTo: string | null) {
+  return isAllowedServiceReturnTo(service, returnTo) ? returnTo : null;
 }
 
 export async function GET(request: NextRequest) {
@@ -78,6 +75,14 @@ export async function GET(request: NextRequest) {
       );
     }
 
+    const safeReturnTo = getSafeReturnTo(service, returnTo);
+
+    if (returnTo && !safeReturnTo) {
+      return NextResponse.redirect(
+        `${getAppUrl()}/login?error=service_return_to_invalid`
+      );
+    }
+
     if (!isServiceDownstreamAuthReady(service)) {
       return NextResponse.redirect(
         `${getAppUrl()}/select-service?error=service_setup_required`
@@ -99,11 +104,12 @@ export async function GET(request: NextRequest) {
 
     await recordServiceAccess(user.id, service);
 
-    const callbackUrl = new URL(`${serviceUrl}/api/auth/linkon-callback`);
-    const safeReturnTo = getSafeReturnTo(returnTo, serviceUrl);
+    const redirectTo = safeReturnTo ?? getDefaultServiceReturnTo(service);
 
-    if (safeReturnTo) {
-      callbackUrl.searchParams.set("returnTo", safeReturnTo);
+    if (!redirectTo) {
+      return NextResponse.redirect(
+        `${getAppUrl()}/select-service?error=service_unavailable`
+      );
     }
 
     const serviceAdmin = await import("@/lib/supabase/admin");
@@ -112,7 +118,7 @@ export async function GET(request: NextRequest) {
       .auth.admin.generateLink({
         type: "magiclink",
         email: user.email,
-        options: { redirectTo: callbackUrl.toString() },
+        options: { redirectTo },
       });
 
     if (error || !data?.properties?.action_link) {

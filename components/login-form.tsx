@@ -10,14 +10,17 @@ import { isSupabaseConfigError } from "@/lib/supabase/config";
 const ERROR_MESSAGES: Record<string, string> = {
   auth_callback_failed: "로그인을 완료하지 못했습니다. 다시 시도해 주세요.",
   account_suspended: "정지된 계정입니다. Linkon 운영팀에 문의해 주세요.",
-  account_deleted: "더 이상 활성화되지 않은 계정입니다. 운영팀에 문의해 주세요.",
+  account_deleted: "더 이상 활성화되지 않은 계정입니다. Linkon 운영팀에 문의해 주세요.",
   admin_required: "최고 관리자 권한이 필요한 화면입니다.",
+  service_return_to_invalid: "서비스 복귀 주소가 올바르지 않습니다. 다시 진입해 주세요.",
   service_unavailable: "서비스 연결 설정이 아직 완료되지 않았습니다.",
   service_setup_required: "서비스 자동 로그인을 준비 중입니다. 연결 설정 완료 후 이용할 수 있습니다.",
   service_sync_failed: "서비스 계정 연결에 실패했습니다. 다시 시도하거나 운영팀에 문의해 주세요.",
   service_signin_failed: "서비스 자동 로그인을 완료하지 못했습니다. 다시 시도해 주세요.",
-  service_disabled: "관리자에 의해 해당 서비스 접근 권한이 비활성화되었습니다.",
+  service_disabled: "관리자 설정에 따라 해당 서비스 접근 권한이 비활성화되었습니다.",
 };
+
+type ServiceName = "vion" | "rion" | "taxon";
 
 function getInitialErrorMessage(errorCode: string | null) {
   return errorCode ? ERROR_MESSAGES[errorCode] ?? "" : "";
@@ -28,24 +31,56 @@ function getSafeRedirect(value: string | null) {
     return null;
   }
 
+  if (value === "/select-service" || value.startsWith("/select-service?")) {
+    return null;
+  }
+
   return value;
 }
 
-async function getPostLoginPath() {
-  const response = await fetch("/api/auth/post-login", {
-    cache: "no-store",
-    credentials: "same-origin",
-  });
-  const data = (await response.json().catch(() => null)) as { nextPath?: string } | null;
+function getSafeService(value: string | null): ServiceName | null {
+  if (value === "vion" || value === "rion" || value === "taxon") {
+    return value;
+  }
 
-  return data?.nextPath && data.nextPath.startsWith("/") && !data.nextPath.startsWith("//")
-    ? data.nextPath
-    : "/";
+  return null;
+}
+
+function getServiceReturnTo(searchParams: ReturnType<typeof useSearchParams>) {
+  return searchParams.get("redirectTo") ?? searchParams.get("returnTo") ?? searchParams.get("next");
+}
+
+function buildServiceTokenPath(service: ServiceName, returnTo: string | null) {
+  const params = new URLSearchParams({ service });
+
+  if (returnTo) {
+    params.set("returnTo", returnTo);
+  }
+
+  return `/api/auth/token?${params.toString()}`;
+}
+
+function buildRegisterHref(service: ServiceName | null, returnTo: string | null) {
+  if (!service) {
+    return "/register";
+  }
+
+  const params = new URLSearchParams({ service });
+
+  if (returnTo) {
+    params.set("returnTo", returnTo);
+  }
+
+  return `/register?${params.toString()}`;
 }
 
 export default function LoginForm() {
   const searchParams = useSearchParams();
   const redirect = getSafeRedirect(searchParams.get("redirect"));
+  const service = getSafeService(searchParams.get("service"));
+  const returnTo = getServiceReturnTo(searchParams);
+  const serviceHandoffPath = service ? buildServiceTokenPath(service, returnTo) : null;
+  const registerHref = buildRegisterHref(service, returnTo);
 
   const [email, setEmail] = useState(searchParams.get("email") ?? "");
   const [password, setPassword] = useState("");
@@ -82,10 +117,10 @@ export default function LoginForm() {
         );
         window.dispatchEvent(new Event("linkon:session-changed"));
       } catch {
-        // 로그인 이동은 캐시 저장 실패와 무관하게 계속 진행합니다.
+        // Session snapshot is only a client-side convenience cache.
       }
 
-      window.location.assign(redirect ?? (await getPostLoginPath()));
+      window.location.assign(redirect ?? serviceHandoffPath ?? "/");
     } catch (loginError) {
       if (isSupabaseConfigError(loginError)) {
         setError("로그인 설정이 아직 완료되지 않았습니다. 운영팀에 문의해 주세요.");
@@ -103,10 +138,10 @@ export default function LoginForm() {
       <aside className="auth-panel">
         <Image src="/assets/linkon-noback.png" alt="" width={72} height={72} />
         <p className="lp-kicker">Linkon Account</p>
-        <h1>하나의 계정으로 필요한 AI 서비스를 시작하세요</h1>
+        <h1>하나의 계정으로 필요한 AI 서비스를 시작하세요.</h1>
         <p>
-          Vion, Rion, Taxon을 하나의 Linkon 계정으로 연결합니다. 로그인 후 이용할 서비스를
-          선택해 주세요.
+          Vion, Rion, Taxon을 하나의 Linkon 계정으로 연결합니다. 로그인 후 원하는 서비스로
+          자연스럽게 이어집니다.
         </p>
       </aside>
 
@@ -155,7 +190,7 @@ export default function LoginForm() {
               id="password"
               type="password"
               className="form-input"
-              placeholder="비밀번호를 입력해 주세요"
+              placeholder="비밀번호를 입력해 주세요."
               value={password}
               onChange={(event) => setPassword(event.target.value)}
               required
@@ -174,7 +209,7 @@ export default function LoginForm() {
         </form>
 
         <p className="auth-switch">
-          아직 계정이 없나요? <Link href="/register">통합 계정 만들기</Link>
+          아직 계정이 없나요? <Link href={registerHref}>통합 계정 만들기</Link>
         </p>
       </div>
     </div>

@@ -6,7 +6,7 @@ export const dynamic = "force-dynamic";
 
 function getSafeNextPath(value: string | null) {
   if (!value || !value.startsWith("/") || value.startsWith("//")) {
-    return "/select-service";
+    return "/";
   }
 
   return value;

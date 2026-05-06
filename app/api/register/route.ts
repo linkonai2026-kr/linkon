@@ -3,7 +3,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { ensureCanonicalUserProfile } from "@/lib/linkon/users";
 import { syncServiceUserState, toServiceSyncPayload } from "@/lib/linkon/service-sync";
 import { ServiceName, SERVICE_NAMES } from "@/lib/linkon/types";
-import { getServiceUrl, isServiceDownstreamAuthReady } from "@/lib/linkon/service-config";
+import { isAllowedServiceReturnTo, isServiceDownstreamAuthReady } from "@/lib/linkon/service-config";
 
 export const dynamic = "force-dynamic";
 
@@ -21,28 +21,14 @@ function isServiceName(value: unknown): value is ServiceName {
   return typeof value === "string" && SERVICE_NAMES.includes(value as ServiceName);
 }
 
-function isAllowedReturnTo(returnTo: string | undefined, service: ServiceName | null) {
-  if (!returnTo || !service) return false;
-
-  const allowedUrl = getServiceUrl(service);
-
-  if (!allowedUrl) return false;
-
-  try {
-    return new URL(returnTo).origin === new URL(allowedUrl).origin;
-  } catch {
-    return false;
-  }
-}
-
 function getPostRegisterPath(service: ServiceName | null, returnTo: string | undefined) {
   if (!service) {
-    return "/select-service";
+    return "/";
   }
 
   const params = new URLSearchParams({ service });
 
-  if (returnTo && isAllowedReturnTo(returnTo, service)) {
+  if (returnTo && isAllowedServiceReturnTo(service, returnTo)) {
     params.set("returnTo", returnTo);
   }
 
@@ -118,6 +104,14 @@ export async function POST(req: Request) {
 
     const profile = await ensureCanonicalUserProfile(createdUser.user);
     const selectedService = isServiceName(preferredService) ? preferredService : null;
+
+    if (selectedService && returnTo && !isAllowedServiceReturnTo(selectedService, returnTo)) {
+      return NextResponse.json(
+        { error: "유효하지 않은 서비스 복귀 URL입니다." },
+        { status: 400 }
+      );
+    }
+
     const syncResults =
       selectedService && isServiceDownstreamAuthReady(selectedService)
         ? [

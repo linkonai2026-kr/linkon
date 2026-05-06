@@ -36,12 +36,32 @@ function isServiceKey(value: string | null): value is ServiceKey {
   return value === "vion" || value === "rion" || value === "taxon";
 }
 
+function buildLoginHref(email: string | null, service: ServiceKey | "", returnTo?: string) {
+  const params = new URLSearchParams();
+
+  if (email) {
+    params.set("email", email);
+  }
+
+  if (service) {
+    params.set("service", service);
+  }
+
+  if (returnTo) {
+    params.set("returnTo", returnTo);
+  }
+
+  const query = params.toString();
+  return query ? `/login?${query}` : "/login";
+}
+
 export default function RegisterForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const serviceFromQuery = searchParams.get("service");
   const initialPreferredService = isServiceKey(serviceFromQuery) ? serviceFromQuery : "";
   const returnTo = searchParams.get("returnTo") ?? undefined;
+  const loginHref = buildLoginHref(null, initialPreferredService, returnTo);
 
   const [step, setStep] = useState<Step>(1);
   const [name, setName] = useState("");
@@ -131,13 +151,13 @@ export default function RegisterForm() {
 
         if (signInError) {
           setError("계정은 생성되었지만 자동 로그인을 완료하지 못했습니다. 직접 로그인해 주세요.");
-          router.push(`/login?email=${encodeURIComponent(normalizedEmail)}`);
+          router.push(buildLoginHref(normalizedEmail, preferredService, returnTo));
           return;
         }
       } catch (authError) {
         if (isSupabaseConfigError(authError)) {
           setError("계정은 생성되었지만 로그인 설정 확인이 필요합니다. 관리자에게 문의해 주세요.");
-          router.push(`/login?email=${encodeURIComponent(normalizedEmail)}`);
+          router.push(buildLoginHref(normalizedEmail, preferredService, returnTo));
           return;
         }
         throw authError;
@@ -287,7 +307,7 @@ export default function RegisterForm() {
             </button>
 
             <p className="auth-switch">
-              이미 계정이 있나요? <Link href="/login">로그인</Link>
+              이미 계정이 있나요? <Link href={loginHref}>로그인</Link>
             </p>
           </form>
         )}
