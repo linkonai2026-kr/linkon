@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { createServerClient, type CookieOptions } from "@supabase/ssr";
 import { getSupabasePublicConfig, isSupabaseConfigError } from "@/lib/supabase/config";
+import { linkonEnv } from "@/lib/linkon/env";
 
 const PROTECTED_PAGE_ROUTES = ["/select-service", "/admin"];
 const PROTECTED_REDIRECT_API_ROUTES = ["/api/auth/token"];
@@ -24,6 +25,11 @@ function isAdminPath(pathname: string) {
 
 function shouldReturnJson(pathname: string) {
   return pathStartsWith(pathname, PROTECTED_JSON_API_ROUTES);
+}
+
+function isBootstrapSuperAdmin(email: string | undefined | null) {
+  const superAdminEmail = linkonEnv.superAdminEmail();
+  return Boolean(email && superAdminEmail && email.trim().toLowerCase() === superAdminEmail);
 }
 
 function redirectToLogin(request: NextRequest, error?: string) {
@@ -110,7 +116,7 @@ export async function proxy(request: NextRequest) {
     return deny(request, 403, "This account is deleted.", "account_deleted");
   }
 
-  if (isAdminPath(pathname) && profile?.role !== "super_admin") {
+  if (isAdminPath(pathname) && profile?.role !== "super_admin" && !isBootstrapSuperAdmin(user.email)) {
     return deny(request, 403, "Super admin access is required.", "admin_required");
   }
 

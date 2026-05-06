@@ -37,6 +37,13 @@ export async function GET() {
       });
     }
 
+    if (profile.role === "super_admin") {
+      return NextResponse.json({
+        nextPath: "/admin",
+        reason: "super_admin",
+      });
+    }
+
     const service = await getPreferredServiceForUser(user.id);
 
     if (!service) {

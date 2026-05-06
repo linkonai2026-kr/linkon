@@ -76,6 +76,42 @@ function normalizeAppUrl(value: string) {
   return value.startsWith("http") ? value : `https://${value}`;
 }
 
+function isLocalAppUrl(value: string) {
+  if (!value) return false;
+
+  try {
+    const url = new URL(value);
+    return url.hostname === "localhost" || url.hostname === "127.0.0.1" || url.hostname === "::1";
+  } catch {
+    return false;
+  }
+}
+
+function getResolvedAppUrl() {
+  const candidates = [
+    { value: normalizeAppUrl(readEnv("NEXT_PUBLIC_APP_URL")), source: "NEXT_PUBLIC_APP_URL" },
+    { value: normalizeAppUrl(readEnv("APP_URL")), source: "APP_URL" },
+    {
+      value: normalizeAppUrl(readEnv("VERCEL_PROJECT_PRODUCTION_URL")),
+      source: "VERCEL_PROJECT_PRODUCTION_URL",
+    },
+    { value: normalizeAppUrl(readEnv("VERCEL_URL")), source: "VERCEL_URL" },
+  ];
+  const isVercelRuntime = readEnv("VERCEL") === "1" || Boolean(readEnv("VERCEL_URL"));
+
+  for (const candidate of candidates) {
+    if (!candidate.value) continue;
+
+    if (isVercelRuntime && isLocalAppUrl(candidate.value)) {
+      continue;
+    }
+
+    return candidate;
+  }
+
+  return { value: "", source: undefined };
+}
+
 function decodeBase64Url(value: string) {
   const base64 = value.replace(/-/g, "+").replace(/_/g, "/");
   const padded = base64.padEnd(base64.length + ((4 - (base64.length % 4)) % 4), "=");
@@ -203,11 +239,7 @@ export function getSupabaseServiceRoleKey() {
 }
 
 export function getAppUrl() {
-  const appUrl =
-    normalizeAppUrl(readEnv("NEXT_PUBLIC_APP_URL")) ||
-    normalizeAppUrl(readEnv("APP_URL")) ||
-    normalizeAppUrl(readEnv("VERCEL_PROJECT_PRODUCTION_URL")) ||
-    normalizeAppUrl(readEnv("VERCEL_URL"));
+  const { value: appUrl } = getResolvedAppUrl();
 
   if (!appUrl) {
     throw new Error("APP_URL_REQUIRED");
@@ -220,11 +252,7 @@ export function getConfigHealth() {
   const publicKey = getPublicKey();
   const publicUrl = getPublicUrl(publicKey.value);
   const serviceRoleKey = getServiceRoleKeyValue();
-  const appUrl =
-    normalizeAppUrl(readEnv("NEXT_PUBLIC_APP_URL")) ||
-    normalizeAppUrl(readEnv("APP_URL")) ||
-    normalizeAppUrl(readEnv("VERCEL_PROJECT_PRODUCTION_URL")) ||
-    normalizeAppUrl(readEnv("VERCEL_URL"));
+  const appUrl = getResolvedAppUrl();
   const webhookSecret = readEnv("LINKON_WEBHOOK_SECRET");
 
   const checks: ConfigCheck[] = [
@@ -251,18 +279,10 @@ export function getConfigHealth() {
     },
     {
       name: "APP_URL",
-      configured: Boolean(appUrl),
-      validFormat: appUrl.startsWith("https://"),
+      configured: Boolean(appUrl.value),
+      validFormat: appUrl.value.startsWith("https://"),
       required: true,
-      source: readEnv("NEXT_PUBLIC_APP_URL")
-        ? "NEXT_PUBLIC_APP_URL"
-        : readEnv("APP_URL")
-          ? "APP_URL"
-          : readEnv("VERCEL_PROJECT_PRODUCTION_URL")
-            ? "VERCEL_PROJECT_PRODUCTION_URL"
-            : readEnv("VERCEL_URL")
-              ? "VERCEL_URL"
-              : undefined,
+      source: appUrl.source,
     },
     {
       name: "LINKON_SUPER_ADMIN_EMAIL",
