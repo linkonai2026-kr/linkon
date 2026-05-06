@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 interface NavItem {
@@ -25,6 +25,8 @@ interface SessionState {
   isSuperAdmin: boolean;
 }
 
+const SESSION_CACHE_KEY = "linkon_session_snapshot";
+
 const signedOutSession: SessionState = {
   authenticated: false,
   email: null,
@@ -33,6 +35,38 @@ const signedOutSession: SessionState = {
   isSuperAdmin: false,
 };
 
+function normalizeSession(data: Partial<SessionState> | null | undefined): SessionState {
+  return {
+    authenticated: Boolean(data?.authenticated),
+    email: data?.email ?? null,
+    role: data?.role ?? null,
+    accountStatus: data?.accountStatus ?? null,
+    isSuperAdmin: Boolean(data?.isSuperAdmin),
+  };
+}
+
+function readCachedSession(): SessionState | null {
+  try {
+    const cached = sessionStorage.getItem(SESSION_CACHE_KEY);
+    return cached ? normalizeSession(JSON.parse(cached) as Partial<SessionState>) : null;
+  } catch {
+    return null;
+  }
+}
+
+function writeCachedSession(session: SessionState) {
+  try {
+    if (session.authenticated) {
+      sessionStorage.setItem(SESSION_CACHE_KEY, JSON.stringify(session));
+      return;
+    }
+
+    sessionStorage.removeItem(SESSION_CACHE_KEY);
+  } catch {
+    // sessionStorage can be unavailable in private/locked browser contexts.
+  }
+}
+
 export default function SiteHeader({
   navItems,
   ctaHref = "/register",
@@ -40,7 +74,6 @@ export default function SiteHeader({
   theme = "light",
 }: SiteHeaderProps) {
   const router = useRouter();
-  const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [session, setSession] = useState<SessionState>(signedOutSession);
@@ -61,38 +94,57 @@ export default function SiteHeader({
   }, [open]);
 
   useEffect(() => {
-    let mounted = true;
+    const cachedSession = readCachedSession();
+    if (cachedSession) {
+      setSession(cachedSession);
+    }
+
+    const controller = new AbortController();
 
     const refreshSession = async () => {
       try {
         const response = await fetch("/api/auth/session", {
           cache: "no-store",
           credentials: "same-origin",
+          signal: controller.signal,
         });
-        const data = (await response.json()) as Partial<SessionState>;
+        const data = normalizeSession((await response.json()) as Partial<SessionState>);
+        setSession(data);
+        writeCachedSession(data);
+      } catch (error) {
+        if (error instanceof DOMException && error.name === "AbortError") {
+          return;
+        }
 
-        if (mounted) {
-          setSession({
-            authenticated: Boolean(data.authenticated),
-            email: data.email ?? null,
-            role: data.role ?? null,
-            accountStatus: data.accountStatus ?? null,
-            isSuperAdmin: Boolean(data.isSuperAdmin),
-          });
-        }
-      } catch {
-        if (mounted) {
-          setSession(signedOutSession);
-        }
+        setSession(signedOutSession);
+        writeCachedSession(signedOutSession);
       }
     };
 
-    refreshSession();
+    const handleSessionChanged = () => {
+      const nextSession = readCachedSession();
+      setSession(nextSession ?? signedOutSession);
+      void refreshSession();
+    };
+
+    const handleVisibilityRefresh = () => {
+      if (document.visibilityState === "visible") {
+        void refreshSession();
+      }
+    };
+
+    void refreshSession();
+    window.addEventListener("linkon:session-changed", handleSessionChanged);
+    window.addEventListener("focus", refreshSession);
+    document.addEventListener("visibilitychange", handleVisibilityRefresh);
 
     return () => {
-      mounted = false;
+      controller.abort();
+      window.removeEventListener("linkon:session-changed", handleSessionChanged);
+      window.removeEventListener("focus", refreshSession);
+      document.removeEventListener("visibilitychange", handleVisibilityRefresh);
     };
-  }, [pathname]);
+  }, []);
 
   async function handleLogout() {
     setLoggingOut(true);
@@ -104,6 +156,8 @@ export default function SiteHeader({
       });
     } finally {
       setSession(signedOutSession);
+      writeCachedSession(signedOutSession);
+      window.dispatchEvent(new Event("linkon:session-changed"));
       setOpen(false);
       setLoggingOut(false);
       router.push("/");

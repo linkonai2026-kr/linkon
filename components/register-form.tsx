@@ -143,7 +143,22 @@ export default function RegisterForm() {
         throw authError;
       }
 
-      sessionStorage.setItem("linkon_sync", JSON.stringify(data.syncResults ?? []));
+      try {
+        sessionStorage.setItem("linkon_sync", JSON.stringify(data.syncResults ?? []));
+        sessionStorage.setItem(
+          "linkon_session_snapshot",
+          JSON.stringify({
+            authenticated: true,
+            email: normalizedEmail,
+            role: null,
+            accountStatus: null,
+            isSuperAdmin: false,
+          })
+        );
+        window.dispatchEvent(new Event("linkon:session-changed"));
+      } catch {
+        // 브라우저 저장소를 사용할 수 없어도 가입 완료 흐름은 유지합니다.
+      }
       router.push(data.nextPath ?? "/select-service");
     } catch {
       setError("네트워크 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.");

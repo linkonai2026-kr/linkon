@@ -57,6 +57,22 @@ export default function LoginForm() {
         return;
       }
 
+      try {
+        sessionStorage.setItem(
+          "linkon_session_snapshot",
+          JSON.stringify({
+            authenticated: true,
+            email: email.trim().toLowerCase(),
+            role: null,
+            accountStatus: null,
+            isSuperAdmin: false,
+          })
+        );
+        window.dispatchEvent(new Event("linkon:session-changed"));
+      } catch {
+        // 로그인 이동은 캐시 저장 실패와 무관하게 계속 진행합니다.
+      }
+
       window.location.assign(redirect);
     } catch (loginError) {
       if (isSupabaseConfigError(loginError)) {

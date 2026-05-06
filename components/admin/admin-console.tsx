@@ -123,13 +123,12 @@ export default function AdminConsole({
       if (statusFilter !== "all") params.set("status", statusFilter);
       if (planFilter !== "all") params.set("plan", planFilter);
 
-      // 사용자 목록과 대시보드 통계를 병렬로 가져옴
-      const [usersData] = await Promise.all([
-        readJson<{ users: AdminUserListItem[] }>(
-          await fetch(`/api/admin/users?${params.toString()}`, { cache: "no-store" })
-        ),
-        loadOverview(),
-      ]);
+      // 사용자 목록과 대시보드 통계를 동시에 요청해 필터/새로고침 대기 시간을 줄입니다.
+      const usersPromise = fetch(`/api/admin/users?${params.toString()}`, {
+        cache: "no-store",
+      }).then((response) => readJson<{ users: AdminUserListItem[] }>(response));
+      const overviewPromise = loadOverview();
+      const [usersData] = await Promise.all([usersPromise, overviewPromise]);
 
       setUsers(usersData.users);
       setDbStatus("connected");

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
+import { linkonEnv } from "@/lib/linkon/env";
 import { createClient } from "@/lib/supabase/server";
-import { ensureCanonicalUserProfile, getBlockedReason } from "@/lib/linkon/users";
+import { getBlockedReason, getCanonicalUserProfile } from "@/lib/linkon/users";
 
 export const dynamic = "force-dynamic";
 
@@ -10,16 +11,21 @@ export async function GET() {
     const {
       data: { user },
     } = await supabase.auth.getUser();
-    const profile = user ? await ensureCanonicalUserProfile(user) : null;
+    const profile = user ? await getCanonicalUserProfile(user.id) : null;
     const blockedReason = profile ? getBlockedReason(profile) : null;
+    const normalizedEmail = user?.email?.trim().toLowerCase() ?? null;
+    const bootstrapSuperAdminEmail = linkonEnv.superAdminEmail();
+    const role =
+      profile?.role ??
+      (normalizedEmail && bootstrapSuperAdminEmail === normalizedEmail ? "super_admin" : null);
 
     return NextResponse.json(
       {
         authenticated: Boolean(user?.email && !blockedReason),
         email: user?.email ?? null,
-        role: profile?.role ?? null,
+        role,
         accountStatus: profile?.account_status ?? null,
-        isSuperAdmin: profile?.role === "super_admin" && !blockedReason,
+        isSuperAdmin: role === "super_admin" && !blockedReason,
         blockedReason,
       },
       {
