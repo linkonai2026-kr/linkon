@@ -399,6 +399,10 @@ export default function AdminConsole({
         </div>
       </section>
 
+      <div className="admin-section-header">
+        <h2 className="admin-section-title">사용자 관리</h2>
+      </div>
+
       <div className="admin-toolbar">
         <input
           className="admin-input"

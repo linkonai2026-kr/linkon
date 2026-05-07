@@ -136,13 +136,18 @@ export default function LoginForm() {
   return (
     <div className="auth-page auth-page--split">
       <aside className="auth-panel">
-        <Image src="/assets/linkon-noback.png" alt="" width={72} height={72} />
+        <Image src="/assets/linkon-noback.png" alt="" width={56} height={56} />
         <p className="lp-kicker">Linkon Account</p>
         <h1>하나의 계정으로 필요한 AI 서비스를 시작하세요.</h1>
         <p>
           Vion, Rion, Taxon을 하나의 Linkon 계정으로 연결합니다. 로그인 후 원하는 서비스로
           자연스럽게 이어집니다.
         </p>
+        <div className="auth-panel__services">
+          <Image src="/assets/vion-noback.png" alt="Vion" width={40} height={40} />
+          <Image src="/assets/rion-noback.png" alt="Rion" width={40} height={40} />
+          <Image src="/assets/taxon-noback.png" alt="Taxon" width={40} height={40} />
+        </div>
       </aside>
 
       <div className="auth-card">
@@ -179,13 +184,19 @@ export default function LoginForm() {
               onChange={(event) => setEmail(event.target.value)}
               required
               autoComplete="email"
+              disabled={loading}
             />
           </div>
 
           <div className="form-group">
-            <label className="form-label" htmlFor="password">
-              비밀번호
-            </label>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "var(--space-2)" }}>
+              <label className="form-label" htmlFor="password" style={{ margin: 0 }}>
+                비밀번호
+              </label>
+              <Link href="/forgot-password" style={{ fontSize: "var(--text-xs)", color: "var(--text-muted)", textDecoration: "none" }}>
+                비밀번호 찾기
+              </Link>
+            </div>
             <input
               id="password"
               type="password"
@@ -195,6 +206,7 @@ export default function LoginForm() {
               onChange={(event) => setPassword(event.target.value)}
               required
               autoComplete="current-password"
+              disabled={loading}
             />
           </div>
 

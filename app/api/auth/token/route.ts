@@ -23,6 +23,10 @@ function getSafeReturnTo(service: ServiceName, returnTo: string | null) {
   return isAllowedServiceReturnTo(service, returnTo) ? returnTo : null;
 }
 
+function isDirectVionHandoff(service: ServiceName) {
+  return service === "vion";
+}
+
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
@@ -70,6 +74,12 @@ export async function GET(request: NextRequest) {
 
     const serviceUrl = getServiceUrl(service);
     if (!serviceUrl) {
+      if (isDirectVionHandoff(service)) {
+        return NextResponse.redirect(
+          `${getAppUrl()}/login?error=service_unavailable`
+        );
+      }
+
       return NextResponse.redirect(
         `${getAppUrl()}/select-service?error=service_unavailable`
       );
@@ -84,22 +94,30 @@ export async function GET(request: NextRequest) {
     }
 
     if (!isServiceDownstreamAuthReady(service)) {
+      if (isDirectVionHandoff(service)) {
+        return NextResponse.redirect(
+          `${getAppUrl()}/login?error=service_setup_required`
+        );
+      }
+
       return NextResponse.redirect(
         `${getAppUrl()}/select-service?error=service_setup_required`
       );
     }
 
-    const syncResult = await syncServiceUserState(
-      service,
-      toServiceSyncPayload(profile, user),
-      user.id,
-      "upsert"
-    );
-
-    if (!syncResult.success) {
-      return NextResponse.redirect(
-        `${getAppUrl()}/select-service?error=service_sync_failed`
+    if (!isDirectVionHandoff(service)) {
+      const syncResult = await syncServiceUserState(
+        service,
+        toServiceSyncPayload(profile, user),
+        user.id,
+        "upsert"
       );
+
+      if (!syncResult.success) {
+        return NextResponse.redirect(
+          `${getAppUrl()}/select-service?error=service_sync_failed`
+        );
+      }
     }
 
     await recordServiceAccess(user.id, service);
@@ -107,6 +125,12 @@ export async function GET(request: NextRequest) {
     const redirectTo = safeReturnTo ?? getDefaultServiceReturnTo(service);
 
     if (!redirectTo) {
+      if (isDirectVionHandoff(service)) {
+        return NextResponse.redirect(
+          `${getAppUrl()}/login?error=service_unavailable`
+        );
+      }
+
       return NextResponse.redirect(
         `${getAppUrl()}/select-service?error=service_unavailable`
       );
@@ -122,6 +146,12 @@ export async function GET(request: NextRequest) {
       });
 
     if (error || !data?.properties?.action_link) {
+      if (isDirectVionHandoff(service)) {
+        return NextResponse.redirect(
+          `${getAppUrl()}/login?error=service_signin_failed`
+        );
+      }
+
       return NextResponse.redirect(
         `${getAppUrl()}/select-service?error=service_signin_failed`
       );
@@ -130,6 +160,16 @@ export async function GET(request: NextRequest) {
     return NextResponse.redirect(data.properties.action_link);
   } catch (error) {
     console.error("[linkon] service token handoff failed:", error);
+
+    const { searchParams } = new URL(request.url);
+    const service = searchParams.get("service");
+
+    if (service === "vion") {
+      return NextResponse.redirect(
+        `${getAppUrl()}/login?error=service_signin_failed`
+      );
+    }
+
     return NextResponse.redirect(
       `${getAppUrl()}/select-service?error=service_signin_failed`
     );

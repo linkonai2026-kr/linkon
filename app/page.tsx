@@ -93,9 +93,15 @@ export default function HomePage() {
               <Link href="/register" className="btn btn--primary btn--lg">
                 통합 계정 만들기
               </Link>
-              <Link href="/login" className="btn btn--outline btn--lg">
-                로그인하기
+              <Link href="/login" className="lp-hero__login-link">
+                로그인하기 →
               </Link>
+            </div>
+
+            <div className="lp-trust-row" aria-label="서비스 특징">
+              <span>무료로 시작</span>
+              <span>가입 2분 소요</span>
+              <span>카드 등록 불필요</span>
             </div>
           </div>
         </section>
@@ -114,7 +120,7 @@ export default function HomePage() {
               {services.map((service) => (
                 <article
                   key={service.key}
-                  className={`service-card lp-service-card lp-service-card--public service-card--${service.color}`}
+                  className={`service-card lp-service-card lp-service-card--public service-card--${service.color} ${service.key === "vion" ? "lp-service-card--live" : "lp-service-card--soon"}`}
                 >
                   <div className="lp-service-card__visual">
                     <Image

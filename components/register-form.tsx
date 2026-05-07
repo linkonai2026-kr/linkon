@@ -190,12 +190,17 @@ export default function RegisterForm() {
   return (
     <div className="auth-page auth-page--split">
       <aside className="auth-panel">
-        <Image src="/assets/linkon-noback.png" alt="" width={72} height={72} />
+        <Image src="/assets/linkon-noback.png" alt="" width={56} height={56} />
         <p className="lp-kicker">통합 계정 만들기</p>
         <h1>가입은 한 번, 이용은 필요한 만큼.</h1>
         <p>
           하나의 계정으로 Vion을 바로 시작하고, Rion과 Taxon은 출시 이후 자연스럽게 이어집니다.
         </p>
+        <div className="auth-panel__services">
+          <Image src="/assets/vion-noback.png" alt="Vion" width={40} height={40} />
+          <Image src="/assets/rion-noback.png" alt="Rion" width={40} height={40} />
+          <Image src="/assets/taxon-noback.png" alt="Taxon" width={40} height={40} />
+        </div>
       </aside>
 
       <div className="auth-card">
