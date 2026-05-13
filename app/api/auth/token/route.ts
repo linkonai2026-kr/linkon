@@ -49,7 +49,14 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const profile = await ensureCanonicalUserProfile(user);
+    // Phase 2 최적화: 서로 독립적인 두 호출을 병렬 처리하여 응답 지연 단축.
+    // ensureCanonicalUserProfile은 사용자 프로필 확인/보정, findServiceAccount는
+    // 서비스 계정 조회로 둘 다 user.id만 필요하며 상호 의존성이 없음.
+    const [profile, existingServiceAccount] = await Promise.all([
+      ensureCanonicalUserProfile(user),
+      findServiceAccount(user.id, service),
+    ]);
+
     const blockedReason = getBlockedReason(profile);
 
     if (blockedReason) {
@@ -58,15 +65,15 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const existingServiceAccount = await findServiceAccount(user.id, service);
-
     if (existingServiceAccount && existingServiceAccount.is_enabled === false) {
       return NextResponse.redirect(
         `${getAppUrl()}/select-service?error=service_disabled`
       );
     }
 
-    await rememberPreferredService(user.id, service);
+    // Phase 2: 선호 서비스 기록은 응답 지연에서 분리 (fire-and-forget).
+    // 실패해도 로그인 흐름은 정상 진행.
+    void rememberPreferredService(user.id, service).catch(() => {});
 
     const serviceUrl = getServiceUrl(service);
     if (!serviceUrl) {
@@ -102,7 +109,8 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    await recordServiceAccess(user.id, service);
+    // Phase 2: 접근 로그 기록은 응답 지연에서 분리 (fire-and-forget).
+    void recordServiceAccess(user.id, service).catch(() => {});
 
     const redirectTo = safeReturnTo ?? getDefaultServiceReturnTo(service);
 

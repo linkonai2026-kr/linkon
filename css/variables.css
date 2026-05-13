@@ -12,8 +12,8 @@
   --text-secondary: #4B4C6A;
   --text-muted:     #9192AD;
   --text-inverse:   #F5F7FF;
-  --text-inverse-soft: rgba(245, 247, 255, 0.78);
-  --text-inverse-muted: rgba(245, 247, 255, 0.56);
+  --text-inverse-soft: rgba(245, 247, 255, 0.82);
+  --text-inverse-muted: rgba(245, 247, 255, 0.66);
 
   /* --- 브랜드 & 프리미엄 골드 --- */
   --gold-primary:   #D4AF37;
@@ -103,6 +103,22 @@
   --text-3xl:  2rem;       /* 32px */
   --text-4xl:  2.75rem;    /* 44px */
   --text-5xl:  3.5rem;     /* 56px */
+
+  /* --- 행간(Line Height) --- */
+  --line-tight:   1.1;
+  --line-snug:    1.15;
+  --line-normal:  1.25;
+  --line-relaxed: 1.6;
+  --line-loose:   1.8;
+
+  /* --- 자간(Letter Spacing) --- */
+  --letter-tighter: -0.04em;
+  --letter-tight:   -0.02em;
+  --letter-normal:  0;
+  --letter-wide:    0.04em;
+  --letter-loose:   0.05em;
+  --letter-wider:   0.08em;
+  --letter-widest:  0.12em;
 
   /* --- 레이아웃 --- */
   --container-max: 1200px;

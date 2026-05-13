@@ -1,14 +1,16 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { isSupabaseConfigError } from "@/lib/supabase/config";
 
 const ERROR_MESSAGES: Record<string, string> = {
   auth_callback_failed: "로그인을 완료하지 못했습니다. 다시 시도해 주세요.",
+  auth_callback_no_code: "로그인 인증 코드가 전달되지 않았어요. Linkon 로그인 화면에서 다시 시작해 주세요.",
+  auth_callback_expired: "로그인 세션이 만료되었어요. 다시 로그인해 주세요.",
   account_suspended: "정지된 계정입니다. Linkon 운영팀에 문의해 주세요.",
   account_deleted: "더 이상 활성화되지 않은 계정입니다. Linkon 운영팀에 문의해 주세요.",
   admin_required: "최고 관리자 권한이 필요한 화면입니다.",
@@ -75,22 +77,37 @@ function buildRegisterHref(service: ServiceName | null, returnTo: string | null)
 }
 
 export default function LoginForm() {
+  const router = useRouter();
   const searchParams = useSearchParams();
   const redirect = getSafeRedirect(searchParams.get("redirect"));
   const service = getSafeService(searchParams.get("service"));
   const returnTo = getServiceReturnTo(searchParams);
   const serviceHandoffPath = service ? buildServiceTokenPath(service, returnTo) : null;
   const registerHref = buildRegisterHref(service, returnTo);
+  const resetSuccess = searchParams.get("reset") === "success";
 
   const [email, setEmail] = useState(searchParams.get("email") ?? "");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(getInitialErrorMessage(searchParams.get("error")));
+  const [authFailed, setAuthFailed] = useState(false);
+
+  // Phase 2: 서비스 핸드오프 경로를 미리 prefetch하여 로그인 후 페이지 도달 지연 감소
+  useEffect(() => {
+    if (serviceHandoffPath) {
+      try {
+        router.prefetch(serviceHandoffPath);
+      } catch {
+        // prefetch 실패는 무시 (실제 로그인 동작에 영향 없음)
+      }
+    }
+  }, [router, serviceHandoffPath]);
 
   const handleLogin = async (event: React.FormEvent) => {
     event.preventDefault();
     setLoading(true);
     setError("");
+    setAuthFailed(false);
 
     try {
       const supabase = createClient();
@@ -100,25 +117,31 @@ export default function LoginForm() {
       });
 
       if (signInError) {
-        setError("이메일 또는 비밀번호가 올바르지 않습니다.");
+        setAuthFailed(true);
+        setError(
+          "이메일 또는 비밀번호가 올바르지 않습니다. 비밀번호가 기억나지 않으시면 아래 '비밀번호를 잊으셨나요?'를 이용해 주세요.",
+        );
         return;
       }
 
-      try {
-        sessionStorage.setItem(
-          "linkon_session_snapshot",
-          JSON.stringify({
-            authenticated: true,
-            email: email.trim().toLowerCase(),
-            role: null,
-            accountStatus: null,
-            isSuperAdmin: false,
-          })
-        );
-        window.dispatchEvent(new Event("linkon:session-changed"));
-      } catch {
-        // Session snapshot is only a client-side convenience cache.
-      }
+      // Phase 2: sessionStorage 쓰기를 마이크로태스크로 옮겨 리다이렉트 블로킹 해소
+      queueMicrotask(() => {
+        try {
+          sessionStorage.setItem(
+            "linkon_session_snapshot",
+            JSON.stringify({
+              authenticated: true,
+              email: email.trim().toLowerCase(),
+              role: null,
+              accountStatus: null,
+              isSuperAdmin: false,
+            }),
+          );
+          window.dispatchEvent(new Event("linkon:session-changed"));
+        } catch {
+          // Session snapshot is only a client-side convenience cache.
+        }
+      });
 
       window.location.assign(redirect ?? serviceHandoffPath ?? "/");
     } catch (loginError) {
@@ -159,9 +182,38 @@ export default function LoginForm() {
         <h2 className="auth-title">로그인</h2>
         <p className="auth-subtitle">Linkon 통합 계정으로 계속 진행합니다.</p>
 
+        {resetSuccess && !error && (
+          <div
+            className="error-box"
+            role="status"
+            style={{
+              background: "var(--color-live-bg)",
+              color: "var(--color-live)",
+              borderLeftColor: "var(--color-live)",
+            }}
+          >
+            비밀번호가 성공적으로 변경되었어요. 새 비밀번호로 로그인해 주세요.
+          </div>
+        )}
+
         {error && (
           <div className="error-box" role="alert">
-            {error}
+            <span>{error}</span>
+            {authFailed && (
+              <>
+                {" "}
+                <Link
+                  href="/forgot-password"
+                  style={{
+                    color: "inherit",
+                    textDecoration: "underline",
+                    fontWeight: 600,
+                  }}
+                >
+                  비밀번호 찾기
+                </Link>
+              </>
+            )}
           </div>
         )}
 
@@ -196,6 +248,15 @@ export default function LoginForm() {
               required
               autoComplete="current-password"
             />
+            <div
+              style={{
+                marginTop: "var(--space-2)",
+                textAlign: "right",
+                fontSize: "var(--text-sm)",
+              }}
+            >
+              <Link href="/forgot-password">비밀번호를 잊으셨나요?</Link>
+            </div>
           </div>
 
           <button

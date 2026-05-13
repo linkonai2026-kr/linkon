@@ -88,7 +88,7 @@ export default function ServicePage({ content }: { content: ServicePageContent }
         ctaLabel={content.navLabel}
       />
 
-      <main className={`sp-page sp-page--${content.accentClass}`}>
+      <main id="main-content" className={`sp-page sp-page--${content.accentClass}`}>
         <section className="sp-hero sp-hero--redesigned">
           <div className="sp-hero__bg">
             <Image

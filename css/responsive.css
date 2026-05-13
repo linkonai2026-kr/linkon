@@ -4,10 +4,12 @@
 @media (max-width: 1024px) {
   .section-title {
     font-size: var(--text-3xl);
+    line-height: 1.28;
   }
 
   .hero__title {
-    font-size: var(--text-4xl);
+    font-size: 3rem;
+    line-height: 1.2;
   }
 
   .about-grid {
@@ -41,11 +43,13 @@
 
   /* 히어로 */
   .hero__title {
-    font-size: var(--text-3xl);
+    font-size: 2.5rem;
+    line-height: 1.2;
   }
 
   .hero__sub {
     font-size: var(--text-base);
+    line-height: 1.7;
   }
 
   .hero__orb--teal {
@@ -169,11 +173,13 @@
   /* 타이포 */
   .hero__eyebrow {
     font-size: var(--text-xs);
+    letter-spacing: var(--letter-loose);
   }
 
   .hero__title {
-    font-size: var(--text-2xl);
-    letter-spacing: -0.01em;
+    font-size: 2rem;
+    letter-spacing: var(--letter-tight);
+    line-height: 1.25;
   }
 
   .hero__sub {
@@ -182,7 +188,8 @@
   }
 
   .section-title {
-    font-size: var(--text-2xl);
+    font-size: 1.5rem;
+    line-height: 1.3;
   }
 
   .hero__content::before {
@@ -365,11 +372,13 @@
 /* ===== VERY SMALL (≤ 360px) ===== */
 @media (max-width: 360px) {
   .hero__title {
-    font-size: var(--text-xl);
+    font-size: 1.5rem;
+    line-height: 1.25;
   }
 
   .section-title {
-    font-size: var(--text-xl);
+    font-size: 1.25rem;
+    line-height: 1.3;
   }
 
   .service-name {

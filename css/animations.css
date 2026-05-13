@@ -118,6 +118,15 @@
     animation: none;
   }
 
+  .service-card:hover,
+  .lp-service-card:hover,
+  .service-select-card:hover,
+  .btn:hover,
+  .teaser-tab:hover,
+  .nav__hamburger:hover {
+    transform: none;
+  }
+
   * {
     transition-duration: 0.01ms !important;
     animation-duration: 0.01ms !important;

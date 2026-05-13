@@ -78,7 +78,7 @@ export default function HomePage() {
         ctaLabel="통합 계정 만들기"
       />
 
-      <main className="lp-page lp-page--public">
+      <main id="main-content" className="lp-page lp-page--public">
         <section className="lp-hero lp-hero--public">
           <div className="lp-hero__centered container">
             <p className="lp-kicker">Linkon AI 서비스</p>
