@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import "@/styles/globals.css";
+import MotionProvider from "@/components/site/motion/motion-provider";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://linkon-xi.vercel.app"),
@@ -48,7 +49,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ko">
-      <body>{children}</body>
+      <body>
+        <a href="#main-content" className="skip-link">
+          본문으로 건너뛰기
+        </a>
+        <MotionProvider>{children}</MotionProvider>
+      </body>
     </html>
   );
 }

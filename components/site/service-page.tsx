@@ -4,7 +4,19 @@ import LaunchNotificationTabs from "@/components/launch-notification-tabs";
 import ServiceLaunchBtn from "@/components/service-launch-btn";
 import SiteFooter from "@/components/site/site-footer";
 import SiteHeader from "@/components/site/site-header";
+import ServiceHeroOrb from "@/components/site/service-hero-orb";
+import ServiceFeaturesGrid from "@/components/site/service-features-grid";
+import ServiceFeatureCard from "@/components/site/service-feature-card";
 import { ServicePageContent } from "@/lib/site/content";
+
+const SERVICE_PALETTE: Record<
+  ServicePageContent["accentClass"],
+  { accent: string; glow: string }
+> = {
+  vion: { accent: "#00C9B1", glow: "rgba(0, 201, 177, 0.32)" },
+  rion: { accent: "#0056A0", glow: "rgba(0, 86, 160, 0.32)" },
+  taxon: { accent: "#DC143C", glow: "rgba(220, 20, 60, 0.32)" },
+};
 
 function FeatureIcon({
   type,
@@ -75,6 +87,7 @@ function FeatureIcon({
 
 export default function ServicePage({ content }: { content: ServicePageContent }) {
   const isLive = content.status === "live";
+  const palette = SERVICE_PALETTE[content.accentClass];
 
   return (
     <>
@@ -88,8 +101,8 @@ export default function ServicePage({ content }: { content: ServicePageContent }
         ctaLabel={content.navLabel}
       />
 
-      <main className={`sp-page sp-page--${content.accentClass}`}>
-        <section className="sp-hero sp-hero--redesigned">
+      <main id="main-content" className={`sp-page sp-page--${content.accentClass}`}>
+        <section className="sp-hero sp-hero--redesigned sp-hero--cinematic">
           <div className="sp-hero__bg">
             <Image
               src={content.backgroundImage}
@@ -101,6 +114,8 @@ export default function ServicePage({ content }: { content: ServicePageContent }
             />
           </div>
           <div className="sp-hero__overlay" style={{ background: content.overlayColor }} />
+          <div className="glow-aura glow-aura--rotating" aria-hidden="true" />
+          <ServiceHeroOrb accent={palette.accent} glow={palette.glow} />
 
           <div className="container sp-hero__content">
             <Link href="/" className="sp-back">
@@ -174,17 +189,17 @@ export default function ServicePage({ content }: { content: ServicePageContent }
               <p className="section-desc">{content.featuresDescription}</p>
             </div>
 
-            <div className="sp-features__grid">
+            <ServiceFeaturesGrid>
               {content.features.map((feature) => (
-                <article key={feature.title} className="sp-feature-card">
+                <ServiceFeatureCard key={feature.title} accent={palette.accent}>
                   <div className="sp-feature-icon">
                     <FeatureIcon type={feature.icon} accentClass={content.accentClass} />
                   </div>
                   <h3 className="sp-feature-title">{feature.title}</h3>
                   <p className="sp-feature-desc">{feature.description}</p>
-                </article>
+                </ServiceFeatureCard>
               ))}
-            </div>
+            </ServiceFeaturesGrid>
           </div>
         </section>
 
@@ -201,7 +216,7 @@ export default function ServicePage({ content }: { content: ServicePageContent }
                     service={content.slug}
                     label={content.ctaPrimaryLabel}
                     loadingLabel="연결 중..."
-                    className={`btn btn--${content.accentClass} btn--lg`}
+                    className={`btn btn--${content.accentClass} btn--lg cta-pulse cta-pulse--${content.accentClass}`}
                   />
                   <Link href="/" className="btn btn--outline btn--lg">
                     {content.ctaSecondaryLabel}

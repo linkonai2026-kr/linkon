@@ -1,5 +1,42 @@
 /* ===== COMPONENTS ===== */
 
+/* ===== SKIP LINK (Accessibility) ===== */
+.skip-link {
+  position: absolute;
+  top: 0;
+  left: 0;
+  padding: 12px 18px;
+  background: var(--linkon-accent);
+  color: #ffffff;
+  font-size: var(--text-sm);
+  font-weight: 700;
+  border-radius: 0 0 var(--radius-md) 0;
+  z-index: 1000;
+  transform: translateY(-110%);
+  transition: transform var(--dur-fast) var(--ease-out);
+  text-decoration: none;
+}
+
+.skip-link:focus,
+.skip-link:focus-visible {
+  transform: translateY(0);
+  outline: 3px solid rgba(123, 97, 255, 0.4);
+  outline-offset: 2px;
+}
+
+/* ===== UNIFIED FOCUS-VISIBLE ===== */
+.btn:focus-visible,
+.nav__link:focus-visible,
+.nav__drawer-link:focus-visible,
+.footer-link:focus-visible,
+.footer-legal-link:focus-visible,
+.lang-btn:focus-visible,
+.nav__hamburger:focus-visible {
+  outline: 2px solid var(--linkon-accent);
+  outline-offset: 3px;
+  border-radius: var(--radius-sm);
+}
+
 /* ===== NAVIGATION ===== */
 .nav {
   position: fixed;
@@ -64,10 +101,11 @@
 .nav__hamburger {
   display: none;
   flex-direction: column;
+  justify-content: center;
   gap: 5px;
-  width: 32px;
-  height: 32px;
-  padding: 6px;
+  width: 44px;
+  height: 44px;
+  padding: 12px;
   border-radius: var(--radius-sm);
   transition: background var(--dur-fast);
   flex-shrink: 0;
@@ -102,7 +140,7 @@
   top: 0;
   right: 0;
   bottom: 0;
-  width: 280px;
+  width: min(320px, 80vw);
   background: var(--bg-primary);
   box-shadow: var(--shadow-xl);
   z-index: 200;
@@ -523,10 +561,11 @@
 
 .notify-form__success {
   margin-top: var(--space-3);
-  font-size: var(--text-sm);
+  font-size: var(--text-base);
   color: var(--color-live);
   min-height: 1.4em;
-  font-weight: 500;
+  font-weight: 600;
+  line-height: 1.6;
   transition: color 200ms ease;
 }
 
@@ -585,11 +624,11 @@
 .lang-btn {
   font-size: 11px;
   font-weight: 700;
-  letter-spacing: 0.08em;
+  letter-spacing: var(--letter-wider);
   color: var(--text-muted);
   background: none;
   border: none;
-  padding: 4px 7px;
+  padding: 8px 10px;
   cursor: pointer;
   transition: color var(--dur-fast);
   border-radius: var(--radius-sm);

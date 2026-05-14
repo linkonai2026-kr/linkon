@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { isSupabaseConfigError } from "@/lib/supabase/config";
+import PasswordChecklist, { isPasswordValid } from "@/components/password-checklist";
 
 type Step = 1 | 2 | 3;
 
@@ -82,7 +83,9 @@ export default function RegisterForm() {
     if (!email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       return "올바른 이메일 주소를 입력해 주세요.";
     }
-    if (password.length < 8) return "비밀번호는 8자 이상이어야 합니다.";
+    if (!isPasswordValid(password)) {
+      return "비밀번호는 8자 이상이며 영문과 숫자를 포함해야 합니다.";
+    }
     if (password !== passwordConfirm) return "비밀번호가 서로 일치하지 않습니다.";
     return "";
   };
@@ -277,13 +280,17 @@ export default function RegisterForm() {
                 id="password"
                 type="password"
                 className="form-input"
-                placeholder="8자 이상 입력해 주세요"
+                placeholder="8자 이상, 영문과 숫자 포함"
                 value={password}
                 onChange={(event) => setPassword(event.target.value)}
                 required
                 minLength={8}
                 autoComplete="new-password"
+                aria-describedby="password-rules"
               />
+              <div id="password-rules">
+                <PasswordChecklist value={password} />
+              </div>
             </div>
 
             <div className="form-group">

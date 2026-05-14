@@ -29,7 +29,7 @@ export default function LegalPage({
         ctaHref="/register"
         ctaLabel="회원가입"
       />
-      <main className="legal-page">
+      <main id="main-content" className="legal-page">
         <div className="legal-wrap">
           <Link href="/" className="legal-back">
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
