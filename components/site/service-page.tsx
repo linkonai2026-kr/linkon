@@ -114,7 +114,7 @@ export default function ServicePage({ content }: { content: ServicePageContent }
             />
           </div>
           <div className="sp-hero__overlay" style={{ background: content.overlayColor }} />
-          <div className="glow-aura glow-aura--rotating" aria-hidden="true" />
+          <div className="glow-aura" aria-hidden="true" />
           <ServiceHeroOrb accent={palette.accent} glow={palette.glow} />
 
           <div className="container sp-hero__content">

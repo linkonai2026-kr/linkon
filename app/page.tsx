@@ -6,9 +6,7 @@ import ServiceLaunchBtn from "@/components/service-launch-btn";
 import SiteFooter from "@/components/site/site-footer";
 import SiteHeader from "@/components/site/site-header";
 import HomeHero from "@/components/site/home-hero";
-import HomeServicesStage from "@/components/site/home-services-stage";
 import HomeTrustStory from "@/components/site/home-trust-story";
-import HomeLaunchParallax from "@/components/site/home-launch-parallax";
 
 export const metadata: Metadata = {
   title: "Linkon | 일상에 필요한 AI 서비스를 연결하는 브랜드",
@@ -86,83 +84,81 @@ export default function HomePage() {
         <HomeHero />
 
         <section className="section lp-services" id="services">
-          <HomeServicesStage>
-            <div className="container">
-              <div className="section-header">
-                <p className="section-label">서비스 소개</p>
-                <h2 className="section-title">지금 필요한 AI를 선택하세요</h2>
-                <p className="section-desc">
-                  각 서비스는 전문 영역에 집중하고, 사용자는 Linkon 계정 하나로 편하게 시작합니다.
-                </p>
-              </div>
-
-              <div className="services-grid lp-services-grid">
-                {services.map((service) => (
-                  <article
-                    key={service.key}
-                    className={`service-card lp-service-card lp-service-card--public service-card--${service.color} brand-shimmer`}
-                  >
-                    <div className="lp-service-card__visual">
-                      <Image
-                        src={service.logo}
-                        alt=""
-                        aria-hidden
-                        width={80}
-                        height={80}
-                        className="lp-service-card__icon"
-                      />
-                    </div>
-
-                    <div className="card-header">
-                      <span
-                        className={`status-badge ${
-                          service.key === "vion" ? "status-badge--live" : "status-badge--soon"
-                        }`}
-                      >
-                        {service.status}
-                      </span>
-                    </div>
-
-                    <div className="card-body">
-                      <h3 className="service-name">{service.name}</h3>
-                      <p className="service-tagline">{service.label}</p>
-                      <p className="service-desc">{service.description}</p>
-                    </div>
-
-                    <div className="card-footer">
-                      <Link href={service.href} className="btn btn--outline btn--full">
-                        자세히 보기
-                      </Link>
-                      {service.key === "vion" ? (
-                        <ServiceLaunchBtn
-                          service="vion"
-                          label={service.actionLabel}
-                          href="https://vion-sandy.vercel.app/"
-                          loadingLabel="연결 중..."
-                          className="btn btn--vion btn--full"
-                          style={{ marginTop: "var(--space-2)" }}
-                        />
-                      ) : (
-                        <Link
-                          href="#launch"
-                          className={`btn btn--${service.color} btn--full`}
-                          style={{ marginTop: "var(--space-2)" }}
-                        >
-                          {service.actionLabel}
-                        </Link>
-                      )}
-                    </div>
-                  </article>
-                ))}
-              </div>
+          <div className="container">
+            <div className="section-header">
+              <p className="section-label">서비스 소개</p>
+              <h2 className="section-title">지금 필요한 AI를 선택하세요</h2>
+              <p className="section-desc">
+                각 서비스는 전문 영역에 집중하고, 사용자는 Linkon 계정 하나로 편하게 시작합니다.
+              </p>
             </div>
-          </HomeServicesStage>
+
+            <div className="services-grid lp-services-grid">
+              {services.map((service) => (
+                <article
+                  key={service.key}
+                  className={`service-card lp-service-card lp-service-card--public service-card--${service.color} brand-shimmer`}
+                >
+                  <div className="lp-service-card__visual">
+                    <Image
+                      src={service.logo}
+                      alt=""
+                      aria-hidden
+                      width={80}
+                      height={80}
+                      className="lp-service-card__icon"
+                    />
+                  </div>
+
+                  <div className="card-header">
+                    <span
+                      className={`status-badge ${
+                        service.key === "vion" ? "status-badge--live" : "status-badge--soon"
+                      }`}
+                    >
+                      {service.status}
+                    </span>
+                  </div>
+
+                  <div className="card-body">
+                    <h3 className="service-name">{service.name}</h3>
+                    <p className="service-tagline">{service.label}</p>
+                    <p className="service-desc">{service.description}</p>
+                  </div>
+
+                  <div className="card-footer">
+                    <Link href={service.href} className="btn btn--outline btn--full">
+                      자세히 보기
+                    </Link>
+                    {service.key === "vion" ? (
+                      <ServiceLaunchBtn
+                        service="vion"
+                        label={service.actionLabel}
+                        href="https://vion-sandy.vercel.app/"
+                        loadingLabel="연결 중..."
+                        className="btn btn--vion btn--full"
+                        style={{ marginTop: "var(--space-2)" }}
+                      />
+                    ) : (
+                      <Link
+                        href="#launch"
+                        className={`btn btn--${service.color} btn--full`}
+                        style={{ marginTop: "var(--space-2)" }}
+                      >
+                        {service.actionLabel}
+                      </Link>
+                    )}
+                  </div>
+                </article>
+              ))}
+            </div>
+          </div>
         </section>
 
         <HomeTrustStory />
 
         <section className="section teaser-section lp-launch-section" id="launch">
-          <HomeLaunchParallax />
+          <div className="glow-aura" aria-hidden="true" />
           <div className="container" style={{ position: "relative", zIndex: 1 }}>
             <div className="section-header">
               <p className="section-label">출시 예정</p>

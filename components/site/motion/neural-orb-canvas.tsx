@@ -21,7 +21,7 @@ type Node = {
   vx: number;
   vy: number;
   size: number;
-  hue: number; // 0~1 — 색 변형 (mode=branch 일 때 3색 분기)
+  hue: number;
 };
 
 const PALETTE = {
@@ -53,8 +53,11 @@ function parseAccent(value: string): { r: number; g: number; b: number } {
  *
  * 성능 가드:
  *  - DPR 캡 1.5
- *  - 60fps 미달 3프레임 연속 시 노드 수 50% 감소
+ *  - 60fps 미달 24프레임 연속 시 노드 수 50% 감소
  *  - document.hidden 시 일시정지
+ *  - IntersectionObserver: viewport 밖이면 RAF 그리기 중단 (2026-05-14)
+ *  - 링크 색 32-bin 양자화 캐시 — rgba() 템플릿 매 프레임 생성 회피
+ *  - 링크 거리 조기 종료: dx/dy 단축 → d² 비교
  *
  * 접근성:
  *  - aria-hidden + role="presentation"
@@ -87,6 +90,15 @@ export default function NeuralOrbCanvas({
 
     const nodes: Node[] = [];
     const linkDistance = 140;
+    const linkDistSq = linkDistance * linkDistance;
+
+    // 링크 색 32-bin 양자화 캐시 — 알파만 변하므로 32개 문자열로 충분.
+    const LINK_BINS = 32;
+    const linkColorCache: string[] = new Array(LINK_BINS);
+    for (let bin = 0; bin < LINK_BINS; bin++) {
+      const a = (bin / (LINK_BINS - 1)) * 0.45;
+      linkColorCache[bin] = `rgba(${accentRgb.r}, ${accentRgb.g}, ${accentRgb.b}, ${a.toFixed(3)})`;
+    }
 
     function resize() {
       if (!canvas) return;
@@ -129,8 +141,8 @@ export default function NeuralOrbCanvas({
       pointer.active = false;
     }
 
-    canvas.addEventListener("pointermove", onPointerMove);
-    canvas.addEventListener("pointerleave", onPointerLeave);
+    canvas.addEventListener("pointermove", onPointerMove, { passive: true });
+    canvas.addEventListener("pointerleave", onPointerLeave, { passive: true });
 
     const ro = new ResizeObserver(() => {
       resize();
@@ -138,13 +150,26 @@ export default function NeuralOrbCanvas({
     });
     ro.observe(canvas);
 
+    // IntersectionObserver — viewport 밖이면 RAF 그리기 중단 (CPU/GPU 부담 0).
+    let isVisible = true;
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          isVisible = entry.isIntersecting;
+        }
+      },
+      { rootMargin: "100px" },
+    );
+    io.observe(canvas);
+
     let raf = 0;
     let slowFrames = 0;
     let lastT = performance.now();
     let degraded = false;
 
     function tick(now: number) {
-      if (document.hidden) {
+      // 백그라운드 탭 또는 viewport 밖이면 그리지 않고 다음 프레임 예약만
+      if (document.hidden || !isVisible) {
         raf = requestAnimationFrame(tick);
         lastT = now;
         return;
@@ -182,13 +207,11 @@ export default function NeuralOrbCanvas({
         const n = nodes[i];
 
         if (mode === "merge") {
-          // 중심으로 약하게 끌림
           const dx = width / 2 - n.x;
           const dy = height / 2 - n.y;
           n.vx += dx * 0.0009;
           n.vy += dy * 0.0009;
         } else if (mode === "branch") {
-          // 3개 클러스터 중심으로 분기
           const targetIdx = Math.floor(n.hue * 3);
           const angle = (targetIdx / 3) * Math.PI * 2;
           const cx = width / 2 + Math.cos(angle) * width * 0.18;
@@ -212,13 +235,11 @@ export default function NeuralOrbCanvas({
         n.x += n.vx * (dt / 16);
         n.y += n.vy * (dt / 16);
 
-        // 경계 반사
         if (n.x < 0 || n.x > width) n.vx *= -1;
         if (n.y < 0 || n.y > height) n.vy *= -1;
         n.x = Math.max(0, Math.min(width, n.x));
         n.y = Math.max(0, Math.min(height, n.y));
 
-        // 노드 색
         let r = accentRgb.r;
         let g = accentRgb.g;
         let b = accentRgb.b;
@@ -236,23 +257,25 @@ export default function NeuralOrbCanvas({
         ctx.fill();
       }
 
-      // 노드 연결선
+      // 노드 연결선 — dx/dy 조기 종료 + d² 비교 + 색 양자화 캐시 lookup
+      ctx.lineWidth = 0.7;
       for (let i = 0; i < nodes.length; i++) {
         const a = nodes[i];
         for (let j = i + 1; j < nodes.length; j++) {
           const b = nodes[j];
           const dx = a.x - b.x;
+          if (dx > linkDistance || dx < -linkDistance) continue;
           const dy = a.y - b.y;
+          if (dy > linkDistance || dy < -linkDistance) continue;
           const d2 = dx * dx + dy * dy;
-          if (d2 < linkDistance * linkDistance) {
-            const alpha = (1 - Math.sqrt(d2) / linkDistance) * 0.45;
-            ctx.beginPath();
-            ctx.strokeStyle = `rgba(${accentRgb.r}, ${accentRgb.g}, ${accentRgb.b}, ${alpha})`;
-            ctx.lineWidth = 0.7;
-            ctx.moveTo(a.x, a.y);
-            ctx.lineTo(b.x, b.y);
-            ctx.stroke();
-          }
+          if (d2 >= linkDistSq) continue;
+          const t = 1 - Math.sqrt(d2) / linkDistance;
+          const bin = Math.min(LINK_BINS - 1, Math.max(0, Math.floor(t * (LINK_BINS - 1))));
+          ctx.beginPath();
+          ctx.strokeStyle = linkColorCache[bin];
+          ctx.moveTo(a.x, a.y);
+          ctx.lineTo(b.x, b.y);
+          ctx.stroke();
         }
       }
 
@@ -266,6 +289,7 @@ export default function NeuralOrbCanvas({
       canvas.removeEventListener("pointermove", onPointerMove);
       canvas.removeEventListener("pointerleave", onPointerLeave);
       ro.disconnect();
+      io.disconnect();
     };
   }, [accent, glow, maxNodes, mode, isDesktop]);
 
