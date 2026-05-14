@@ -123,4 +123,22 @@
   /* --- 레이아웃 --- */
   --container-max: 1200px;
   --nav-height: 68px;
+
+  /* --- 모션 / 광택(2026 인터랙티브 리디자인) --- */
+  /* 스테이지 컬러 변수: ScrollColorStage 가 JS 에서 보간해 주입한다. 초기값은 Linkon 보라. */
+  --stage-accent: #7B61FF;
+  --stage-glow:   rgba(123, 97, 255, 0.28);
+
+  /* 강한 글로우 — hero/CTA 박동용 */
+  --glow-strong:  0 0 60px rgba(123, 97, 255, 0.35),
+                  0 0 120px rgba(123, 97, 255, 0.18);
+  --glow-vion:    0 0 50px rgba(0, 201, 177, 0.35);
+  --glow-rion:    0 0 50px rgba(0, 86, 160, 0.35);
+  --glow-taxon:   0 0 50px rgba(220, 20, 60, 0.35);
+
+  /* AI 시그니처 그라데이션 — hero 배경 광원 */
+  --gradient-ai:
+    radial-gradient(circle at 20% 30%, rgba(123, 97, 255, 0.22), transparent 55%),
+    radial-gradient(circle at 80% 65%, rgba(0, 201, 177, 0.18), transparent 60%),
+    radial-gradient(circle at 50% 90%, rgba(212, 175, 55, 0.12), transparent 65%);
 }
