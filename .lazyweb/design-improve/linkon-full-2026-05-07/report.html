@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Design Improvement — Linkon Full System</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+    background: #f6f3ea;
+    color: #111118;
+    line-height: 1.6;
+    padding: 48px 24px 96px;
+  }
+  .wrap {
+    max-width: 900px;
+    margin: 0 auto;
+  }
+  .tag {
+    display: inline-block;
+    background: rgba(123, 97, 255, 0.12);
+    color: #5b41d6;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 5px 10px;
+    border-radius: 999px;
+    margin-bottom: 20px;
+  }
+  h1 {
+    font-size: clamp(1.8rem, 4vw, 2.6rem);
+    font-weight: 900;
+    letter-spacing: -0.04em;
+    line-height: 1.15;
+    margin-bottom: 8px;
+  }
+  .meta {
+    color: #7c7d9a;
+    font-size: 13px;
+    margin-bottom: 40px;
+  }
+  .tldr {
+    background: linear-gradient(135deg, rgba(123,97,255,0.08), rgba(0,201,177,0.06));
+    border: 1px solid rgba(123,97,255,0.15);
+    border-radius: 20px;
+    padding: 28px 32px;
+    margin-bottom: 48px;
+  }
+  .tldr h2 {
+    font-size: 11px;
+    font-weight: 900;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #7B61FF;
+    margin-bottom: 12px;
+  }
+  .tldr p {
+    font-size: 1.1rem;
+    line-height: 1.7;
+    color: #2d2e4a;
+  }
+  .improvements {
+    display: grid;
+    gap: 24px;
+  }
+  .card {
+    background: rgba(255,255,255,0.88);
+    border: 1px solid rgba(20,27,48,0.08);
+    border-radius: 24px;
+    padding: 28px 32px;
+    box-shadow: 0 4px 16px rgba(20,27,48,0.05);
+  }
+  .card-top {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+  .priority-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    font-size: 11px;
+    font-weight: 900;
+    flex-shrink: 0;
+  }
+  .priority-high { background: rgba(220,20,60,0.12); color: #b11638; }
+  .priority-medium { background: rgba(234,179,8,0.15); color: #a16207; }
+  .priority-low { background: rgba(22,163,74,0.12); color: #0f8d40; }
+  .card h3 {
+    font-size: 1.05rem;
+    font-weight: 900;
+    letter-spacing: -0.02em;
+  }
+  .card p { color: #4B4C6A; line-height: 1.75; margin-bottom: 12px; }
+  .card p:last-child { margin-bottom: 0; }
+  .files {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 14px;
+  }
+  .file-chip {
+    background: rgba(20,27,48,0.06);
+    color: #4B4C6A;
+    font-size: 11px;
+    font-family: 'Menlo', 'Consolas', monospace;
+    padding: 4px 9px;
+    border-radius: 6px;
+  }
+  pre {
+    background: rgba(17,17,24,0.05);
+    border: 1px solid rgba(20,27,48,0.08);
+    border-radius: 12px;
+    padding: 16px 18px;
+    font-size: 12px;
+    font-family: 'Menlo', 'Consolas', monospace;
+    overflow-x: auto;
+    margin: 14px 0;
+    color: #2d2e4a;
+    line-height: 1.6;
+    white-space: pre;
+  }
+  .divider {
+    border: none;
+    border-top: 1px solid rgba(20,27,48,0.08);
+    margin: 48px 0;
+  }
+  .working {
+    background: rgba(22,163,74,0.06);
+    border: 1px solid rgba(22,163,74,0.15);
+    border-radius: 20px;
+    padding: 24px 28px;
+  }
+  .working h2 {
+    font-size: 11px;
+    font-weight: 900;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #0f8d40;
+    margin-bottom: 14px;
+  }
+  .working ul {
+    list-style: none;
+    display: grid;
+    gap: 8px;
+  }
+  .working li {
+    color: #2d4a2e;
+    padding-left: 20px;
+    position: relative;
+    font-size: 0.95rem;
+  }
+  .working li::before {
+    content: '✓';
+    position: absolute;
+    left: 0;
+    color: #16a34a;
+    font-weight: 900;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <span class="tag">Design Improve</span>
+  <h1>Linkon 전체 시스템 디자인 개선</h1>
+  <p class="meta">2026-05-07 · 코드 분석 기반 · 홈 / 로그인·회원가입 / 서비스 페이지 / 어드민</p>
+
+  <div class="tldr">
+    <h2>TL;DR — 핵심 개선</h2>
+    <p>가장 큰 기회는 <strong>숨겨진 auth 패널 복원</strong>이었습니다 — 브랜드 콘텐츠가 DOM에 존재했지만 <code>display: none</code>으로 숨겨져 있었습니다. 이를 복원하면 로그인/회원가입 페이지가 일반적인 폼에서 브랜드 경험으로 바뀝니다. 두 번째로 큰 문제는 <strong>홈 페이지의 서비스 카드 시각적 위계</strong>로, Vion(이용 가능)과 출시 예정 카드가 동일한 시각적 무게를 갖고 있어 우선순위 신호가 모호했습니다.</p>
+  </div>
+
+  <div class="improvements">
+    <div class="card">
+      <div class="card-top">
+        <span class="priority-badge priority-high">1</span>
+        <h3>Auth 패널 데스크톱에서 복원 ⭐</h3>
+      </div>
+      <p>로그인·회원가입 페이지의 분할 레이아웃이 이제 ≥1100px에서 동작합니다. 왼쪽 패널에 Linkon 로고, 브랜드 문구, Vion/Rion/Taxon 로고 행이 표시됩니다. 배경도 브랜드 색상(#f8f6ff → #f6f3ea)에 맞게 조정했습니다.</p>
+      <pre>┌─────────────────────┬─────────────────────┐
+│ [Linkon logo]       │   [Linkon wordmark]  │
+│ LINKON ACCOUNT      │                      │
+│                     │  로그인              │
+│ 하나의 계정으로     │  이메일 [_________]  │
+│ 필요한 AI 서비스를  │  비밀번호[_________] │
+│ 시작하세요.         │    비밀번호 찾기 →   │
+│                     │  [로그인]            │
+│ [Vion][Rion][Taxon] │  계정 만들기 →       │
+│                     │                      │
+│  Dark tinted panel  │   White card         │
+└─────────────────────┴─────────────────────┘</pre>
+      <div class="files">
+        <span class="file-chip">styles/globals.css</span>
+        <span class="file-chip">components/login-form.tsx</span>
+        <span class="file-chip">components/register-form.tsx</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-top">
+        <span class="priority-badge priority-high">2</span>
+        <h3>서비스 카드 시각적 위계 — Live vs 출시 예정 ⭐</h3>
+      </div>
+      <p>Vion 카드에 <code>lp-service-card--live</code> 클래스(teal 테두리 + 높은 그림자)를 적용하고, Rion·Taxon에 <code>lp-service-card--soon</code>(아이콘 50% 불투명도, CTA 영역 72% 불투명도)을 적용했습니다.</p>
+      <pre>┌──────────────────┐  ┌──────────────────┐  ┌──────────────────┐
+│ ████ VION  ●LIVE │  │ ░░░░ RION        │  │ ░░░░ TAXON       │
+│  Teal border+    │  │  Muted icon      │  │  Muted icon      │
+│  elevated shadow │  │  Dim CTA         │  │  Dim CTA         │
+└──────────────────┘  └──────────────────┘  └──────────────────┘</pre>
+      <div class="files">
+        <span class="file-chip">styles/globals.css</span>
+        <span class="file-chip">app/page.tsx</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-top">
+        <span class="priority-badge priority-high">3</span>
+        <h3>히어로 CTA 위계 개선</h3>
+      </div>
+      <p>두 번째 버튼(로그인하기)을 <code>btn--outline btn--lg</code>에서 텍스트 링크로 변경해 기본 액션인 "통합 계정 만들기"가 명확히 우선시되도록 했습니다.</p>
+      <pre>Before:  [ 통합 계정 만들기 ]   [ 로그인하기 ]
+After:   [ 통합 계정 만들기 ]   로그인하기 →</pre>
+      <div class="files">
+        <span class="file-chip">app/page.tsx</span>
+        <span class="file-chip">styles/globals.css</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-top">
+        <span class="priority-badge priority-medium">4</span>
+        <h3>히어로 신뢰 칩 추가</h3>
+      </div>
+      <p>히어로 CTA 아래에 <code>.lp-trust-row</code> 칩을 추가했습니다 (이 CSS 컴포넌트는 이미 존재했지만 이 페이지에서 사용되지 않았습니다).</p>
+      <pre>[ 통합 계정 만들기 ]   로그인하기 →
+
+  • 무료로 시작   • 가입 2분 소요   • 카드 등록 불필요</pre>
+      <div class="files">
+        <span class="file-chip">app/page.tsx</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-top">
+        <span class="priority-badge priority-medium">5</span>
+        <h3>로그인 폼 — 비밀번호 찾기 링크</h3>
+      </div>
+      <p>비밀번호 필드 레이블 오른쪽에 "비밀번호 찾기" 링크를 추가했습니다. 비밀번호를 잊은 사용자가 복구 경로를 바로 확인할 수 있습니다 (<code>/forgot-password</code> 라우트 구현 필요).</p>
+      <div class="files">
+        <span class="file-chip">components/login-form.tsx</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-top">
+        <span class="priority-badge priority-medium">6</span>
+        <h3>로그인 제출 중 입력 비활성화</h3>
+      </div>
+      <p>로그인 중에 이메일·비밀번호 입력 필드에 <code>disabled={loading}</code>을 추가해 제출 중 혼란스러운 상태를 방지합니다.</p>
+      <div class="files">
+        <span class="file-chip">components/login-form.tsx</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-top">
+        <span class="priority-badge priority-medium">7</span>
+        <h3>어드민 배경 그라디언트 — 따뜻/차가운 색상 불일치 수정</h3>
+      </div>
+      <p><code>#f6f3ea</code>(따뜻한 톤 시작) → <code>#f4f6fc</code>(시원한 블루-그레이)로 변경해 어드민 셸의 전문적인 맥락에 맞게 일관된 색조를 유지합니다.</p>
+      <div class="files">
+        <span class="file-chip">styles/globals.css</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-top">
+        <span class="priority-badge priority-medium">8</span>
+        <h3>어드민 통계 카드 숫자 크기 조정</h3>
+      </div>
+      <p>4개 통계 카드의 숫자 폰트를 44px(<code>text-4xl</code>)에서 32px(<code>text-3xl</code>)로 줄였습니다. 숫자 우선성은 유지하면서 시각적 여백이 개선됩니다.</p>
+      <div class="files">
+        <span class="file-chip">styles/globals.css</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-top">
+        <span class="priority-badge priority-medium">9</span>
+        <h3>어드민 사이드바 너비 + 이메일 말줄임표</h3>
+      </div>
+      <p>사이드바를 고정 360px에서 <code>clamp(360px, 32%, 460px)</code>로 확장하고, 사용자 행의 이메일에 <code>text-overflow: ellipsis</code>를 적용해 긴 한국어 이메일 주소가 잘리지 않게 했습니다.</p>
+      <div class="files">
+        <span class="file-chip">styles/globals.css</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-top">
+        <span class="priority-badge priority-low">10</span>
+        <h3>어드민 "사용자 관리" 섹션 구분선</h3>
+      </div>
+      <p>통계 개요 섹션과 사용자 관리 툴바·그리드 사이에 섹션 헤더와 경계선을 추가해 두 영역이 시각적으로 명확히 구분됩니다.</p>
+      <div class="files">
+        <span class="file-chip">components/admin/admin-console.tsx</span>
+        <span class="file-chip">styles/globals.css</span>
+      </div>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <div class="working">
+    <h2>유지된 좋은 패턴</h2>
+    <ul>
+      <li>디자인 토큰 시스템 (variables.css) — 시맨틱 명명, 8px 베이스</li>
+      <li>서비스 색상 팔레트 — Vion 틸 / Rion 블루 / Taxon 크림슨, 구별 명확</li>
+      <li>카드 테두리 반경 시스템 — 28-36px, 프리미엄하고 일관적</li>
+      <li>모바일 햄버거 드로어 — aria-expanded, 오버레이 포함, 잘 구현됨</li>
+      <li>출시 알림 탭 UI — 탭 전환 패턴 우수</li>
+      <li>인증 폼 에러 처리 — 포괄적인 에러 메시지 맵</li>
+      <li>애니메이션 변수 — ease-out/spring, 부드러운 호버 전환</li>
+    </ul>
+  </div>
+</div>
+</body>
+</html>

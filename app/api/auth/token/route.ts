@@ -145,7 +145,7 @@ export async function GET(request: NextRequest) {
         options: { redirectTo },
       });
 
-    if (error || !data?.properties?.action_link) {
+    if (error || !data?.properties?.hashed_token) {
       if (isDirectVionHandoff(service)) {
         return NextResponse.redirect(
           `${getAppUrl()}/login?error=service_signin_failed`
@@ -157,7 +157,16 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    return NextResponse.redirect(data.properties.action_link);
+    // Build the service callback URL with token_hash + type so the downstream
+    // (SSR) app can call supabase.auth.verifyOtp({ token_hash, type }) directly.
+    // Going through Supabase's /auth/v1/verify endpoint returns the session in
+    // the URL fragment (#access_token=...), which a server route cannot read —
+    // that path breaks SSR callbacks like Vion's /auth/callback.
+    const callbackUrl = new URL(redirectTo);
+    callbackUrl.searchParams.set("token_hash", data.properties.hashed_token);
+    callbackUrl.searchParams.set("type", "magiclink");
+
+    return NextResponse.redirect(callbackUrl.toString());
   } catch (error) {
     console.error("[linkon] service token handoff failed:", error);
 
