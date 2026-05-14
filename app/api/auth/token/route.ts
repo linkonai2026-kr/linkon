@@ -53,7 +53,15 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const profile = await ensureCanonicalUserProfile(user);
+    // user.id 만 의존하는 작업들과 profile 조회를 병렬화하여 round trip을 단축.
+    // rememberPreferredService 의 반환값은 사용하지 않으나, 같은 Promise.all 묶음에서
+    // 에러가 발생하면 전체가 reject 되어 기존 동작과 동일하게 catch 블록으로 떨어진다.
+    const [profile, existingServiceAccount] = await Promise.all([
+      ensureCanonicalUserProfile(user),
+      findServiceAccount(user.id, service),
+      rememberPreferredService(user.id, service),
+    ]);
+
     const blockedReason = getBlockedReason(profile);
 
     if (blockedReason) {
@@ -62,15 +70,11 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const existingServiceAccount = await findServiceAccount(user.id, service);
-
     if (existingServiceAccount && existingServiceAccount.is_enabled === false) {
       return NextResponse.redirect(
         `${getAppUrl()}/select-service?error=service_disabled`
       );
     }
-
-    await rememberPreferredService(user.id, service);
 
     const serviceUrl = getServiceUrl(service);
     if (!serviceUrl) {
@@ -120,7 +124,9 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    await recordServiceAccess(user.id, service);
+    // 위에서 이미 조회한 existingServiceAccount 를 hint 로 전달하여
+    // recordServiceAccess 내부의 findServiceAccount 호출을 생략.
+    await recordServiceAccess(user.id, service, existingServiceAccount);
 
     const redirectTo = safeReturnTo ?? getDefaultServiceReturnTo(service);
 

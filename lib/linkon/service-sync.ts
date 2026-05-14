@@ -327,9 +327,18 @@ export async function syncAllServices(
   return outcomes;
 }
 
-export async function recordServiceAccess(linkonUid: string, service: ServiceName) {
+export async function recordServiceAccess(
+  linkonUid: string,
+  service: ServiceName,
+  existingHint?: ServiceAccountRecord | null,
+) {
   const admin = getLinkonAdmin();
-  const existingAccount = await findServiceAccount(linkonUid, service);
+  // caller가 이미 조회한 결과를 재사용할 수 있도록 hint 인자를 받음.
+  // hint 가 undefined 이면 기존처럼 한 번 조회.
+  const existingAccount =
+    existingHint !== undefined
+      ? existingHint
+      : await findServiceAccount(linkonUid, service);
   const now = new Date().toISOString();
   const nextUsageCount = (existingAccount?.usage_count ?? 0) + 1;
 
@@ -355,27 +364,33 @@ export async function recordServiceAccess(linkonUid: string, service: ServiceNam
     throw new Error(`Failed to record ${service} access: ${accountError.message}`);
   }
 
-  const { data: serviceRows, error: serviceRowsError } = await admin
-    .from("service_accounts")
-    .select("service, usage_count")
-    .eq("linkon_uid", linkonUid)
-    .order("usage_count", { ascending: false })
-    .limit(1);
+  // most_used 계산용 service_accounts 조회와 primary_service 확인용 users 조회는
+  // 서로 독립적이므로 병렬 실행하여 round trip 1회분 단축.
+  const [serviceRowsRes, profileRes] = await Promise.all([
+    admin
+      .from("service_accounts")
+      .select("service, usage_count")
+      .eq("linkon_uid", linkonUid)
+      .order("usage_count", { ascending: false })
+      .limit(1),
+    admin
+      .from("users")
+      .select("primary_service")
+      .eq("id", linkonUid)
+      .maybeSingle(),
+  ]);
 
-  if (serviceRowsError) {
-    throw new Error(`Failed to calculate most used service: ${serviceRowsError.message}`);
+  if (serviceRowsRes.error) {
+    throw new Error(`Failed to calculate most used service: ${serviceRowsRes.error.message}`);
   }
+
+  const serviceRows = serviceRowsRes.data;
+  const profile = profileRes.data;
 
   const mostUsedService =
     serviceRows?.[0] && typeof serviceRows[0].service === "string"
       ? serviceRows[0].service
       : service;
-
-  const { data: profile } = await admin
-    .from("users")
-    .select("primary_service")
-    .eq("id", linkonUid)
-    .maybeSingle();
 
   const { error: userError } = await admin
     .from("users")
